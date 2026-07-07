@@ -57,6 +57,28 @@ body {
   display: inline-block;
   animation: fadeUp 0.8s ease both;
 }
+/* 白鳥さんのヘッダー画像 */
+.hero-art {
+  position: relative;
+  width: min(92%, 620px);
+  margin: 0 auto 36px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(212,135,154,0.25);
+  animation: fadeUp 0.9s 0.15s ease both;
+}
+.hero-art img {
+  width: 100%;
+  display: block;
+}
+/* 半透明の白ベール（色をふわっと薄く見せる） */
+.hero-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(253,248,242,0.32);
+  pointer-events: none;
+}
 .hero h1 {
   font-size: clamp(2rem, 6vw, 3.8rem);
   font-weight: 500;
@@ -216,6 +238,9 @@ footer .footer-name {
 <!-- HERO -->
 <section class="hero">
   <div class="hero-badge">MORITTO OFFICIAL</div>
+  <div class="hero-art">
+    <img src="moritto-header.png" alt="moritto - ハートを作る2羽の白鳥">
+  </div>
   <h1>モリット</h1>
   <p class="hero-sub">恋愛コーチ・作家｜ホントの自分で、なぜか？愛される。</p>
   <div class="gold-line"></div>
