@@ -57,28 +57,6 @@ body {
   display: inline-block;
   animation: fadeUp 0.8s ease both;
 }
-/* 白鳥さんのヘッダー画像 */
-.hero-art {
-  position: relative;
-  width: min(92%, 620px);
-  margin: 0 auto 36px;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 16px 48px rgba(212,135,154,0.25);
-  animation: fadeUp 0.9s 0.15s ease both;
-}
-.hero-art img {
-  width: 100%;
-  display: block;
-}
-/* 半透明の白ベール（色をふわっと薄く見せる） */
-.hero-art::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(253,248,242,0.32);
-  pointer-events: none;
-}
 .hero h1 {
   font-size: clamp(2rem, 6vw, 3.8rem);
   font-weight: 500;
@@ -238,9 +216,6 @@ footer .footer-name {
 <!-- HERO -->
 <section class="hero">
   <div class="hero-badge">MORITTO OFFICIAL</div>
-  <div class="hero-art">
-    <img src="moritto-header.png" alt="moritto - ハートを作る2羽の白鳥">
-  </div>
   <h1>モリット</h1>
   <p class="hero-sub">恋愛コーチ・作家｜ホントの自分で、なぜか？愛される。</p>
   <div class="gold-line"></div>
@@ -249,7 +224,7 @@ footer .footer-name {
 <!-- NAV CARDS -->
 <section class="nav-section">
   <div class="nav-grid">
-    <a class="nav-card" href="#">
+    <a class="nav-card" href="renaibu_allinone.html">
       <span class="nav-card-icon">💌</span>
       <div class="nav-card-title">恋愛部</div>
       <div class="nav-card-desc">みっこと一緒に愛され体質を育てるコミュニティ</div>
@@ -259,7 +234,7 @@ footer .footer-name {
       <div class="nav-card-title">恋愛講座</div>
       <div class="nav-card-desc">潜在意識から恋愛を変える本格講座</div>
     </a>
-    <a class="nav-card" href="#">
+    <a class="nav-card" href="session_allinone_v3.html">
       <span class="nav-card-icon">💎</span>
       <div class="nav-card-title">個別コーチング</div>
       <div class="nav-card-desc">あなただけの恋愛サポート</div>
