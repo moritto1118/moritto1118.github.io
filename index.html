@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>モリット | 恋愛コーチ・作家</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #FDF4E3;
+  --cream-deep: #F8E8CC;
+  --green: #8FA84E;
+  --green-deep: #6E8B3D;
+  --orange: #F49B33;
+  --yellow: #F4C542;
+  --red: #E85D4A;
+  --pink: #F0A3B0;
+  --pink-deep: #E4798E;
+  --navy: #33517A;
+  --brown: #6B4A2B;
+  --maru: 'Zen Maru Gothic', sans-serif;
+  --pop: 'Mochiy Pop One', 'Zen Maru Gothic', sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--cream);
+  color: var(--brown);
+  font-family: var(--maru);
+  line-height: 1.9;
+  overflow-x: hidden;
+}
+
+/* ===== チェック柄背景 ===== */
+.checker {
+  background-image:
+    linear-gradient(45deg, rgba(143,168,78,0.16) 25%, transparent 25%, transparent 75%, rgba(143,168,78,0.16) 75%),
+    linear-gradient(45deg, rgba(143,168,78,0.16) 25%, transparent 25%, transparent 75%, rgba(143,168,78,0.16) 75%);
+  background-size: 64px 64px;
+  background-position: 0 0, 32px 32px;
+}
+
+/* ===== HERO（Canvaバナー版） ===== */
+.hero-banner-outer {
+  padding: clamp(16px, 3.5vw, 40px) clamp(12px, 3vw, 28px) 8px;
+}
+.hero-banner {
+  position: relative;
+  max-width: 880px;
+  margin: 0 auto;
+  line-height: 0;
+  overflow: hidden;
+  border: 4px solid var(--brown);
+  border-radius: 22px;
+  box-shadow: 7px 7px 0 rgba(107,74,43,0.16);
+}
+.hero-banner .banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.hb-item {
+  position: absolute;
+  line-height: 1.6;
+  pointer-events: none;
+}
+/* カタカナ「モリット」：morittoロゴの下 */
+.hb-kana {
+  top: 37%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--pop);
+  font-size: clamp(0.85rem, 2.6vw, 2rem);
+  letter-spacing: 0.6em;
+  text-indent: 0.6em;
+  color: var(--navy);
+  white-space: nowrap;
+  animation: fadeUp 0.9s 0.1s ease both;
+}
+/* MORITTO OFFICIALバッジ（オレンジ楕円） */
+.hb-badge {
+  top: 47.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--pop);
+  font-size: clamp(0.55rem, 1.5vw, 1.05rem);
+  letter-spacing: 0.26em;
+  color: #fff;
+  background: var(--orange);
+  border-radius: 999px;
+  padding: 0.5em 1.9em;
+  white-space: nowrap;
+  box-shadow: 0 0.3em 0 rgba(107,74,43,0.22);
+  animation: fadeUp 1s 0.2s ease both;
+}
+/* キャッチコピー（白楕円） */
+.hb-catch {
+  top: 70%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--maru);
+  font-weight: 700;
+  font-size: clamp(0.68rem, 2.1vw, 1.5rem);
+  letter-spacing: 0.13em;
+  color: var(--navy);
+  background: rgba(255,255,255,0.94);
+  border-radius: 999px;
+  padding: 0.6em 1.8em;
+  white-space: nowrap;
+  box-shadow: 0 0.35em 0 rgba(51,81,122,0.18);
+  animation: fadeUp 1.1s 0.3s ease both;
+}
+/* クリームソーダ：うちわの右上 */
+.hb-soda {
+  top: 47%;
+  left: 61%;
+  width: 11%;
+  animation: floaty 6s 0.4s ease-in-out infinite;
+}
+/* お花たち：不規則配置 */
+.hb-f1 { top: 60%; left: 7%;  width: 9%;  animation: floaty 7s ease-in-out infinite; }
+.hb-f2 { top: 57%; left: 86%; width: 7%;  animation: floaty 5.5s 1s ease-in-out infinite; }
+.hb-f3 { top: 24%; left: 70%; width: 5.5%; animation: spinFloat 12s linear infinite; }
+
+/* ===== 波の区切り ===== */
+.wave { display: block; width: 100%; height: 60px; }
+
+/* ===== セクション共通 ===== */
+.section-label {
+  font-family: var(--pop);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: var(--green-deep);
+  margin-bottom: 10px;
+  text-align: center;
+}
+.section-title {
+  font-family: var(--pop);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+  color: var(--navy);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.title-flower { width: 54px; margin: 0 auto 34px; display: block; }
+
+/* ===== MENU ===== */
+.nav-section {
+  padding: 72px 22px 88px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 26px;
+}
+.nav-card {
+  background: #fff;
+  border: 3px solid var(--brown);
+  border-radius: 22px;
+  padding: 30px 22px 26px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--brown);
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 6px 6px 0 rgba(107,74,43,0.16);
+}
+.nav-card:hover {
+  transform: translateY(-6px) rotate(-0.6deg);
+  box-shadow: 8px 10px 0 rgba(107,74,43,0.22);
+}
+.nav-card:nth-child(odd):hover { transform: translateY(-6px) rotate(0.6deg); }
+.nav-card svg { width: 86px; height: 86px; margin-bottom: 14px; }
+.nav-card-title {
+  font-family: var(--pop);
+  font-size: 1.08rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+  color: var(--navy);
+}
+.nav-card-desc {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #8a6a4f;
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+}
+.nav-card-tag {
+  position: absolute;
+  top: -14px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--pop);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: #fff;
+  border-radius: 999px;
+  padding: 3px 16px;
+  white-space: nowrap;
+}
+.tag-red { background: var(--red); }
+.tag-orange { background: var(--orange); }
+.tag-green { background: var(--green); }
+.tag-pink { background: var(--pink-deep); }
+.tag-navy { background: var(--navy); }
+
+/* ===== ABOUT ===== */
+.about {
+  background: #fff;
+  padding: 80px 22px 90px;
+  position: relative;
+  overflow: hidden;
+}
+.about-inner { max-width: 640px; margin: 0 auto; position: relative; z-index: 1; }
+.about-text {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #7a5a3f;
+  line-height: 2.3;
+  letter-spacing: 0.04em;
+}
+.about-text p { margin-bottom: 1.5em; }
+.about-animals {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 34px;
+  margin-top: 44px;
+  flex-wrap: wrap;
+}
+.about-animals svg { width: 96px; height: auto; }
+.animal-wrap { text-align: center; }
+.animal-name {
+  font-family: var(--pop);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  color: var(--green-deep);
+  margin-top: 6px;
+}
+
+/* ===== BOOKS ===== */
+.books {
+  padding: 78px 22px 90px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 26px;
+  margin-top: 10px;
+}
+.book-card {
+  background: #fff;
+  border: 3px solid var(--brown);
+  border-radius: 20px;
+  padding: 28px 26px;
+  box-shadow: 6px 6px 0 rgba(232,93,74,0.25);
+  position: relative;
+}
+.book-card:nth-child(2) { box-shadow: 6px 6px 0 rgba(143,168,78,0.35); }
+.book-label {
+  font-family: var(--pop);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  color: var(--red);
+  margin-bottom: 10px;
+}
+.book-card:nth-child(2) .book-label { color: var(--green-deep); }
+.book-title {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 0.05em;
+}
+.book-heart {
+  position: absolute;
+  top: -16px; right: 18px;
+  width: 38px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--navy);
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  padding: 54px 22px 46px;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  position: relative;
+}
+footer .footer-name {
+  font-family: var(--pop);
+  font-size: 1.5rem;
+  color: #fff;
+  letter-spacing: 0.18em;
+  margin-bottom: 10px;
+}
+.footer-flowers {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.footer-flowers svg { width: 30px; height: 30px; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(3deg); }
+}
+@keyframes spinFloat {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(-10px) rotate(180deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero-banner-outer">
+<div class="hero-banner">
+  <img class="banner-img" src="moritto_banner.png" alt="moritto オフィシャルサイト">
+
+  <!-- クリームソーダ（うちわの右上でふわふわ） -->
+  <img class="hb-item hb-soda" src="soda.png" alt="" aria-hidden="true">
+
+  <!-- お花たち -->
+  <img class="hb-item hb-f1" src="f_orange.png" alt="" aria-hidden="true">
+  <img class="hb-item hb-f2" src="f_pink.png" alt="" aria-hidden="true">
+  <img class="hb-item hb-f3" src="f_cream.png" alt="" aria-hidden="true">
+
+  <!-- テキストオーバーレイ -->
+  <div class="hb-item hb-kana">モリット</div>
+  <div class="hb-item hb-badge">MORITTO OFFICIAL</div>
+  <div class="hb-item hb-catch">ホントの自分で、なぜか？愛される。</div>
+</div>
+</section>
+
+<!-- ============ MENU ============ -->
+<section class="nav-section" style="position: relative;">
+
+  <!-- プリン（ふわふわ） -->
+  <img src="pudding.png" alt="" aria-hidden="true" style="position:absolute; top:-30px; right:4%; width:112px; animation: floaty 6.5s 1.2s ease-in-out infinite; filter: drop-shadow(3px 5px 0 rgba(107,74,43,0.15));">
+
+  <div class="section-label">MENU</div>
+  <h2 class="section-title">メニュー</h2>
+  <svg class="title-flower" viewBox="0 0 100 100" aria-hidden="true">
+    <g fill="#E85D4A">
+      <circle cx="50" cy="20" r="14"/><circle cx="75" cy="32" r="14"/><circle cx="80" cy="58" r="14"/>
+      <circle cx="62" cy="78" r="14"/><circle cx="38" cy="78" r="14"/><circle cx="20" cy="58" r="14"/>
+      <circle cx="25" cy="32" r="14"/>
+    </g>
+    <circle cx="50" cy="50" r="15" fill="#FBEAC2"/>
+  </svg>
+
+  <div class="nav-grid">
+
+    <!-- 恋愛部：レトロハート -->
+    <a class="nav-card" href="renaibu_allinone.html">
+      <span class="nav-card-tag tag-pink">COMMUNITY</span>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 86 C20 64 10 46 14 32 C18 18 34 14 44 24 L50 30 L56 24 C66 14 82 18 86 32 C90 46 80 64 50 86 Z" fill="#E4798E" stroke="#6B4A2B" stroke-width="3"/>
+        <circle cx="34" cy="34" r="6" fill="#fff" opacity="0.7"/>
+        <g fill="#F4C542">
+          <circle cx="82" cy="14" r="4"/><circle cx="16" cy="12" r="3"/><circle cx="90" cy="70" r="3"/>
+        </g>
+      </svg>
+      <div class="nav-card-title">恋愛部</div>
+      <div class="nav-card-desc">みっこと一緒に愛され体質を育てるコミュニティ</div>
+    </a>
+
+    <!-- 恋愛講座：リボン付きハート -->
+    <a class="nav-card" href="koza.html">
+      <span class="nav-card-tag tag-red">LESSON</span>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 82 C24 62 14 46 18 34 C21 22 36 18 45 27 L50 32 L55 27 C64 18 79 22 82 34 C86 46 76 62 50 82 Z" fill="#E85D4A" stroke="#6B4A2B" stroke-width="3"/>
+        <path d="M38 14 L50 24 L62 14 L58 30 L42 30 Z" fill="#F4C542" stroke="#6B4A2B" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="36" cy="40" r="5" fill="#fff" opacity="0.7"/>
+      </svg>
+      <div class="nav-card-title">恋愛講座</div>
+      <div class="nav-card-desc">潜在意識から恋愛を変える本格講座</div>
+    </a>
+
+    <!-- 個別コーチング：お花 -->
+    <a class="nav-card" href="session_allinone_v3.html">
+      <span class="nav-card-tag tag-orange">SESSION</span>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <g fill="#F49B33" stroke="#6B4A2B" stroke-width="2.5">
+          <circle cx="50" cy="22" r="13"/><circle cx="73" cy="33" r="13"/><circle cx="78" cy="57" r="13"/>
+          <circle cx="61" cy="76" r="13"/><circle cx="39" cy="76" r="13"/><circle cx="22" cy="57" r="13"/>
+          <circle cx="27" cy="33" r="13"/>
+        </g>
+        <circle cx="50" cy="50" r="15" fill="#FBEAC2" stroke="#6B4A2B" stroke-width="2.5"/>
+        <circle cx="45" cy="48" r="2.5" fill="#6B4A2B"/>
+        <circle cx="55" cy="48" r="2.5" fill="#6B4A2B"/>
+        <path d="M45 55 Q50 59 55 55" stroke="#6B4A2B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="nav-card-title">個別コーチング</div>
+      <div class="nav-card-desc">あなただけの恋愛サポート</div>
+    </a>
+
+    <!-- ブログ：本とハート -->
+    <a class="nav-card" href="https://ameblo.jp/3017niko/" target="_blank" rel="noopener">
+      <span class="nav-card-tag tag-green">BLOG</span>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 26 C42 18 22 16 14 22 L14 76 C22 70 42 72 50 80 C58 72 78 70 86 76 L86 22 C78 16 58 18 50 26 Z" fill="#9ED6B5" stroke="#6B4A2B" stroke-width="3" stroke-linejoin="round"/>
+        <line x1="50" y1="26" x2="50" y2="80" stroke="#6B4A2B" stroke-width="3"/>
+        <g stroke="#5E8F74" stroke-width="3" stroke-linecap="round">
+          <line x1="24" y1="34" x2="42" y2="36"/><line x1="24" y1="46" x2="42" y2="48"/><line x1="24" y1="58" x2="42" y2="60"/>
+        </g>
+        <path d="M68 38 C64 34 58 36 58 42 C58 47 63 51 68 55 C73 51 78 47 78 42 C78 36 72 34 68 38 Z" fill="#E85D4A"/>
+      </svg>
+      <div class="nav-card-title">ブログ</div>
+      <div class="nav-card-desc">無料で読める恋愛コンテンツ</div>
+    </a>
+
+    <!-- YouTube：レトロテレビ -->
+    <a class="nav-card" href="https://www.youtube.com/channel/UCA7WWN7HwRuz8fz0PVwoyLQ" target="_blank" rel="noopener">
+      <span class="nav-card-tag tag-navy">YOUTUBE</span>
+      <svg viewBox="0 0 110 100" aria-hidden="true">
+        <g stroke="#D9C79E" stroke-width="5" stroke-linecap="round">
+          <line x1="47" y1="22" x2="38" y2="6"/><line x1="55" y1="22" x2="66" y2="6"/>
+        </g>
+        <rect x="40" y="16" width="26" height="9" rx="4.5" fill="#E85D4A"/>
+        <rect x="10" y="24" width="90" height="62" rx="16" fill="#8FA84E" stroke="#6B4A2B" stroke-width="3"/>
+        <rect x="20" y="33" width="56" height="44" rx="9" fill="#6B4A2B"/>
+        <rect x="24" y="37" width="48" height="36" rx="6" fill="#FBF0DA"/>
+        <path d="M44 46 L60 55 L44 64 Z" fill="#E85D4A"/>
+        <g fill="#F4C542">
+          <circle cx="88" cy="40" r="4.5"/><circle cx="88" cy="53" r="4.5"/><circle cx="88" cy="66" r="4.5"/>
+        </g>
+        <path d="M26 86 L20 96 L32 96 Z" fill="#F4C542"/>
+        <path d="M84 86 L78 96 L90 96 Z" fill="#F4C542"/>
+      </svg>
+      <div class="nav-card-title">YouTube</div>
+      <div class="nav-card-desc">動画で見る恋愛コンテンツ</div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="about">
+  <div class="about-inner">
+    <div class="section-label">ABOUT MORITTO</div>
+    <h2 class="section-title">モリットについて</h2>
+    <svg class="title-flower" viewBox="0 0 100 100" aria-hidden="true">
+      <g fill="#F49B33">
+        <circle cx="50" cy="20" r="14"/><circle cx="75" cy="32" r="14"/><circle cx="80" cy="58" r="14"/>
+        <circle cx="62" cy="78" r="14"/><circle cx="38" cy="78" r="14"/><circle cx="20" cy="58" r="14"/>
+        <circle cx="25" cy="32" r="14"/>
+      </g>
+      <circle cx="50" cy="50" r="15" fill="#FBEAC2"/>
+    </svg>
+    <div class="about-text">
+      <p>恋愛コーチ・作家のモリットです。10年以上にわたり、恋愛に悩む女性たちに寄り添い続けてきました。</p>
+      <p>「ホントの自分でいることが、最高の愛され方」という信念のもと、潜在意識・エネルギー・スピリチュアルをベースにした独自のアプローチで、多くの方の恋愛を変えてきました。</p>
+      <p>著書2冊。恋愛部・恋愛講座・個別コーチングを通じて、今日もたくさんの女性たちと一緒に歩んでいます。</p>
+    </div>
+
+    <!-- レトロどうぶつたち -->
+    <div class="about-animals" aria-hidden="true">
+
+      <!-- パンダ -->
+      <div class="animal-wrap">
+        <svg viewBox="0 0 110 110">
+          <circle cx="30" cy="26" r="14" fill="#3A3A3A"/>
+          <circle cx="80" cy="26" r="14" fill="#3A3A3A"/>
+          <circle cx="55" cy="58" r="40" fill="#FFFDF8" stroke="#6B4A2B" stroke-width="3"/>
+          <ellipse cx="38" cy="52" rx="10" ry="13" fill="#3A3A3A" transform="rotate(-15 38 52)"/>
+          <ellipse cx="72" cy="52" rx="10" ry="13" fill="#3A3A3A" transform="rotate(15 72 52)"/>
+          <circle cx="40" cy="52" r="4" fill="#fff"/>
+          <circle cx="70" cy="52" r="4" fill="#fff"/>
+          <ellipse cx="55" cy="68" rx="6" ry="4.5" fill="#3A3A3A"/>
+          <path d="M48 78 Q55 84 62 78" stroke="#3A3A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="26" cy="70" r="6" fill="#F0A3B0" opacity="0.7"/>
+          <circle cx="84" cy="70" r="6" fill="#F0A3B0" opacity="0.7"/>
+        </svg>
+        <div class="animal-name">PANDA</div>
+      </div>
+
+      <!-- キリン -->
+      <div class="animal-wrap">
+        <svg viewBox="0 0 110 130">
+          <g stroke="#B8802E" stroke-width="4" stroke-linecap="round">
+            <line x1="42" y1="18" x2="42" y2="6"/><line x1="68" y1="18" x2="68" y2="6"/>
+          </g>
+          <circle cx="42" cy="6" r="5" fill="#8A5A2B"/>
+          <circle cx="68" cy="6" r="5" fill="#8A5A2B"/>
+          <ellipse cx="16" cy="30" rx="9" ry="6" fill="#F4C542" transform="rotate(-25 16 30)"/>
+          <ellipse cx="94" cy="30" rx="9" ry="6" fill="#F4C542" transform="rotate(25 94 30)"/>
+          <circle cx="55" cy="52" r="36" fill="#F4C542" stroke="#6B4A2B" stroke-width="3"/>
+          <g fill="#E8A33C">
+            <circle cx="30" cy="34" r="7"/><circle cx="78" cy="32" r="6"/><circle cx="86" cy="60" r="6"/><circle cx="24" cy="62" r="5"/>
+          </g>
+          <ellipse cx="55" cy="72" rx="20" ry="15" fill="#FBEAC2"/>
+          <circle cx="44" cy="48" r="4" fill="#3A3A3A"/>
+          <circle cx="66" cy="48" r="4" fill="#3A3A3A"/>
+          <circle cx="48" cy="70" r="3" fill="#8A5A2B"/>
+          <circle cx="62" cy="70" r="3" fill="#8A5A2B"/>
+          <path d="M50 80 Q55 84 60 80" stroke="#8A5A2B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="animal-name">KIRIN</div>
+      </div>
+
+      <!-- ロバ -->
+      <div class="animal-wrap">
+        <svg viewBox="0 0 110 120">
+          <ellipse cx="24" cy="22" rx="10" ry="20" fill="#A8B0BC" stroke="#6B4A2B" stroke-width="3" transform="rotate(-15 24 22)"/>
+          <ellipse cx="86" cy="22" rx="10" ry="20" fill="#A8B0BC" stroke="#6B4A2B" stroke-width="3" transform="rotate(15 86 22)"/>
+          <ellipse cx="24" cy="24" rx="4.5" ry="12" fill="#F0A3B0" transform="rotate(-15 24 24)"/>
+          <ellipse cx="86" cy="24" rx="4.5" ry="12" fill="#F0A3B0" transform="rotate(15 86 24)"/>
+          <circle cx="55" cy="62" r="37" fill="#C3CAD4" stroke="#6B4A2B" stroke-width="3"/>
+          <path d="M40 30 Q55 20 70 30 L66 44 Q55 38 44 44 Z" fill="#6B7684"/>
+          <ellipse cx="55" cy="76" rx="21" ry="16" fill="#EDE3D4"/>
+          <circle cx="44" cy="56" r="4" fill="#3A3A3A"/>
+          <circle cx="66" cy="56" r="4" fill="#3A3A3A"/>
+          <ellipse cx="48" cy="74" rx="3" ry="4" fill="#6B4A2B"/>
+          <ellipse cx="62" cy="74" rx="3" ry="4" fill="#6B4A2B"/>
+          <path d="M49 85 Q55 90 61 85" stroke="#6B4A2B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="animal-name">ROBA</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ BOOKS ============ -->
+<section class="books">
+  <div class="section-label">BOOKS</div>
+  <h2 class="section-title">著書</h2>
+  <svg class="title-flower" viewBox="0 0 100 100" aria-hidden="true">
+    <g fill="#F4C542">
+      <circle cx="50" cy="20" r="14"/><circle cx="75" cy="32" r="14"/><circle cx="80" cy="58" r="14"/>
+      <circle cx="62" cy="78" r="14"/><circle cx="38" cy="78" r="14"/><circle cx="20" cy="58" r="14"/>
+      <circle cx="25" cy="32" r="14"/>
+    </g>
+    <circle cx="50" cy="50" r="15" fill="#FBEAC2"/>
+  </svg>
+
+  <div class="books-grid">
+    <div class="book-card">
+      <svg class="book-heart" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 86 C20 64 10 46 14 32 C18 18 34 14 44 24 L50 30 L56 24 C66 14 82 18 86 32 C90 46 80 64 50 86 Z" fill="#E85D4A"/>
+      </svg>
+      <div class="book-label">著書 01</div>
+      <div class="book-title">未来設定で幸せな恋愛を引き寄せる</div>
+    </div>
+    <div class="book-card">
+      <svg class="book-heart" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 86 C20 64 10 46 14 32 C18 18 34 14 44 24 L50 30 L56 24 C66 14 82 18 86 32 C90 46 80 64 50 86 Z" fill="#F0A3B0"/>
+      </svg>
+      <div class="book-label">著書 02</div>
+      <div class="book-title">恋愛の底から抜け出して今より1000倍幸せになる方法</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-flowers" aria-hidden="true">
+    <svg viewBox="0 0 100 100"><g fill="#E85D4A"><circle cx="50" cy="20" r="14"/><circle cx="75" cy="32" r="14"/><circle cx="80" cy="58" r="14"/><circle cx="62" cy="78" r="14"/><circle cx="38" cy="78" r="14"/><circle cx="20" cy="58" r="14"/><circle cx="25" cy="32" r="14"/></g><circle cx="50" cy="50" r="15" fill="#FBEAC2"/></svg>
+    <svg viewBox="0 0 100 100"><g fill="#F49B33"><circle cx="50" cy="20" r="14"/><circle cx="75" cy="32" r="14"/><circle cx="80" cy="58" r="14"/><circle cx="62" cy="78" r="14"/><circle cx="38" cy="78" r="14"/><circle cx="20" cy="58" r="14"/><circle cx="25" cy="32" r="14"/></g><circle cx="50" cy="50" r="15" fill="#FBEAC2"/></svg>
+    <svg viewBox="0 0 100 100"><g fill="#F4C542"><circle cx="50" cy="20" r="14"/><circle cx="75" cy="32" r="14"/><circle cx="80" cy="58" r="14"/><circle cx="62" cy="78" r="14"/><circle cx="38" cy="78" r="14"/><circle cx="20" cy="58" r="14"/><circle cx="25" cy="32" r="14"/></g><circle cx="50" cy="50" r="15" fill="#FBEAC2"/></svg>
+  </div>
+  <div class="footer-name">moritto</div>
+  <p>© 2026 株式会社モリット All rights reserved.</p>
+</footer>
+
+</body>
+</html>
