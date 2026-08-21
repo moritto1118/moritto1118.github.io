@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<!--
+════════════════════════════════════════════════════════════
+  小春ジュエリー　石の診断　3タイプ対応版
+  koharu_app_02_3types.html
+  2026年8月19日
+
+  ■ このファイルの位置づけ
+    診断の仕組みと石のデータを完成させた「土台」です。
+    このあと、見た目と体験のデザインを重ねていきます。
+
+  ■ デザインを変えるときに、触らないでほしいところ
+    ・STONES（石40種類のデータ）の中身
+    ・numerology() 数秘の計算
+    ・pickCandidates() 石の候補を選ぶ計算
+    ・drawBracelet() ブレスレットの絵を描く処理
+    ・JavaScript が使っている id
+        y / m / d / pref / colorChips / wishGrid / freeWish / go1 / err1
+        numCard / stoneList / back1 / braceletBox / braceletMini / miniCap
+        braceletBig / bigCap / resultStones / summary / copyBtn / copied
+        baseLink / redo / tsugiWish / koharuLink / threadLabel / tb0 tb1 tb2
+    ・JavaScript が使っているクラス
+        .chip / .wish / .stone / .stone-main / .stone-pick / .stone-body
+        .step / .thread-bead / .photo-box
+
+  ■ 自由に変えていいところ
+    ・:root の色（下にまとまっています）
+    ・上記以外の CSS すべて
+    ・新しいクラスを足すこと
+    ・飾りの画像や囲いを足すこと
+    ・文章
+
+  ■ 石の写真について
+    images フォルダに「石のID.webp」の名前で入れるだけで表示されます。
+    （例：images/amethyst.webp）
+    webp / png / jpg / jpeg のどれでも大丈夫です。
+    写真がない石は、色だけで表示されます。
+
+  ■ 決まっている配色と書体
+    背景 #F6E9E2 ／ 本文 #523325 ／ 薄い文字 #7A5B48
+    カード #FFFBF8 ／ ボタン 桜紅 #D9738F ／ 罫線 #E7D6CC
+    見出し Kaisei Opti 太字 ／ 本文 Zen Kaku Gothic New 中字
+════════════════════════════════════════════════════════════
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>あなたに合う石を見つける｜小春ジュエリー</title>
+<meta name="description" content="生年月日・好きな色・願いから、あなたに寄り添う天然石をお選びします。和歌山の小さな工房から、世界にひとつのブレスレットを。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Opti:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ══ 小春ジュエリー 配色 ═════════════════
+     ここを書き換えれば、ページ全体の色が変わります。 */
+  --haichi:#F6E9E2;      /* 背景（ベージュピンク） */
+  --shiro:#FFFBF8;       /* カードの白 */
+  --sumi:#523325;        /* 本文の文字（こげ茶） */
+  --sumi-usu:#7A5B48;    /* 薄い文字（説明・補足） */
+  --sakura:#D9738F;      /* ボタン・アクセント（桜紅） */
+  --sakura-koi:#C25E7C;  /* ボタンを押したとき */
+  --sakura-usu:#FBE4EA;  /* 選んだときの淡い背景 */
+  --kasumi:#E7D6CC;      /* 罫線・枠 */
+  /* ══ 書体 ════════════════════════════ */
+  --mincho:"Kaisei Opti","Hiragino Mincho ProN","Yu Mincho",YuMincho,serif;
+  --gothic:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:
+    radial-gradient(circle at 10% 3%,rgba(255,251,248,.82),transparent 30%),
+    radial-gradient(circle at 93% 16%,rgba(217,115,143,.09),transparent 25%),
+    var(--haichi);
+  color:var(--sumi);
+  font-family:var(--gothic);
+  font-weight:500;
+  font-size:16px;
+  line-height:1.9;
+  letter-spacing:.03em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 96px}
+
+/* ── 糸と珠のステップ表示 ─────────────── */
+.thread{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;padding:34px 0 30px;
+}
+.thread-bead{
+  width:11px;height:11px;border-radius:50%;
+  background:var(--kasumi);flex:none;
+  transition:background .5s ease,transform .5s ease;
+}
+.thread-bead.on{background:var(--sakura);transform:scale(1.35)}
+.thread-bead.done{background:var(--sakura)}
+.thread-line{
+  width:42px;height:1px;background:var(--kasumi);flex:none;
+}
+.thread-label{
+  text-align:center;font-family:var(--mincho);
+  font-size:13px;letter-spacing:.22em;color:var(--sumi-usu);
+  margin-bottom:6px;
+}
+.app-brand{
+  padding-top:28px;text-align:center;font-family:var(--mincho);
+  font-size:11px;letter-spacing:.25em;color:var(--sakura);
+}
+.progress-names{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  max-width:360px;margin:-18px auto 38px;
+  font-size:11px;line-height:1.5;text-align:center;color:var(--sumi-usu);
+}
+.progress-names span{display:flex;flex-direction:column;gap:2px;align-items:center}
+.progress-names b{
+  font-family:var(--mincho);font-size:12px;font-weight:700;
+  color:var(--sakura);letter-spacing:.08em;
+}
+
+/* ── 見出し ────────────────────────── */
+.eyebrow{
+  font-family:var(--mincho);font-size:12px;letter-spacing:.3em;
+  color:var(--sakura);text-align:center;margin-bottom:16px;
+}
+h1{
+  font-family:var(--mincho);font-weight:700;
+  font-size:clamp(23px,5.6vw,31px);line-height:1.65;
+  letter-spacing:.06em;text-align:center;margin-bottom:20px;
+}
+h2{
+  font-family:var(--mincho);font-weight:700;
+  font-size:clamp(19px,4.4vw,24px);line-height:1.7;
+  letter-spacing:.06em;text-align:center;margin-bottom:14px;
+}
+.lede{
+  text-align:center;font-size:14.5px;line-height:2.1;
+  color:var(--sumi-usu);margin-bottom:40px;
+}
+.lede-sep{
+  display:block;width:26px;height:1px;background:var(--kasumi);
+  margin:26px auto;
+}
+.intro-copy{
+  max-width:590px;margin:0 auto 42px;padding:28px 24px;
+  background:rgba(255,251,248,.68);border:1px solid rgba(231,214,204,.9);
+  border-radius:24px;box-shadow:0 18px 50px rgba(82,51,37,.055);
+  font-size:14.5px;line-height:2.15;color:var(--sumi-usu);text-align:left;
+}
+.intro-copy p + p{margin-top:14px}
+.intro-copy .intro-em{
+  font-family:var(--mincho);font-size:15.5px;line-height:2;
+  color:var(--sumi);font-weight:700;
+}
+
+/* ── フォーム ───────────────────────── */
+.field{margin-bottom:34px}
+.field-head{
+  display:flex;align-items:baseline;gap:4px 10px;
+  flex-wrap:wrap;margin-bottom:13px;
+}
+.field-label{
+  font-family:var(--mincho);font-size:16px;
+  letter-spacing:.1em;font-weight:700;flex:none;
+}
+.field-note{font-size:12px;color:var(--sumi-usu);letter-spacing:.04em}
+
+.dob{display:flex;gap:8px;align-items:center}
+.dob select{flex:1;min-width:0}
+.dob span{font-size:13px;color:var(--sumi-usu);flex:none}
+
+select{
+  width:100%;padding:13px 14px;
+  font-family:var(--gothic);font-size:15px;color:var(--sumi);
+  background:var(--shiro);
+  border:1px solid var(--kasumi);border-radius:14px;
+  appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23D9738F' stroke-width='1.3' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;
+  cursor:pointer;
+}
+select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{
+  outline:2px solid var(--sakura);outline-offset:2px;
+}
+textarea{
+  width:100%;padding:14px;min-height:110px;resize:vertical;
+  font-family:var(--gothic);font-size:15px;line-height:1.9;color:var(--sumi);
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:14px;
+}
+textarea::placeholder{color:#B79C8E}
+
+/* 色チップ */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 15px 9px 11px;
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:999px;
+  font-family:var(--gothic);font-size:14px;color:var(--sumi);
+  cursor:pointer;transition:border-color .2s,background .2s,opacity .2s;
+}
+.chip:hover{border-color:var(--sakura)}
+.chip-dot{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.09);
+}
+.chip[aria-pressed="true"]{
+  border-color:var(--sakura);background:var(--sakura-usu);
+  font-weight:500;
+}
+.chip[data-full="1"][aria-pressed="false"]{opacity:.38;cursor:default}
+
+/* 願いカード */
+.wishes{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.wish{
+  text-align:left;padding:15px 16px;
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:16px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+  font-family:var(--gothic);color:var(--sumi);
+}
+.wish:hover{border-color:var(--sakura)}
+.wish[aria-pressed="true"]{border-color:var(--sakura);background:var(--sakura-usu)}
+.wish-t{
+  display:block;font-family:var(--mincho);font-size:15.5px;
+  letter-spacing:.08em;font-weight:700;margin-bottom:3px;
+}
+.wish-s{display:block;font-size:11.5px;color:var(--sumi-usu);line-height:1.6}
+.wish-hint{
+  font-size:12px;color:var(--sumi-usu);line-height:1.85;
+  margin-top:11px;
+}
+
+/* ── ボタン ────────────────────────── */
+.btn{
+  display:block;width:100%;padding:17px;
+  font-family:var(--mincho);font-size:16px;letter-spacing:.18em;font-weight:700;
+  color:var(--shiro);background:var(--sakura);
+  border:none;border-radius:999px;cursor:pointer;
+  box-shadow:0 10px 26px rgba(194,94,124,.2);
+  transition:background .25s,opacity .25s;
+}
+.btn:hover:not(:disabled){background:var(--sakura-koi)}
+.btn:disabled{background:#E2C9CF;cursor:default}
+.btn-ghost{
+  display:block;width:100%;padding:15px;margin-top:11px;
+  font-family:var(--gothic);font-size:14px;letter-spacing:.1em;
+  color:var(--sumi-usu);background:transparent;
+  border:1px solid var(--kasumi);border-radius:999px;cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+.btn-ghost:hover{border-color:var(--sakura);color:var(--sakura)}
+.err{
+  font-size:13px;color:#A8465C;font-weight:500;text-align:center;
+  margin-top:14px;min-height:20px;
+}
+
+/* ── 数秘の読み ─────────────────────── */
+.numcard{
+  background:var(--shiro);border:1px solid var(--kasumi);
+  padding:28px 24px;margin-bottom:38px;text-align:center;border-radius:22px;
+  box-shadow:0 14px 38px rgba(82,51,37,.05);
+}
+.numcard-n{
+  font-family:var(--mincho);font-size:44px;line-height:1;
+  color:var(--sakura);font-weight:400;margin-bottom:6px;
+}
+.numcard-k{
+  font-family:var(--mincho);font-size:15px;letter-spacing:.2em;
+  font-weight:700;margin-bottom:12px;
+}
+.numcard-b{font-size:13.5px;line-height:2;color:var(--sumi-usu);text-align:left}
+
+/* ── 石カード ──────────────────────── */
+.stones{display:flex;flex-direction:column;gap:11px;margin-bottom:26px}
+.stone{
+  background:var(--shiro);border:1px solid var(--kasumi);
+  transition:border-color .25s,box-shadow .25s;
+  overflow:hidden;border-radius:18px;
+}
+.stone.picked{
+  border-color:var(--sakura);
+  box-shadow:0 0 0 1px var(--sakura);
+}
+.stone-main{
+  display:flex;align-items:flex-start;gap:15px;
+  padding:16px 17px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--gothic);
+}
+.bead{
+  width:52px;height:52px;border-radius:50%;flex:none;
+  box-shadow:inset 0 -3px 7px rgba(0,0,0,.17),
+             inset 0 3px 6px rgba(255,255,255,.5),
+             0 1px 3px rgba(82,51,37,.16);
+  position:relative;overflow:hidden;background-size:cover;background-position:center;
+}
+.bead::after{
+  content:"";position:absolute;top:19%;left:25%;
+  width:24%;height:19%;border-radius:50%;
+  background:rgba(255,255,255,.62);filter:blur(2.5px);
+}
+.stone-txt{flex:1;min-width:0;padding-top:2px}
+.stone-name{
+  font-family:var(--mincho);font-size:17px;letter-spacing:.07em;
+  font-weight:700;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;
+  line-height:1.5;
+}
+.star{color:var(--sakura);font-size:11.5px;letter-spacing:.08em;white-space:nowrap}
+.stone-en{
+  display:block;
+  font-size:10px;letter-spacing:.16em;color:#9C8172;
+  text-transform:uppercase;margin-top:2px;line-height:1.5;
+}
+.stone-lead{
+  display:block;
+  font-size:13.5px;line-height:1.85;color:var(--sumi-usu);margin-top:7px;
+}
+.stone-more{
+  display:inline-flex;width:fit-content;
+  font-family:var(--mincho);
+  font-size:13.5px;color:var(--sakura);margin-top:13px;
+  letter-spacing:.12em;align-items:center;gap:8px;
+  border:1px solid var(--sakura);border-radius:999px;
+  padding:8px 17px;background:var(--sakura-usu);
+}
+.stone-more i{
+  display:inline-block;width:6px;height:6px;border-right:1px solid var(--sakura);
+  border-bottom:1px solid var(--sakura);transform:rotate(45deg) translateY(-2px);
+  transition:transform .3s;
+}
+.stone.open .stone-more i{transform:rotate(225deg) translateY(-1px)}
+.stone-body{
+  display:none;
+  margin:0 17px;padding:0 0 18px;
+  border-top:1px solid var(--kasumi);
+}
+.stone.open .stone-body{display:block}
+.stone-body p{
+  font-size:14px;line-height:2.05;color:var(--sumi);
+  margin-top:15px;
+}
+.stone-pick{
+  display:block;width:calc(100% - 34px);margin:0 17px 17px;
+  padding:12px;font-family:var(--mincho);font-size:14px;letter-spacing:.15em;
+  background:transparent;color:var(--sakura);
+  border:1px solid var(--sakura);border-radius:2px;cursor:pointer;
+  transition:background .2s,color .2s;
+}
+.stone-pick:hover{background:var(--sakura-usu)}
+.stone.picked .stone-pick{background:var(--sakura);color:var(--shiro)}
+.stone-pick[disabled]{
+  border-color:var(--kasumi);color:#BCA294;cursor:default;background:transparent;
+}
+/* 石のお話を読み終わってから現れる「選ぶ」ボタン */
+@keyframes pickin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.stone.read .stone-pick{animation:pickin .4s ease backwards}
+.stone-readnote{
+  display:block;margin:0 17px 17px;padding:11px;
+  text-align:center;font-size:12px;letter-spacing:.06em;
+  color:#A8907F;background:var(--haichi);border-radius:2px;
+}
+
+/* ── 石の大きな写真 ────────────────── */
+.photo-box{
+  margin-top:16px;
+  border:1px solid var(--kasumi);
+  background:var(--haichi);
+  overflow:hidden;border-radius:14px;
+  line-height:0;
+}
+.photo-box img{
+  display:block;width:100%;height:auto;
+  aspect-ratio:1;object-fit:cover;
+}
+
+/* ── ブレスレット（署名要素） ─────────── */
+.braceletbox{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:rgba(255,251,248,.96);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-top:1px solid var(--kasumi);
+  box-shadow:0 -4px 18px rgba(82,51,37,.07);
+}
+.braceletbox-in{
+  max-width:660px;margin:0 auto;padding:11px 20px;
+  display:flex;align-items:center;gap:15px;
+}
+.bracelet{display:block;width:62px;height:62px;flex:none}
+.bracelet-side{flex:1;min-width:0}
+.bracelet-cap{
+  font-family:var(--mincho);font-size:13.5px;
+  letter-spacing:.12em;color:var(--sumi-usu);
+}
+.bracelet-cap b{color:var(--sakura);font-weight:600;font-size:16px}
+.bracelet-side .btn{padding:13px;font-size:15px}
+.bracelet-big{width:100%;max-width:230px;height:auto;aspect-ratio:1;margin:0 auto}
+.bigcap{
+  text-align:center;font-family:var(--mincho);font-size:14px;
+  letter-spacing:.14em;color:var(--sumi-usu);margin-top:14px;line-height:1.9;
+}
+.step2-pad{height:88px}
+@keyframes beadin{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+.bracelet .bd{transform-origin:center;transform-box:fill-box;animation:beadin .45s cubic-bezier(.3,1.5,.6,1) backwards}
+
+/* ── 結果 ───────────────────────────── */
+.result-stone{
+  background:var(--shiro);border:1px solid var(--kasumi);
+  padding:22px 20px;margin-bottom:12px;border-radius:18px;
+}
+.result-head{display:flex;align-items:flex-start;gap:15px;margin-bottom:6px}
+.result-body p{font-size:14px;line-height:2.05;margin-top:14px}
+.fixed-note{
+  background:var(--sakura-usu);padding:20px 21px;
+  margin-bottom:30px;font-size:13.5px;line-height:2;border-radius:18px;
+}
+.fixed-note strong{
+  display:block;font-family:var(--mincho);font-size:15px;
+  letter-spacing:.1em;margin-bottom:7px;font-weight:700;
+}
+.summary{
+  background:var(--shiro);border:1px dashed var(--kasumi);
+  padding:19px 20px;margin-bottom:14px;
+  font-size:13px;line-height:2;white-space:pre-wrap;
+  font-family:var(--gothic);color:var(--sumi-usu);border-radius:16px;
+}
+.price{
+  text-align:center;font-family:var(--mincho);
+  font-size:15px;letter-spacing:.1em;margin-bottom:6px;
+}
+.price em{font-style:normal;font-size:22px;color:var(--sakura)}
+.price-s{
+  text-align:center;font-size:12px;color:var(--sumi-usu);
+  margin-bottom:24px;letter-spacing:.04em;
+}
+.copied{
+  text-align:center;font-size:12.5px;color:var(--sakura);
+  min-height:19px;margin-top:8px;letter-spacing:.06em;
+}
+.closing{
+  text-align:center;font-family:var(--mincho);
+  font-size:15px;line-height:2.2;letter-spacing:.08em;
+  color:var(--sumi-usu);margin:38px 0 28px;
+}
+
+/* ── 小春だよりへの道 ──────────────── */
+.tsugi{
+  border-top:1px solid var(--kasumi);
+  margin-top:44px;padding-top:36px;
+}
+.tsugi-lead{
+  text-align:center;font-size:14px;line-height:2.15;
+  color:var(--sumi-usu);margin-bottom:22px;
+}
+.tsugi-lead b{
+  font-family:var(--mincho);font-weight:700;
+  color:var(--sakura);font-size:15px;letter-spacing:.06em;
+}
+.tsugi-name{
+  text-align:center;font-family:var(--mincho);
+  font-size:17px;letter-spacing:.14em;font-weight:700;margin-bottom:8px;
+}
+.tsugi-sub{
+  text-align:center;font-size:12px;color:var(--sumi-usu);
+  letter-spacing:.06em;margin-bottom:20px;
+}
+/* 小春だよりのボタン（主役より一回り小さいピンク） */
+.btn-tsugi{
+  display:block;width:auto;max-width:340px;margin:0 auto;
+  padding:14px 26px;
+  font-family:var(--mincho);font-size:14.5px;letter-spacing:.14em;font-weight:700;
+  color:var(--shiro);background:var(--sakura);
+  border:none;border-radius:999px;cursor:pointer;
+  text-align:center;text-decoration:none;
+  box-shadow:0 7px 18px rgba(194,94,124,.16);
+  transition:background .25s,transform .2s,box-shadow .25s;
+}
+.btn-tsugi:hover{
+  background:var(--sakura-koi);transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(194,94,124,.22);
+}
+.tsugi-omake{
+  text-align:center;font-size:11.5px;color:var(--sumi-usu);
+  letter-spacing:.05em;margin-top:11px;
+}
+
+/* ── 仕立ての選択 ───────────────────── */
+.style-section{
+  margin:46px 0 30px;padding-top:38px;border-top:1px solid var(--kasumi);
+  scroll-margin-top:22px;
+}
+.style-lede{
+  max-width:560px;margin:0 auto 24px;text-align:center;
+  font-size:13.5px;line-height:2;color:var(--sumi-usu);
+}
+.style-price{
+  display:inline-flex;align-items:center;gap:8px;margin-top:13px;
+  padding:7px 15px;border-radius:999px;background:var(--sakura-usu);
+  color:var(--sumi);font-family:var(--mincho);font-weight:700;
+}
+.style-grid{display:grid;gap:16px}
+.style-card{
+  display:grid;grid-template-columns:148px 1fr;gap:0;width:100%;
+  padding:0;text-align:left;overflow:hidden;
+  color:var(--sumi);background:var(--shiro);border:1px solid var(--kasumi);
+  border-radius:22px;cursor:pointer;font-family:var(--gothic);
+  transition:border-color .2s,box-shadow .2s,transform .2s;
+}
+.style-card:hover:not([aria-disabled="true"]){
+  border-color:var(--sakura);transform:translateY(-1px);
+}
+.style-card[aria-pressed="true"]{
+  border-color:var(--sakura);box-shadow:0 0 0 1px var(--sakura),0 16px 42px rgba(82,51,37,.08);
+}
+.style-card[aria-disabled="true"]{opacity:.56;cursor:default}
+.style-media{position:relative;min-height:188px;background:#F3E4DC;overflow:hidden}
+.style-media img{display:block;width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.style-media img:not([hidden]) + .style-placeholder,
+.result-type-media img:not([hidden]) + .style-placeholder{display:none}
+.style-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;padding:14px;text-align:center;
+  color:var(--sumi-usu);background:
+    radial-gradient(circle at 50% 38%,rgba(255,255,255,.9) 0 13%,transparent 14%),
+    radial-gradient(circle at 42% 50%,rgba(217,115,143,.2) 0 7%,transparent 8%),
+    radial-gradient(circle at 58% 50%,rgba(122,91,72,.14) 0 7%,transparent 8%),
+    linear-gradient(145deg,#FFF8F4,#EEDFD7);
+}
+.style-placeholder b{font-family:var(--mincho);font-size:13px;letter-spacing:.08em}
+.style-placeholder small{font-size:10px;letter-spacing:.08em}
+.style-copy{padding:20px 20px 18px}
+.style-no{font-size:10px;letter-spacing:.18em;color:var(--sakura);font-weight:700}
+.style-name{
+  display:block;margin:4px 0 9px;font-family:var(--mincho);
+  font-size:17px;line-height:1.55;letter-spacing:.05em;font-weight:700;
+}
+.style-desc{display:block;font-size:12.5px;line-height:1.9;color:var(--sumi-usu)}
+.style-select-label{
+  display:inline-flex;margin-top:12px;color:var(--sakura);font-family:var(--mincho);
+  font-size:12.5px;letter-spacing:.08em;font-weight:700;
+}
+.style-lock,.style-error{
+  margin-top:14px;min-height:22px;text-align:center;font-size:12.5px;color:var(--sumi-usu);
+}
+.style-error{color:#A8465C}
+
+/* ── 手首サイズの選択 ───────────────── */
+.size-section{
+  margin:46px 0 30px;padding-top:38px;border-top:1px solid var(--kasumi);
+  scroll-margin-top:22px;
+}
+.size-grid{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+  max-width:460px;margin:0 auto;
+}
+.size-btn{
+  min-width:78px;padding:15px 10px;
+  font-family:var(--mincho);font-size:17px;letter-spacing:.06em;font-weight:700;
+  color:var(--sumi);background:var(--shiro);
+  border:1px solid var(--kasumi);border-radius:14px;cursor:pointer;
+  transition:border-color .2s,box-shadow .2s,transform .2s,background .2s;
+}
+.size-btn small{
+  display:block;font-family:var(--gothic);font-size:10.5px;
+  font-weight:400;color:var(--sumi-usu);letter-spacing:.1em;margin-top:2px;
+}
+.size-btn:hover:not([aria-disabled="true"]){
+  border-color:var(--sakura);transform:translateY(-1px);
+}
+.size-btn[aria-pressed="true"]{
+  border-color:var(--sakura);background:var(--sakura-usu);
+  box-shadow:0 0 0 1px var(--sakura);
+}
+.size-btn[aria-pressed="true"] small{color:var(--sakura)}
+.size-btn[aria-disabled="true"]{opacity:.5;cursor:default}
+.size-note{
+  max-width:460px;margin:20px auto 0;padding:15px 18px;
+  background:var(--haichi);border-radius:14px;
+  font-size:12.5px;line-height:1.95;color:var(--sumi-usu);text-align:center;
+}
+.size-lock,.size-error{
+  margin-top:14px;min-height:22px;text-align:center;font-size:12.5px;color:var(--sumi-usu);
+}
+.size-error{color:#A8465C}
+
+/* ── 完成画面：選んだ内容のまとめ ────── */
+.order-recap{
+  max-width:520px;margin:30px auto 6px;
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:18px;
+  padding:8px 22px;
+}
+.recap-row{
+  display:flex;align-items:baseline;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--kasumi);
+}
+.order-recap .recap-row:last-child{border-bottom:none}
+.recap-label{
+  flex:none;width:88px;
+  font-family:var(--mincho);font-size:12.5px;letter-spacing:.1em;
+  color:var(--sumi-usu);
+}
+.recap-value{
+  flex:1;font-family:var(--mincho);font-size:15.5px;
+  letter-spacing:.05em;font-weight:700;line-height:1.8;
+}
+@media (max-width:420px){
+  .size-btn{min-width:calc(33.333% - 7px);padding:13px 6px;font-size:16px}
+}
+
+/* ── 選んだ仕立ての結果 ─────────────── */
+.result-kicker{text-align:center;font-family:var(--mincho);font-size:14px;color:var(--sumi-usu)}
+.result-english{
+  text-align:center;font-family:var(--mincho);font-size:12px;letter-spacing:.28em;
+  color:var(--sakura);margin:3px 0 24px;
+}
+.result-type{
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:24px;
+  overflow:hidden;margin:30px 0;box-shadow:0 18px 50px rgba(82,51,37,.06);
+}
+.result-type-media{position:relative;aspect-ratio:16/10;background:#F2E3DB;overflow:hidden}
+.result-type-media img{display:block;width:100%;height:100%;object-fit:cover}
+.result-type-copy{padding:24px 22px 25px;text-align:center}
+.result-type-copy .eyebrow{margin-bottom:8px}
+.result-type-copy h3{
+  font-family:var(--mincho);font-size:20px;line-height:1.6;letter-spacing:.06em;margin-bottom:12px;
+}
+.result-type-copy p{font-size:13.5px;line-height:2;color:var(--sumi-usu);text-align:left}
+.selected-stones-title{
+  margin:38px 0 18px;text-align:center;font-family:var(--mincho);
+  font-size:18px;letter-spacing:.08em;
+}
+.clasp-note{
+  margin:28px 0 34px;padding:22px 21px;border:1px solid var(--kasumi);
+  border-radius:18px;background:rgba(255,251,248,.7);font-size:13px;line-height:2;
+}
+.clasp-note strong{
+  display:block;margin-bottom:8px;font-family:var(--mincho);font-size:15px;letter-spacing:.08em;
+}
+.shop-pending{opacity:.66;box-shadow:none;cursor:not-allowed}
+.shop-note{text-align:center;min-height:20px;margin-top:8px;font-size:12px;color:var(--sumi-usu)}
+.style-mini-icon{
+  width:62px;height:62px;flex:none;border:1px solid var(--kasumi);border-radius:50%;
+  display:grid;place-items:center;background:var(--sakura-usu);font-family:var(--mincho);
+  font-size:11px;line-height:1.35;text-align:center;color:var(--sakura);
+}
+
+.step{display:none;animation:fade .5s ease}
+.step.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+@media (max-width:420px){
+  .wishes{grid-template-columns:1fr}
+  .thread-line{width:30px}
+  .style-card{grid-template-columns:1fr}
+  .style-media{min-height:0;aspect-ratio:16/9}
+  .intro-copy{padding:24px 20px;border-radius:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="app-brand">KOHARU · STONE DIAGNOSIS</p>
+<div class="thread-label" id="threadLabel">お聞かせください</div>
+<div class="thread" aria-hidden="true">
+  <span class="thread-bead on" id="tb0"></span>
+  <span class="thread-line"></span>
+  <span class="thread-bead" id="tb1"></span>
+  <span class="thread-line"></span>
+  <span class="thread-bead" id="tb2"></span>
+</div>
+<div class="progress-names" aria-label="診断の進み具合">
+  <span><b>1</b>入力</span>
+  <span><b>2</b>石・仕立て選び</span>
+  <span><b>3</b>完成</span>
+</div>
+
+<!-- ══ STEP 1 ══════════════════════════ -->
+<section class="step active" id="step1">
+  <p class="eyebrow">koharu amulet Jewelry</p>
+  <div class="intro-copy">
+    <p class="intro-em">
+      石には、それぞれ個性があります。<br>
+      そして、その人が今どんな状態にいるかによって、<br>
+      寄り添ってくれる石も変わってきます。
+    </p>
+    <p>
+      選んでいただくストーンは、それぞれ個性があり、<br>
+      その時々で丸玉、カット、コインなど形状が変わります。<br>
+      それも、ご縁で惹かれあった石で、あなただけのオリジナルの<br>
+      ブレスレットに生まれ変わります。
+    </p>
+    <p>では、さっそく生年月日と生まれた場所、好きな色と、今いちばん叶ってほしいことを教えてください。</p>
+    <p>数秘、星の巡り、クリスタルヒーリングでの経験をもとに、あなたに寄り添う石をお選びします。</p>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><span class="field-label">生年月日</span></div>
+    <div class="dob">
+      <select id="y" aria-label="生まれた年"></select><span>年</span>
+      <select id="m" aria-label="生まれた月"></select><span>月</span>
+      <select id="d" aria-label="生まれた日"></select><span>日</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">生まれた場所</span>
+      <span class="field-note">土地のエネルギーを見ます</span>
+    </div>
+    <select id="pref" aria-label="生まれた都道府県"></select>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">好きな色</span>
+      <span class="field-note">3つまで選べます</span>
+    </div>
+    <div class="chips" id="colorChips"></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><span class="field-label">今、いちばん叶ってほしいことを教えてください</span></div>
+    <div class="wishes" id="wishGrid"></div>
+    <p class="wish-hint">願いは、ひとつだけ選んでください。いちばん叶ってほしいことに絞ることで、その願いに寄り添う石がはっきりと見えてきます。</p>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">今の願いを教えてください。</span>
+    </div>
+    <p class="wish-hint" style="margin:0 0 12px">
+      ここに書いたことは、ブレスレットと共にお送りする鑑定書をお書きするときの大切な手がかりになります。<br>
+      さらに詳しく、生まれた市や町、生まれた時刻まで分かれば、書き添えてください。より詳しくお調べできます。<br>
+      （わからない場合は、空白でも大丈夫です）
+    </p>
+    <textarea id="freeWish" aria-label="今の願い"></textarea>
+  </div>
+
+  <button class="btn" id="go1">石を選ぶ</button>
+  <p class="err" id="err1" role="alert" aria-live="polite"></p>
+</section>
+
+<script>
+/* ══════════════════════════════════════
+   小春ジュエリー 石データベース（40種類）
+
+   写真について：
+   images フォルダに「石のID.webp」という名前で入れるだけで、
+   自動的にその石の写真が表示されます。
+   （例：images/amethyst.webp）
+   webp / png / jpg / jpeg のどれでも大丈夫です。
+   写真がない石は、これまでどおり色だけで表示されます。
+   ══════════════════════════════════════ */
+const STONES = [
+  {
+    id: "amethyst", name: "アメジスト", en: "Amethyst",
+    color: ["紫"], hex: ["#B9A0D4", "#7E5FA8", "#5C4080"],
+    wish: ["浄化", "恋愛", "癒し"], num: [7, 9],
+    lead: "心を静めて、本当の答えを見せてくれる石",
+    body: "和名を紫水晶といい、古くから「愛の守護石」として大切にされてきました。感情がざわついているとき、その波を静かに沈めて、頭で考えた答えではなく、心の奥にある本当の望みに気づかせてくれます。\n\n強い浄化の力を持ちながら、その働き方はとても穏やか。無理に何かを変えるのではなく、あなたが自分のペースで整っていくのを、そばで見守るように支えてくれます。眠りが浅いとき、考えごとが止まらないとき、枕元に置いておくのもおすすめです。\n\n迷いの多い時期をすごしている方、直感をもっと信じられるようになりたい方に、そっと寄り添ってくれる一粒です。"
+  },
+  {
+    id: "peridot", name: "ペリドット", en: "Peridot",
+    color: ["緑"], hex: ["#D3E08A", "#A8C24E", "#7A9130"],
+    wish: ["癒し", "自信", "浄化"], num: [3, 5],
+    lead: "重たい気持ちを、光のほうへ連れ出してくれる石",
+    body: "太陽の光をそのまま閉じ込めたような、明るい黄緑色。古代エジプトでは「太陽の宝石」と呼ばれ、闇や不安を遠ざけるお守りとして身につけられていました。\n\nこの石が得意なのは、嫉妬や執着、誰かと比べてしまう気持ちなど、自分でも扱いに困る重たい感情をやわらげること。責める代わりに「もう手放してもいいよ」と、明るいほうへ視線を向けさせてくれます。\n\nなんとなく気持ちが晴れない日が続いている方、もう一度前を向くきっかけがほしい方に。心の風通しをよくしてくれる、あたたかな石です。"
+  },
+  {
+    id: "aquamarine", name: "アクアマリン", en: "Aquamarine",
+    color: ["青"], hex: ["#CDE9EF", "#8FCBD9", "#5E9FB0"],
+    wish: ["恋愛", "癒し", "浄化"], num: [2, 6],
+    lead: "言いたいことが、やさしい言葉になって出てくる石",
+    body: "名前の由来は、ラテン語の「海の水」。船乗りたちが安全な航海を願って持ち歩いた、お守りの石として知られています。\n\n「勇気の石」とも呼ばれ、伝えたいのに言えないこと、飲み込んでしまった気持ちを、やわらかい言葉にほどいて外に出す手助けをしてくれます。強く言い切る勇気ではなく、相手を思いやりながら本音を伝える、そんな種類の勇気です。\n\nパートナーや家族との関係で、すれ違いや誤解を感じている方に。あなたの中の言葉が、ちゃんと相手に届くように支えてくれます。"
+  },
+  {
+    id: "pinktourmaline", name: "ピンクトルマリン", en: "Pink Tourmaline",
+    color: ["ピンク"], hex: ["#F0B4CC", "#D9739E", "#A84A72"],
+    wish: ["恋愛", "癒し"], num: [2, 6],
+    lead: "傷ついた心を、いちばん深いところから癒す石",
+    body: "深い愛のエネルギーを持つ石で、ハートのあたりにあたたかい灯りをともすように働きかけると言われています。\n\n恋愛の石として有名ですが、この石が最初に向き合うのは、相手ではなくあなた自身。過去に傷ついた記憶や、自分を後回しにしてきた癖を、責めずにゆっくりほどいていきます。自分をちゃんと大切にできるようになると、不思議と人からの愛も受け取りやすくなる。その順番を、この石はよく知っています。\n\n恋の痛みを抱えている方、もう一度やわらかい気持ちで人と向き合いたい方に、いちばん近くにいてほしい石です。"
+  },
+  {
+    id: "citrine", name: "シトリン", en: "Citrine",
+    color: ["黄"], hex: ["#F7DFA0", "#E5B84B", "#B88A28"],
+    wish: ["金運", "自信", "仕事"], num: [3, 8],
+    lead: "豊かさの流れを、明るく呼び込む石",
+    body: "黄水晶とも呼ばれ、古くから「商売繁盛の石」「富をもたらす石」として愛されてきました。商いをする人が、お店や財布に忍ばせてきた歴史があります。\n\nただお金を呼ぶというより、この石が高めてくれるのは「受け取る力」。自分には価値がある、受け取っていい、と思えるようになると、豊かさは自然と流れ込んでくる。その土台の部分を、明るく照らしてくれます。\n\n新しい挑戦を始めたい方、収入や仕事の流れを変えていきたい方に。太陽のような前向きさを分けてくれる石です。"
+  },
+  {
+    id: "pearlwhite", name: "淡水パール（ホワイト）", en: "Freshwater Pearl",
+    color: ["白"], hex: ["#FBF7F0", "#EFE4D4", "#D6C6B0"],
+    wish: ["浄化", "恋愛", "癒し"], num: [2, 9],
+    lead: "まっさらな気持ちに戻して、新しく始めさせてくれる石",
+    body: "貝の中で長い時間をかけて育つ、生命が生んだ宝石。母から子へ受け継がれることも多く、慈愛と守りの象徴とされてきました。\n\n淡水パールの働きは、余計なものを削ぎ落として、心をまっさらな状態に戻すこと。過去の出来事や人の言葉に引きずられているとき、その重さをそっと洗い流して、いまのあなたに戻してくれます。\n\n節目を迎える方、心機一転して新しい自分で歩き出したい方に。清らかさと女性らしいやわらかさを、同時に授けてくれる一粒です。"
+  },
+  {
+    id: "carnelian", name: "カーネリアン", en: "Carnelian",
+    color: ["オレンジ"], hex: ["#F0A878", "#D9683C", "#A8451F"],
+    wish: ["自信", "仕事"], num: [1, 5],
+    lead: "「やってみよう」の一歩を、後ろから押してくれる石",
+    body: "燃えるような橙色を持ち、古代エジプトやローマでは戦士や旅人が、勇気と生命力を求めて身につけていました。ナポレオンが愛用した石としても知られています。\n\n頭では分かっているのに動けない、そんなときに力を貸してくれるのがこの石。迷いを断ち切って、最初の一歩を踏み出す瞬間のエネルギーを後押ししてくれます。\n\n新しいことを始めたい方、先延ばしにしている大事な用事がある方に。読んで終わりにせず、行動に変えたいときの相棒です。"
+  },
+  {
+    id: "moonstone", name: "ムーンストーン", en: "Moonstone",
+    color: ["白"], hex: ["#F2F2F7", "#DCDCE6", "#B8B8C6"],
+    wish: ["癒し", "恋愛", "浄化"], num: [2, 7],
+    lead: "心の満ち欠けに、静かに寄り添ってくれる石",
+    body: "「女神の石」と呼ばれ、月の満ち欠けと同じリズムで人の心に寄り添うと言われてきました。表面をゆらめく青白い光は、シラーと呼ばれる、この石だけの輝きです。\n\n感情には波があって当たり前。上がるときも下がるときもある——それを否定せず、そのまま受けとめて整えてくれるのがムーンストーンです。感受性が豊かで、周りの空気を敏感に感じ取ってしまう方ほど、この石の穏やかさに助けられます。\n\n心のリズムを大切にしたい方、新しい始まりを迎える方に。夜の海のように静かに支えてくれる石です。"
+  },
+  {
+    id: "smokyquartz", name: "スモーキークォーツ", en: "Smoky Quartz",
+    color: ["茶"], hex: ["#C4A88F", "#8B6B52", "#5C4432"],
+    wish: ["浄化", "癒し"], num: [4, 8],
+    lead: "地に足をつけて、ちゃんと現実を歩かせてくれる石",
+    body: "煙水晶とも呼ばれる、やさしい茶色の水晶。大地とのつながりを強め、根を張るように心を安定させてくれる「グラウンディング」の代表的な石です。\n\n不安や心配ごとを吸い取って、地面に流してくれるような働きをします。考えすぎて眠れない夜、気持ちだけが先走ってしまうとき、この石はあなたを静かに現実に引き戻してくれます。\n\nふわふわと落ち着かない時期をすごしている方、目の前のことに集中したい方に。守りの力も強く、お守りとして長く持ち歩ける石です。"
+  },
+  {
+    id: "aquaaura", name: "アクアオーラ", en: "Aqua Aura",
+    color: ["白", "青"], hex: ["#E8F4FA", "#B8D9EC", "#9FC5DE"],
+    wish: ["浄化", "仕事"], num: [7, 1],
+    lead: "視界をひらいて、新しい可能性を見せてくれる石",
+    body: "水晶にプラチナを蒸着させて生まれた、虹色に輝く石。天然石と人の手仕事が出会って生まれた、めずらしい存在です。\n\n水晶が持つ強い浄化の力に、プラチナの華やかさが加わることで、意識をひとつ上の視点へ引き上げてくれると言われています。行き詰まって同じところをぐるぐるしているとき、「そこじゃない道もあるよ」と教えてくれるような働きです。\n\n新しいアイデアがほしい方、直感やひらめきを大切にしたい方に。持っているだけで気分が晴れやかになる、光の石です。"
+  },
+  {
+    id: "incarose", name: "インカローズ", en: "Rhodochrosite",
+    color: ["ピンク"], hex: ["#EFA0B8", "#C4527A", "#94304F"],
+    wish: ["恋愛", "自信"], num: [1, 6],
+    lead: "情熱を思い出させてくれる、愛の石",
+    body: "和名を菱マンガン鉱、別名ロードクロサイト。インカ帝国の王が愛したという伝説から、この名で呼ばれています。「バラ色の人生」を象徴する石です。\n\n恋愛の石として名高いですが、その力の源は自己愛。自分を大切に扱えるようになったとき、人は自然と魅力的になり、まっすぐな愛を受け取れるようになります。長く眠っていた情熱や、忘れかけていた「こうなりたい」という願いを呼び起こしてくれる石でもあります。\n\n新しい恋を始めたい方、もう一度自分の人生に情熱を取り戻したい方に。"
+  },
+  {
+    id: "iolite", name: "アイオライト", en: "Iolite",
+    color: ["紫", "青"], hex: ["#B0B4DB", "#7B7FB5", "#54588C"],
+    wish: ["仕事", "自信", "浄化"], num: [1, 7],
+    lead: "迷いの中で、進むべき方角を指し示す石",
+    body: "かつてバイキングたちが、太陽の位置を知るための羅針盤として使ったと伝えられ、「バイキングコンパス」とも呼ばれます。\n\nその名の通り、この石が得意なのは方向を示すこと。選択肢が多すぎてどれを選べばいいか分からないとき、周りの声に流されそうなとき、あなた自身が本当に進みたい方角に意識を戻してくれます。\n\n人生の転機にいる方、大きな決断を控えている方に。静かな青紫の光が、あなたの内側の羅針盤を目覚めさせてくれます。"
+  },
+  {
+    id: "blueapatite", name: "ブルーアパタイト", en: "Blue Apatite",
+    color: ["青"], hex: ["#7FC4E0", "#2E8BC0", "#1B5F8C"],
+    wish: ["仕事", "自信"], num: [3, 5],
+    lead: "目標に向かう意志を、はっきりさせてくれる石",
+    body: "透きとおった青が印象的な石で、意志力と自己表現力を高めるはたらきがあると言われています。\n\n「なんとなくやりたい」を「これをやる」に変えるのが、この石の得意分野。ぼんやりした願いに輪郭を与え、そこに向かって進む集中力を保たせてくれます。同時に、自分の考えを人に伝える力も後押ししてくれるので、発信する仕事をしている方とも相性がいい石です。\n\n新しく何かを始めたい方、目標を最後までやり切りたい方に。"
+  },
+  {
+    id: "greenaventurine", name: "グリーンアベンチュリン", en: "Green Aventurine",
+    color: ["緑"], hex: ["#B5D9BC", "#7FB88C", "#528A62"],
+    wish: ["癒し", "金運", "浄化"], num: [6, 4, 8],
+    lead: "深呼吸をひとつ、思い出させてくれる石",
+    body: "森林浴をしているような、やわらかい緑色。「ヒーリングストーン」の代表格として、心身の疲れをやさしくほぐす石として知られています。同時に「チャンスの石」という別名も持っています。\n\n頑張りすぎているとき、この石は「少し休んでもいいよ」と伝えてくれます。緊張がゆるむと視野が広がって、これまで見落としていた道や機会が見えてくる。癒しと幸運がひとつながりであることを、この石はよく知っています。\n\n人間関係に気を使いすぎてしまう方、なんとなく疲れが取れない方に。持っているだけで肩の力が抜ける、そんな存在です。"
+  },
+  {
+    id: "amazonite", name: "アマゾナイト", en: "Amazonite",
+    color: ["青", "緑"], hex: ["#A8E0DA", "#6BC4BA", "#3F918A"],
+    wish: ["癒し", "浄化", "自信"], num: [5, 2],
+    lead: "「これでいい」と思えるようにしてくれる石",
+    body: "アマゾン川の名を持つ、澄んだ青緑色の石。「ホープストーン（希望の石）」とも呼ばれ、迷いや不安を晴らして前を向かせてくれます。\n\nこの石が整えてくれるのは、心のバランス。不安から出た決断と、希望から出た決断はまったく違うものになります。恐れが薄れると、自分の選択に「これでいい」と納得できるようになる——そういう変化を後押ししてくれます。\n\n人間関係のストレスを感じている方、自分の選択に自信を持ちたい方に。"
+  },
+  {
+    id: "charoite", name: "チャロアイト", en: "Charoite",
+    color: ["紫"], hex: ["#B79FCE", "#8B6FA8", "#5E4676"],
+    wish: ["浄化", "癒し", "仕事"], num: [9, 7],
+    lead: "古い自分を脱いで、生まれ変わらせてくれる石",
+    body: "ロシアのチャロ川流域でしか採れない、紫のマーブル模様が美しい希少な石。世界三大ヒーリングストーンのひとつに数えられています。\n\n「変容の石」と呼ばれ、長く握りしめてきた考え方や、もう合わなくなった人間関係を手放す力を貸してくれます。手放すのは痛みを伴うこともありますが、この石はその過程を怖がらずに通り抜けられるよう、静かに支えてくれます。\n\n人生の転換期にいる方、そろそろ変わりたいと感じている方に。"
+  },
+  {
+    id: "garnet", name: "ガーネット", en: "Garnet",
+    color: ["赤"], hex: ["#C4566B", "#8B2635", "#5C1620"],
+    wish: ["恋愛", "自信", "仕事"], num: [1, 8],
+    lead: "積み重ねたものを、実らせてくれる石",
+    body: "ざくろの実に由来する名を持つ、深い赤の石。古くから「実りの石」として、努力を成果に結びつけるお守りとされてきました。\n\n情熱と生命力を高める石ですが、その熱は瞬間的な勢いではなく、続ける力としての熱。これまで積み重ねてきたものがなかなか形にならないとき、最後のひと押しをしてくれます。また、変わらぬ愛を象徴する石でもあり、大切な人との絆を深めたいときにも選ばれてきました。\n\nやる気を取り戻したい方、あと一歩のところで踏ん張りたい方に。"
+  },
+  {
+    id: "labradorite", name: "ラブラドライト", en: "Labradorite",
+    color: ["青", "黒"], hex: ["#A8B4BE", "#6B7E8C", "#3F4C57"],
+    wish: ["浄化", "仕事", "自信"], num: [7, 9],
+    lead: "自分の内側の声を、信じさせてくれる石",
+    body: "見る角度によって青や金の閃光がひらめく、神秘的な石。この輝きは「ラブラドレッセンス」と呼ばれ、この石だけが持つ特徴です。\n\n「魔法の石」とも称され、直感力を研ぎ澄ますと同時に、外からの余計なエネルギーから持ち主を守ってくれます。人の意見に振り回されやすいとき、この石は「あなたが感じていることは正しいよ」と、内側の声を信じる後押しをしてくれます。\n\n人と接する機会が多い方、自分の感覚を大切に生きたい方に。"
+  },
+  {
+    id: "lapislazuli", name: "ラピスラズリ", en: "Lapis Lazuli",
+    color: ["青"], hex: ["#4A63B0", "#26428B", "#152A5C"],
+    wish: ["仕事", "浄化", "自信"], num: [7, 8],
+    lead: "本質を見抜く目を、育ててくれる石",
+    body: "人類最古のパワーストーンのひとつとされ、古代エジプトでは「聖なる石」として神々に捧げられました。ツタンカーメンの黄金のマスクにも使われています。\n\n「真実の石」と呼ばれ、物事の本質を見抜く洞察力を高めてくれます。同時に、迷いや誘惑を退け、必要な変化を起こす強い力も持っています。持ち主に厳しさを見せることもある石ですが、それはいつも、その人が本来進むべき道へ戻すためです。\n\n大きな目標がある方、自分の生き方を見つめ直したい方に。"
+  },
+  {
+    id: "scolecite", name: "スコロライト", en: "Scolecite",
+    color: ["白"], hex: ["#F5F2F5", "#E0DBE4", "#BDB6C4"],
+    wish: ["癒し", "浄化"], num: [9, 2],
+    lead: "深いところまで、静けさを届けてくれる石",
+    body: "細い針が束になったような結晶で、白く清らかな見た目そのままに、とても穏やかな波動を持つ石です。\n\n緊張でこわばった心をゆるめ、深い安心感の中に連れていってくれます。ヒーリングや瞑想の場で好まれるのは、この石が「何かを起こす」のではなく「静けさを取り戻させる」働きをするからです。眠りの質を整えたいときにも選ばれます。\n\n気を張りつめている日々を送っている方、心からゆっくり休みたい方に。"
+  },
+  {
+    id: "onyx", name: "オニキス", en: "Onyx",
+    color: ["黒"], hex: ["#4A4A4A", "#242424", "#0F0F0F"],
+    wish: ["浄化", "自信", "仕事"], num: [4, 8],
+    lead: "ぶれない自分軸をつくってくれる石",
+    body: "深く艶やかな黒。古来より魔除けの石として、また意志を貫くためのお守りとして、世界中で身につけられてきました。\n\nこの石が育ててくれるのは、忍耐力と自分軸。誘惑や横やりに揺らがず、決めたことをやり抜く力を支えてくれます。同時に、他人の負のエネルギーを跳ね返す守りの働きも強く、人の多い場所で消耗しやすい方の助けにもなります。\n\n目標に向かって進んでいる方、周りに流されず自分を保ちたい方に。"
+  },
+  {
+    id: "fluorite", name: "フローライト", en: "Fluorite",
+    color: ["紫", "緑"], hex: ["#C2AEDB", "#9B7FC4", "#6E559B"],
+    wish: ["仕事", "浄化", "癒し"], num: [3, 7],
+    lead: "散らかった頭の中を、整理してくれる石",
+    body: "紫や緑が層になって流れる、独特の美しさを持つ石。その多彩さから「天才の石」「勉強の石」とも呼ばれます。\n\n情報が多すぎて何から手をつければいいか分からないとき、この石は思考を整理し、優先順位をつける手助けをしてくれます。集中力を保ちながらも緊張しすぎない、ちょうどいい状態に導いてくれるのが特徴です。\n\n学びや資格の勉強をしている方、頭の中をすっきりさせたい方に。デスクに置いておくのもおすすめです。"
+  },
+  {
+    id: "greenonyx", name: "グリーンオニキス", en: "Green Onyx",
+    color: ["緑"], hex: ["#4FA87D", "#2E7D5B", "#1A5238"],
+    wish: ["仕事", "浄化", "金運"], num: [4, 6],
+    lead: "続ける力を、静かに支えてくれる石",
+    body: "深く鮮やかな緑を持つオニキス。黒いオニキスの持つ強さに、緑の癒しが加わったような性質の石です。\n\n安定と持続を象徴し、物事を長く続けるための粘り強さを育ててくれます。短期間で結果を求めて疲れてしまうのではなく、自分のペースを守りながら着実に積み上げていく——そんな歩き方を支えてくれる石です。\n\n新しい習慣を身につけたい方、長期的な目標に取り組んでいる方に。"
+  },
+  {
+    id: "blacktourmaline", name: "ブラックトルマリン", en: "Black Tourmaline",
+    color: ["黒"], hex: ["#3D3D3D", "#1C1C1C", "#080808"],
+    wish: ["浄化"], num: [4, 1],
+    lead: "いちばん強い、守りのお守り",
+    body: "数あるパワーストーンの中でも、最強クラスの魔除けの石として知られています。摩擦や熱によって微弱な電気を帯びる性質があり、その特性が浄化の力と結びつけて語られてきました。\n\nこの石の役割ははっきりしていて、あなたに向かってくる悪い流れや、疲れさせるエネルギーを跳ね返すこと。守りに徹してくれるので、外に出る機会が多い方、人のエネルギーを受け取りやすい方の心強い盾になります。\n\n環境を変えたばかりの方、しっかり自分を守りたい方に。"
+  },
+  {
+    id: "rhodonite", name: "ロードナイト", en: "Rhodonite",
+    color: ["ピンク"], hex: ["#DFA0AB", "#C4737F", "#8E4A55"],
+    wish: ["癒し", "恋愛"], num: [6, 2],
+    lead: "許すことを、少しずつ教えてくれる石",
+    body: "やわらかなピンクに黒い模様が入る、優しさと強さを併せ持った石。和名を薔薇輝石といいます。\n\n心の傷を癒し、自分と他者への思いやりを育ててくれます。この石が向き合うのは、誰かを許せない気持ちや、自分を責めてしまう癖。無理に忘れさせるのではなく、その痛みを抱えたままでも前に進めるように、少しずつ心をほどいていきます。\n\n人間関係で痛い思いをした方、誰かとの関係をやり直したい方に。"
+  },
+  {
+    id: "lepidolite", name: "レピドライト", en: "Lepidolite",
+    color: ["紫"], hex: ["#D2C2E4", "#B9A5CE", "#8E7BA6"],
+    wish: ["癒し", "浄化"], num: [9, 2],
+    lead: "不安をやわらげて、安心を連れてくる石",
+    body: "紫のきらめきを含む鱗雲母。天然のリチウムを含むことから、心を落ち着かせる石として語られてきました。\n\n不安やストレスをやわらげ、揺れる感情を穏やかに整えてくれます。特に、変化の多い時期や環境が変わったときなど、心が落ち着かない場面で力になってくれる石です。眠る前の時間に、そばに置いておく方も多くいらっしゃいます。\n\n気持ちの浮き沈みが大きい方、安心して過ごせる時間を増やしたい方に。"
+  },
+  {
+    id: "chrysoprase", name: "クリソプレーズ", en: "Chrysoprase",
+    color: ["緑"], hex: ["#B0DEC0", "#7FC49B", "#4F9269"],
+    wish: ["金運", "癒し", "自信"], num: [3, 6],
+    lead: "気持ちを明るくして、運を呼び込む石",
+    body: "みずみずしい黄緑色を持ち、古代ギリシャ・ローマ時代から幸運を呼ぶ石として重宝されてきました。アレクサンダー大王が身につけていたという伝説もあります。\n\n心の重荷を軽くして、明るい気持ちを取り戻させてくれるのがこの石の得意分野。気持ちが上向くと行動が変わり、行動が変わると出会うものが変わる——そんな連鎖の入り口をつくってくれます。\n\n新しいチャンスがほしい方、毎日を明るい気持ちで過ごしたい方に。"
+  },
+  {
+    id: "pinkepidote", name: "ピンクエピドート", en: "Pink Epidote",
+    color: ["ピンク"], hex: ["#F2B0B8", "#E08B96", "#B05F6C"],
+    wish: ["癒し", "恋愛"], num: [6, 9],
+    lead: "時間をかけて、そっと回復させてくれる石",
+    body: "やわらかなピンクの中に、細かな輝きを含んだ石。見た目そのままに、とても優しい波動を持っています。\n\nこの石の癒し方は、劇的ではありません。急がず、責めず、あなたのペースに合わせてゆっくりと回復を支えてくれます。心が疲れているときほど、強い言葉より静かな寄り添いが必要になる——その役割を担ってくれる石です。\n\n心が消耗している方、自分をいたわる時間を持ちたい方に。"
+  },
+  {
+    id: "tigereye", name: "タイガーアイ", en: "Tiger's Eye",
+    color: ["茶", "黄"], hex: ["#E0B45F", "#B8842B", "#7E5714"],
+    wish: ["仕事", "金運", "自信"], num: [8, 1],
+    lead: "見極める目と、勝負どころの決断力をくれる石",
+    body: "光を当てると虎の目のような筋が浮かび上がる、力強い石。古くから金運と仕事運の石として、世界中で愛されてきました。\n\n「洞察力の石」と呼ばれ、物事の本質と、いま動くべきタイミングを見極める力を高めてくれます。同時に、その見極めを行動に移す決断力も後押ししてくれるので、仕事で結果を出したい方との相性がとてもいい石です。\n\nキャリアを前に進めたい方、大きな目標に挑んでいる方に。"
+  },
+  {
+    id: "sunstone", name: "サンストーン", en: "Sunstone",
+    color: ["オレンジ"], hex: ["#F2BE8F", "#E89B5C", "#B96D32"],
+    wish: ["自信", "仕事", "恋愛"], num: [1, 3],
+    lead: "自分を信じる力を、太陽のように灯す石",
+    body: "内側にきらきらとした輝きを宿す、太陽の名を持つ石。ムーンストーンと対をなす存在として語られることもあります。\n\nこの石が高めてくれるのは、自己肯定感。「自分なんて」という気持ちが薄れ、自分の存在をそのまま認められるようになると、人前に出ることや自分を表現することが、驚くほど軽くなります。明るい前向きさを、内側から生み出す力をくれる石です。\n\n自信を取り戻したい方、もっと自分らしく輝きたい方に。"
+  },
+  {
+    id: "prehnite", name: "プレナイト", en: "Prehnite",
+    color: ["緑"], hex: ["#DCE8B0", "#C4D69B", "#96A86C"],
+    wish: ["浄化", "癒し"], num: [6, 9],
+    lead: "いらないものを手放して、心を整える石",
+    body: "薄い黄緑の中に、うっすらと光を透かす美しい石。「予言の石」という別名も持ち、内側の感覚を澄ませてくれると言われています。\n\n心の中に溜まった不要な感情や、抱え込みすぎた思いを手放す手助けをしてくれます。何かを足すのではなく、引いて整える——部屋の片づけをしたあとのような、すっきりとした心地よさを届けてくれる石です。\n\n頭も心もごちゃごちゃしている方、身の回りを整理したい方に。"
+  },
+  {
+    id: "sodalite", name: "ソーダライト", en: "Sodalite",
+    color: ["青"], hex: ["#4A5C96", "#2E4272", "#1A2749"],
+    wish: ["仕事", "浄化"], num: [7, 4],
+    lead: "感情に飲まれず、冷静に考えさせてくれる石",
+    body: "深い藍色に白い模様が入る、落ち着いた佇まいの石。理性と論理を司る石として知られています。\n\n感情が高ぶって判断を誤りそうなとき、この石は一歩引いた視点を取り戻させてくれます。冷たくなるのではなく、落ち着いて考えられる状態に整えるということ。目標に向かって一貫した行動をとりたいときにも、頼りになります。\n\n大事な判断を控えている方、感情に振り回されたくない方に。"
+  },
+  {
+    id: "whitetopaz", name: "ホワイトトパーズ", en: "White Topaz",
+    color: ["白"], hex: ["#F7F7F7", "#E8E8E8", "#C4C4C4"],
+    wish: ["浄化", "仕事", "自信"], num: [1, 8],
+    lead: "進みたい道を、明るく照らしてくれる石",
+    body: "無色透明で、光を受けるとダイヤモンドのように輝く石。11月の誕生石としても知られています。\n\n浄化の力が高く、心と場のエネルギーを澄ませてくれると同時に、成功へ向かう道を照らす石とされてきました。何を望んでいるのかがはっきりしてくると、迷いが減り、進むスピードが自然と上がります。その明晰さを届けてくれる石です。\n\n新しいスタートを切る方、目指すものをはっきりさせたい方に。"
+  },
+  {
+    id: "pinkopal", name: "ピンクオパール", en: "Pink Opal",
+    color: ["ピンク"], hex: ["#F5CFCF", "#E8B5B5", "#BC8888"],
+    wish: ["恋愛", "癒し"], num: [2, 6],
+    lead: "やわらかな魅力を、引き出してくれる石",
+    body: "「キューピットストーン」とも呼ばれる、優しい桃色の石。愛と美をもたらす石として、女性を中心に長く愛されてきました。\n\nこの石が引き出すのは、あなたの中にもともとある、やわらかさや思いやり。無理に作り込んだ魅力ではなく、自然体でいるときのあなたの良さが表に出てくるように働きかけてくれます。恋愛においても、飾らない自分で相手と向き合えるようになります。\n\n恋愛運を高めたい方、自分らしい優しさを大切にしたい方に。"
+  },
+  {
+    id: "rutilequartz", name: "ルチルクオーツ", en: "Rutilated Quartz",
+    color: ["黄", "白"], hex: ["#EFE0BC", "#DBC48B", "#B39B57"],
+    wish: ["金運", "仕事", "自信"], num: [8, 1],
+    lead: "強い運を呼び込む、金運の代表格",
+    body: "透明な水晶の中に、金色の針が走る美しい石。和名を金針水晶といい、パワーストーンの中でも屈指の人気を誇ります。\n\n古くから「幸運を呼ぶ石」として名高く、金運・仕事運・勝負運を強力に後押しすると言われてきました。針の一本一本がアンテナのように働き、チャンスや情報を引き寄せると語られます。大きな目標に挑むときの、力強い味方になってくれる石です。\n\n事業や仕事で結果を出したい方、金運を高めたい方に。"
+  },
+  {
+    id: "kunzite", name: "クンツァイト", en: "Kunzite",
+    color: ["ピンク", "紫"], hex: ["#EBC8DF", "#DDB5CE", "#B18AA4"],
+    wish: ["恋愛", "癒し"], num: [2, 9],
+    lead: "愛を受け取ることを、許してくれる石",
+    body: "淡いピンクからライラック色へ移ろう、繊細で上品な石。無条件の愛を象徴する石として知られています。\n\nこの石が向き合うのは、「愛を受け取る」ことの難しさ。与えることは得意でも、受け取ることには罪悪感を覚えてしまう——そんな方の心を、ゆっくりとほどいてくれます。心を開いても大丈夫だと、静かに教えてくれる存在です。\n\n人に頼るのが苦手な方、愛されることに慣れたい方に。"
+  },
+  {
+    id: "malachite", name: "マラカイト", en: "Malachite",
+    color: ["緑"], hex: ["#3F9973", "#1F6B4B", "#0F4530"],
+    wish: ["浄化", "仕事", "癒し"], num: [5, 9],
+    lead: "悪い流れを断ち切って、新しくする石",
+    body: "深緑の縞模様が特徴的な、存在感のある石。古代エジプトでは魔除けとして、また顔料としても使われてきた歴史があります。\n\n「変容と保護の石」と呼ばれ、危険や悪い流れを察知して持ち主を守ると同時に、停滞した状況を動かす力を持っています。同じところで足踏みしているとき、この石は流れを断ち切って新しい展開を呼び込んでくれます。\n\n今の状況を変えたい方、しっかり守られたい方に。"
+  },
+  {
+    id: "tanzanite", name: "タンザナイト", en: "Tanzanite",
+    color: ["紫", "青"], hex: ["#A5A5D9", "#6B6BB5", "#464682"],
+    wish: ["浄化", "仕事", "癒し"], num: [7, 9],
+    lead: "深い気づきへ、導いてくれる石",
+    body: "タンザニアのごく限られた場所でしか採れない、希少な青紫の石。見る角度によって青にも紫にも表情を変えます。\n\n高い精神性を象徴し、内側の気づきや直感を深めてくれる石とされています。日々の忙しさの中で見失っていた「自分は本当は何を大切にしたいのか」という問いに、静かに答えを返してくれるような働きです。\n\n人生の意味を考えている方、内面と向き合う時間を持ちたい方に。"
+  },
+  {
+    id: "chrysocolla", name: "クリソコラ", en: "Chrysocolla",
+    color: ["青", "緑"], hex: ["#5FB5B5", "#3B8B8B", "#22605F"],
+    wish: ["恋愛", "癒し", "自信"], num: [2, 5],
+    lead: "本当の気持ちを、言葉にする力をくれる石",
+    body: "青と緑が溶け合った、海のような色を持つ石。「女神の石」と呼ばれ、女性性を高めるお守りとされてきました。\n\nコミュニケーション能力と自己表現力を高め、飲み込んでしまった気持ちを言葉にする手助けをしてくれます。伝えたいのに伝わらないもどかしさを抱えているとき、この石は言葉の詰まりをやさしくほどいてくれます。\n\n人間関係を良くしたい方、自分の気持ちを素直に伝えたい方に。"
+  },
+  {
+    id: "orangemoonstone", name: "オレンジムーンストーン", en: "Orange Moonstone",
+    color: ["オレンジ", "白"], hex: ["#F5D5BC", "#E8C4A8", "#BF9878"],
+    wish: ["恋愛", "自信", "癒し"], num: [3, 6],
+    lead: "新しい始まりを、あたたかく後押しする石",
+    body: "淡いオレンジに、絹のような光沢を宿す石。ムーンストーンの持つ穏やかさに、太陽のようなあたたかみが加わった性質を持ちます。\n\n感受性を高めながら、その繊細さが不安ではなく喜びに向かうよう支えてくれます。新しい環境や新しい関係に踏み出すとき、緊張をほぐしながら「大丈夫」と背中に手を添えてくれるような石です。\n\n新生活を迎える方、前向きな変化を望んでいる方に。"
+  }
+];
+
+/* 仕立て画像が未登録の間は、カード内の仮画像を表示します。 */
+function typeImageFallback(img){
+  img.hidden = true;
+}
+</script>
+
+<!-- ══ STEP 2 ══════════════════════════ -->
+<section class="step" id="step2">
+  <p class="eyebrow">石を選ぶ</p>
+  <h1>あなたと相性の良い石</h1>
+  <h2>この中から、3つ選んでください</h2>
+  <p class="lede">
+    お選びした候補の中に、<br>あなたの願いに寄り添う石があります。
+    <span class="lede-sep"></span>
+    まずは「石のお話を読む」から、<br>ひとつずつ石の意味にふれてみてください。<br>
+    お話を読んでいただいた石から、お選びいただけます。
+    <span class="lede-sep"></span>
+    最後は、どうか直感で選んでください。<br>
+    あなたの直感が加わることで、あなたにぴったりの一本に仕上がります。
+  </p>
+
+  <div class="numcard" id="numCard"></div>
+  <div class="stones" id="stoneList"></div>
+
+  <section class="style-section" id="styleSection" aria-labelledby="styleHeading">
+    <p class="eyebrow">仕立てを選ぶ</p>
+    <h2 id="styleHeading">お好きなタイプを、ひとつ選んでください</h2>
+    <div class="style-lede">
+      <p>3種類の石を選んだら、次にブレスレットの仕立てをお選びください。</p>
+      <p>お選びいただいた3種類の石を、それぞれの仕立てに合わせて、世界にひとつだけのブレスレットに仕上げます。</p>
+      <p class="style-price">どのタイプも　¥9,800</p>
+      <p style="margin-top:9px">ブレスレット送付と一緒に鑑定書をお付けしてお届けします。</p>
+    </div>
+
+    <div class="style-grid" id="braceletStyleGrid">
+      <button type="button" class="style-card" data-style="natural" aria-pressed="false" aria-disabled="true">
+        <span class="style-media">
+          <img src="images/bracelet-type1.webp" alt="天然石の一連タイプの完成イメージ" loading="lazy" onerror="typeImageFallback(this)">
+          <span class="style-placeholder"><b>天然石の一連タイプ</b><small>完成イメージ準備中</small></span>
+        </span>
+        <span class="style-copy">
+          <span class="style-no">TYPE 1</span>
+          <span class="style-name">天然石の一連タイプ</span>
+          <span class="style-desc">お選びいただいた3種類の石を主役に、4ミリの小さめストーンで軽やかに仕上げます。<br><br>真ん中には、ハートのカットクリスタルを2個、リボンの形に。中央には、小さく上質なオパールを添えています。<br><br>この3つは、一連の天然石タイプにお入れすることであなたに寄り添うお守りになります。</span>
+          <span class="style-select-label">このタイプを選ぶ</span>
+        </span>
+      </button>
+
+      <button type="button" class="style-card" data-style="clear" aria-pressed="false" aria-disabled="true">
+        <span class="style-media">
+          <img src="images/bracelet-type2.webp" alt="水晶とローズクォーツとシルバーカラーチェーンの完成イメージ" loading="lazy" onerror="typeImageFallback(this)">
+          <span class="style-placeholder"><b>水晶とローズクォーツ × SILVER</b><small>完成イメージ準備中</small></span>
+        </span>
+        <span class="style-copy">
+          <span class="style-no">TYPE 2</span>
+          <span class="style-name">水晶とローズクォーツ × SILVER</span>
+          <span class="style-desc">4ミリ玉の水晶とローズクォーツを使った、やさしく透明感のあるブレスレット。<br><br>そこに、お選びいただいた3種類の石をあしらって、サージカルステンレスのシルバーカラーチェーンを重ねます。<br><br>天然石と繊細なチェーンが手元で寄り添う、軽やかな二連ブレスレットです。素材の美しさを生かして、シンプルに仕上げます。</span>
+          <span class="style-select-label">このタイプを選ぶ</span>
+        </span>
+      </button>
+
+      <button type="button" class="style-card" data-style="pearl" aria-pressed="false" aria-disabled="true">
+        <span class="style-media">
+          <img src="images/bracelet-type3.webp" alt="淡水パールとゴールドカラーチェーンの完成イメージ" loading="lazy" onerror="typeImageFallback(this)">
+          <span class="style-placeholder"><b>淡水パール × GOLD</b><small>完成イメージ準備中</small></span>
+        </span>
+        <span class="style-copy">
+          <span class="style-no">TYPE 3</span>
+          <span class="style-name">淡水パール × GOLD</span>
+          <span class="style-desc">小粒の淡水パールを使った、上品でやわらかな印象のブレスレット。<br><br>そこに、お選びいただいた3種類の石をあしらった、サージカルステンレスのゴールドカラーチェーンを重ねます。<br><br>淡水パールのやさしい艶とゴールドカラーの輝きが手元を彩る、上品な二連ブレスレットです。素材の美しさを生かして、シンプルに仕上げます。</span>
+          <span class="style-select-label">このタイプを選ぶ</span>
+        </span>
+      </button>
+    </div>
+
+    <p class="style-lock" id="styleLock">先に石を3つ選んでください</p>
+    <p class="style-error" id="styleErr" role="alert" aria-live="polite"></p>
+    <div class="fixed-note" style="margin-top:20px">
+      写真は完成イメージです。<br>
+      お選びいただく石によって、色や形、配置は一つひとつ異なります。<br>
+      世界にひとつだけの組み合わせとしてお楽しみください。
+    </div>
+  </section>
+
+  <section class="size-section" id="sizeSection" aria-labelledby="sizeHeading">
+    <p class="eyebrow">サイズを選ぶ</p>
+    <h2 id="sizeHeading">手首のサイズを、お選びください</h2>
+    <div class="style-lede">
+      <p>お作りするブレスレットの大きさを決めるために、<br>手首のサイズを教えてください。</p>
+    </div>
+
+    <div class="size-grid" id="sizeGrid"></div>
+
+    <div class="size-note">
+      メジャーなどで手首をピッタリのサイズで測って選んでください。
+    </div>
+
+    <p class="size-lock" id="sizeLock">先に仕立てを選んでください</p>
+    <p class="size-error" id="sizeErr" role="alert" aria-live="polite"></p>
+  </section>
+
+  <button class="btn-ghost" id="back1">前に戻る</button>
+  <div class="step2-pad"></div>
+</section>
+
+<!-- ══ STEP 3 ══════════════════════════ -->
+<section class="step" id="step3">
+  <p class="eyebrow">できあがり</p>
+  <h2>ありがとうございます</h2>
+  <p class="result-kicker">あなたの</p>
+  <p class="result-english">YOUR AMULET</p>
+  <p class="lede">お選びいただいた石と仕立てをもとに、あなたと共に幸せになっていく、世界にひとつだけのブレスレットをお作りしますね。</p>
+
+  <article class="result-type" id="resultType">
+    <div class="result-type-media">
+      <img id="resultTypeImage" src="" alt="" onerror="typeImageFallback(this)">
+      <div class="style-placeholder" id="resultTypePlaceholder"><b id="resultTypePlaceholderName"></b><small>完成イメージ準備中</small></div>
+    </div>
+    <div class="result-type-copy">
+      <p class="eyebrow" id="resultTypeEnglish"></p>
+      <h3 id="resultTypeName"></h3>
+      <div id="resultTypeDescription"></div>
+    </div>
+  </article>
+
+  <div id="resultBraceletDrawing" style="margin:30px 0 8px" hidden>
+    <svg class="bracelet bracelet-big" id="braceletBig" viewBox="0 0 200 200" role="img" aria-label="選んだ石でできたブレスレットの図"></svg>
+    <p class="bigcap" id="bigCap"></p>
+  </div>
+
+  <div class="order-recap" id="orderRecap"></div>
+
+  <h3 class="selected-stones-title">お選びいただいた3種類の石</h3>
+  <div id="resultStones"></div>
+
+  <p class="price">どのタイプも　<em>¥9,800</em></p>
+  <p class="price-s">ブレスレットと共に、鑑定書をお付けしてお届けします。</p>
+
+  <div class="clasp-note">
+    <strong>留め具について</strong>
+    標準は、着け外しが簡単なサージカルステンレスでできた上質のマグネット仕様でお作りします。<br>
+    サージカルステンレスアジャスター仕様をご希望の方は、追加料金なしで変更いたします。<br>
+    ご注文の際、備考欄に「アジャスター希望」とご記入ください。
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">ご注文のときに</span>
+      <span class="field-note">下の内容をコピーして、備考欄に貼り付けてください。</span>
+    </div>
+    <p class="wish-hint" style="margin:0 0 14px">アジャスター仕様をご希望の方は、コピーした内容の最後に「アジャスター希望」と書き添えてください。</p>
+    <div class="summary" id="summary"></div>
+    <button class="btn-ghost" id="copyBtn" style="margin-top:0">この内容をコピーする</button>
+    <p class="copied" id="copied"></p>
+  </div>
+
+  <p class="closing">
+    あなたの生まれた日と、願いにあわせて書いた鑑定書もお付けします。<br>
+    石の意味、これからの流れ、そしてあなたへのメッセージを。<br><br>
+    あなたを幸せへと導く一本になりますように。
+  </p>
+
+  <a class="btn shop-pending" id="baseLink" href="#" aria-disabled="true"
+     style="text-align:center;text-decoration:none">ブレスレットのご注文へ</a>
+  <p class="shop-note" id="shopNote">小春のご注文ページは準備中です</p>
+  <button class="btn-ghost" id="redo">もう一度、選び直す</button>
+
+  <!-- 次の願いへ（小春だより） -->
+  <div class="tsugi">
+    <p class="tsugi-lead">
+      願いは、ひとつずつ叶えていきましょう。<br>
+      今回は「<b id="tsugiWish">恋愛・ご縁</b>」の石をお選びしました。
+      <span class="lede-sep"></span>
+      次に叶えたい願いが出てきたとき、そのときはまた別の石が、あなたを待っています。
+    </p>
+    <p class="tsugi-name">小春だより</p>
+    <p class="tsugi-sub">御守りジュエリーの定期便　月額 ¥5,500</p>
+    <a class="btn-tsugi" id="koharuLink" href="#" target="_blank" rel="noopener">小春だよりを受け取る</a>
+    <p class="tsugi-omake">愛が深まるパワー画像のおまけつき</p>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<!-- 画面下に貼りつくブレスレット（STEP2のあいだだけ表示） -->
+<div class="braceletbox" id="braceletBox" style="display:none">
+  <div class="braceletbox-in">
+    <svg class="bracelet" id="braceletMini" viewBox="0 0 200 200" role="img" aria-label="選んだ石でできていくブレスレット"></svg>
+    <div class="style-mini-icon" id="styleMiniIcon" hidden></div>
+    <div class="bracelet-side" id="miniCap"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════ 設定 ══════════════════════
+   リンク先を変えたいときは、ここだけ書き換えてください。 */
+const SHOP_URL   = "https://amuletkoharu.base.shop";              // 小春のBASEショップ（商品登録後は商品ページURLに変更）
+const KOHARU_URL = "https://moritto.net/koharu.html#koharudayori"; // 小春だよりのご案内
+
+/* 石の写真を入れるフォルダと、試す拡張子の順番
+   images フォルダに「石のID.webp」で入れるだけで自動的に表示されます。 */
+const PHOTO_DIR = "images/";
+const PHOTO_EXT = ["webp", "png", "jpg", "jpeg", "JPG", "PNG"];
+/* ════════════════════════════════════ */
+
+/* ── 写真：拡張子を順番に試して、あったものを表示する ── */
+function photoNext(img){
+  const i = (+img.dataset.ext) + 1;
+  if(i < PHOTO_EXT.length){
+    img.dataset.ext = i;
+    img.src = PHOTO_DIR + img.dataset.sid + "." + PHOTO_EXT[i];
+  }else{
+    const box = img.closest(".photo-box");
+    if(box) box.remove();          // どの拡張子でも見つからなければ、静かに消す
+  }
+}
+function photoTag(s){
+  return `<div class="photo-box">
+    <img data-sid="${s.id}" data-ext="0" loading="lazy"
+         src="${PHOTO_DIR}${s.id}.${PHOTO_EXT[0]}"
+         alt="${s.name}の写真" onerror="photoNext(this)">
+  </div>`;
+}
+
+const COLORS = [
+  {k:"赤",     c:"#B03A4A"},
+  {k:"オレンジ",c:"#E08A4A"},
+  {k:"黄",     c:"#E5C05A"},
+  {k:"緑",     c:"#6FA87C"},
+  {k:"青",     c:"#5A8FB8"},
+  {k:"紫",     c:"#8B76AE"},
+  {k:"ピンク", c:"#E2A0B8"},
+  {k:"白",     c:"#F2EFEA"},
+  {k:"茶",     c:"#9C7A5C"},
+  {k:"黒",     c:"#3A3A3A"}
+];
+
+const WISHES = [
+  {k:"恋愛", t:"恋愛・ご縁",     s:"大切な人との関係、これからの出会い"},
+  {k:"癒し", t:"癒し・安心",     s:"心を休めたい、穏やかに過ごしたい"},
+  {k:"仕事", t:"仕事・目標",     s:"やりたいことを形にしていきたい"},
+  {k:"金運", t:"金運・豊かさ",   s:"収入や暮らしの流れを整えたい"},
+  {k:"浄化", t:"浄化・厄除け",   s:"重たいものを手放して、守られたい"},
+  {k:"自信", t:"自信・行動力",   s:"自分を信じて、一歩を踏み出したい"}
+];
+
+const BRACELET_TYPES = {
+  natural:{
+    name:"天然石の一連タイプ",
+    en:"KOHARU'S AMULET",
+    image:"images/bracelet-type1.webp",
+    mini:"一連",
+    result:`<p><strong>そして、真ん中には</strong><br>
+      ハートのカットクリスタルを2個、リボンの形に。<br>
+      中央には、小さく上質なオパールを添えています。<br>
+      この3つは、一連の天然石タイプにお入れする、小春からのお守りです。<br>
+      4ミリの小さめストーンで、軽やかに仕上げます。</p>`
+  },
+  clear:{
+    name:"水晶とローズクォーツ × SILVER",
+    en:"CLEAR AMULET",
+    image:"images/bracelet-type2.webp",
+    mini:"二連\nSILVER",
+    result:`<p>4ミリ玉の水晶とローズクォーツに、お選びいただいた3種類の石をあしらったシルバーカラーチェーンを重ねます。<br>
+      透明感のある、軽やかな二連ブレスレットに仕上げます。</p>`
+  },
+  pearl:{
+    name:"淡水パール × GOLD",
+    en:"PEARL AMULET",
+    image:"images/bracelet-type3.webp",
+    mini:"二連\nGOLD",
+    result:`<p>小粒の淡水パールに、お選びいただいた3種類の石をあしらったゴールドカラーチェーンを重ねます。<br>
+      やさしい艶と輝きを楽しめる、上品な二連ブレスレットに仕上げます。</p>`
+  }
+};
+
+const NUMEROLOGY = {
+  1:{k:"はじまりの一",b:"あなたの中には、自分の足で道をひらいていく力があります。誰かの後についていくより、まだ誰も歩いていない場所に最初の足あとをつけるほうが、本当は性に合っている。今年その力が動き出そうとしているなら、迷わず一歩目を踏み出してください。"},
+  2:{k:"寄り添いの二",b:"あなたは、人の心の機微をとても細やかに受け取る方です。だからこそ気を使いすぎて、自分を後回しにしてしまうこともあるかもしれません。与えるのと同じくらい、受け取ることを自分に許してあげてください。それがあなたの流れを整えます。"},
+  3:{k:"よろこびの三",b:"楽しむこと、表現すること、笑うこと。あなたにとってそれは息抜きではなく、力の源そのものです。義務でいっぱいになると本来の輝きが曇ってしまう方なので、心が弾むことを日々の真ん中に置いてあげてください。"},
+  4:{k:"土台の四",b:"あなたは、こつこつと積み上げることのできる、なかなかいない種類の方です。派手さはなくても、あなたが築いたものは崩れません。すぐに結果が出なくても大丈夫。あなたの努力は、必ず後から形になって返ってきます。"},
+  5:{k:"うつろいの五",b:"同じ場所にとどまり続けることが、あなたにとっては窮屈さになります。変化を怖がる必要はありません。動くことで運がひらけていくタイプなので、心が「そろそろ」と言っているなら、その声を信じてあげてください。"},
+  6:{k:"愛の六",b:"あなたは、そばにいる人をあたためる力を持っています。家族、友人、パートナー。あなたがいるだけで安心する人がきっといるはずです。ただ、その優しさをいちばん先に向けるべき相手は、あなた自身でもあります。"},
+  7:{k:"探求の七",b:"表面的なことでは満たされず、物事の奥にあるものを知りたくなる方です。ひとりで静かに考える時間が、あなたにとっては栄養になります。その直感はよく当たります。どうか、自分の感じたことを疑わないでください。"},
+  8:{k:"実りの八",b:"あなたには、望むものを現実の形にしていく力があります。願うだけで終わらせず、ちゃんと手に入れることのできる方です。遠慮せず、大きく望んでください。受け取ることに罪悪感を持つ必要は、まったくありません。"},
+  9:{k:"めぐりの九",b:"人の痛みが分かる、あたたかい方です。ひとつの流れが終わり、次が始まる節目に立っていることが多い数でもあります。手放すのはさみしいけれど、その先に必ず新しいものが入ってきます。安心して、両手を空けてください。"}
+};
+
+const PREFS = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県","海外・その他"];
+
+/* ── 状態 ───────────────────────────── */
+const state = {step:1, colors:[], wish:null, num:null, candidates:[], picked:[], braceletStyle:null, wristSize:null, read:[], open:[]};
+
+const $ = id => document.getElementById(id);
+
+/* ── 初期化：フォームを組み立てる ────── */
+(function initForm(){
+  const now = new Date().getFullYear();
+  let yh = '<option value="">選ぶ</option>';
+  for(let v=now; v>=1930; v--) yh += `<option value="${v}">${v}</option>`;
+  $("y").innerHTML = yh;
+
+  let mh = '<option value="">選ぶ</option>';
+  for(let v=1; v<=12; v++) mh += `<option value="${v}">${v}</option>`;
+  $("m").innerHTML = mh;
+
+  let dh = '<option value="">選ぶ</option>';
+  for(let v=1; v<=31; v++) dh += `<option value="${v}">${v}</option>`;
+  $("d").innerHTML = dh;
+
+  $("pref").innerHTML = '<option value="">選んでください</option>' +
+    PREFS.map(p => `<option value="${p}">${p}</option>`).join("");
+
+  $("colorChips").innerHTML = COLORS.map(c =>
+    `<button type="button" class="chip" aria-pressed="false" data-color="${c.k}">
+       <span class="chip-dot" style="background:${c.c}"></span>${c.k}
+     </button>`).join("");
+
+  $("wishGrid").innerHTML = WISHES.map(w =>
+    `<button type="button" class="wish" aria-pressed="false" data-wish="${w.k}">
+       <span class="wish-t">${w.t}</span><span class="wish-s">${w.s}</span>
+     </button>`).join("");
+
+  $("koharuLink").href = KOHARU_URL;
+})();
+
+/* ── 色チップ（3つまで） ─────────────── */
+$("colorChips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if(!b) return;
+  const k = b.dataset.color;
+  const i = state.colors.indexOf(k);
+  if(i > -1) state.colors.splice(i,1);
+  else { if(state.colors.length >= 3) return; state.colors.push(k); }
+  const full = state.colors.length >= 3;
+  document.querySelectorAll(".chip").forEach(c => {
+    const on = state.colors.includes(c.dataset.color);
+    c.setAttribute("aria-pressed", on);
+    c.dataset.full = (full && !on) ? "1" : "0";
+  });
+});
+
+/* ── 願い（1つ） ────────────────────── */
+$("wishGrid").addEventListener("click", e => {
+  const b = e.target.closest(".wish"); if(!b) return;
+  state.wish = b.dataset.wish;
+  document.querySelectorAll(".wish").forEach(w =>
+    w.setAttribute("aria-pressed", w.dataset.wish === state.wish));
+});
+
+/* ── ブレスレットの仕立て（1つ） ────── */
+$("braceletStyleGrid").addEventListener("click", e => {
+  const b = e.target.closest(".style-card"); if(!b) return;
+  if(state.picked.length !== 3) return;
+  state.braceletStyle = b.dataset.style;
+  $("styleErr").textContent = "";
+  renderStyleSelection();
+  updateBracelet();
+});
+
+function renderStyleSelection(){
+  const ready = state.picked.length === 3;
+  document.querySelectorAll(".style-card").forEach(card => {
+    const on = card.dataset.style === state.braceletStyle;
+    card.setAttribute("aria-pressed", on);
+    card.setAttribute("aria-disabled", !ready);
+    const label = card.querySelector(".style-select-label");
+    if(label) label.textContent = on ? "選んでいます　✓" : "このタイプを選ぶ";
+  });
+  $("styleLock").textContent = ready
+    ? (state.braceletStyle ? "選んだ仕立てでお作りします" : "ブレスレットのタイプを1つ選んでください")
+    : "先に石を3つ選んでください";
+}
+
+/* ── 手首サイズ（1つ） ──────────────── */
+const WRIST_SIZES = [14, 15, 16, 17, 18, 19, 20];
+
+$("sizeGrid").innerHTML = WRIST_SIZES.map(v =>
+  `<button type="button" class="size-btn" data-size="${v}" aria-pressed="false" aria-disabled="true">
+     ${v}<small>cm</small>
+   </button>`).join("");
+
+$("sizeGrid").addEventListener("click", e => {
+  const b = e.target.closest(".size-btn"); if(!b) return;
+  if(!state.braceletStyle) return;              // 仕立てを選ぶまでは押せない
+  state.wristSize = +b.dataset.size;
+  $("sizeErr").textContent = "";
+  renderSizeSelection();
+  updateBracelet();
+});
+
+function renderSizeSelection(){
+  const ready = !!state.braceletStyle && state.picked.length === 3;
+  document.querySelectorAll(".size-btn").forEach(b => {
+    b.setAttribute("aria-pressed", +b.dataset.size === state.wristSize);
+    b.setAttribute("aria-disabled", !ready);
+  });
+  $("sizeLock").textContent = ready
+    ? (state.wristSize ? `${state.wristSize}cm でお作りします` : "手首のサイズを1つ選んでください")
+    : (state.picked.length === 3 ? "先に仕立てを選んでください" : "先に石を3つ選んでください");
+}
+
+/* ── 数秘：全部の数字を1桁になるまで足す ── */
+function numerology(y,m,d){
+  let n = String(y) + String(m).padStart(2,"0") + String(d).padStart(2,"0");
+  while(n.length > 1) n = String(n.split("").reduce((a,c)=>a+ +c, 0));
+  return +n === 0 ? 9 : +n;
+}
+
+/* ── 土地と生年月日から、ゆらぎの種をつくる ── */
+function seed(str){
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h,16777619); }
+  return h >>> 0;
+}
+function jitter(sd, id){
+  const h = seed(sd + "|" + id);
+  return (h % 1000) / 1000 * 2.4;   // 0〜2.4 の重み
+}
+
+/* ── 候補をえらぶ ───────────────────── */
+function pickCandidates(y,m,d,pref){
+  const sd = `${y}-${m}-${d}-${pref}-${state.colors.join("")}-${state.wish}`;
+  const scored = STONES.map(s => {
+    let sc = jitter(sd, s.id);
+    if(s.wish.includes(state.wish)) sc += 6;
+    state.colors.forEach(c => { if(s.color.includes(c)) sc += 4; });
+    if(s.num.includes(state.num)) sc += 5;
+    return {s, sc, starred: s.num.includes(state.num)};
+  }).sort((a,b) => b.sc - a.sc);
+
+  // 願いに合う石を必ず4つは入れて、残りは総合点の高いものから
+  const wishHit = scored.filter(x => x.s.wish.includes(state.wish)).slice(0,4);
+  const rest = scored.filter(x => !wishHit.includes(x)).slice(0, 9 - wishHit.length);
+  return [...wishHit, ...rest].sort((a,b) => b.sc - a.sc);
+}
+
+/* ── 珠の描画 ───────────────────────── */
+function beadStyle(st){
+  const [l,m2,dk] = st.hex;
+  return `background:radial-gradient(circle at 33% 29%, ${l} 0%, ${m2} 52%, ${dk} 100%)`;
+}
+
+/* ── ブレスレットのSVGを描く（署名の絵） ── */
+function drawBracelet(svg, picked, big){
+  const cx = 100, cy = 100, R = big ? 72 : 70, r = big ? 8.4 : 8;
+  const N = 26;                 // 珠の数
+  let out = "";
+  // 糸
+  out += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#E7D6CC" stroke-width="1"/>`;
+
+  for(let i=0;i<N;i++){
+    const ang = (i / N) * Math.PI * 2 - Math.PI/2;   // 12時から時計まわり
+    const x = cx + Math.cos(ang) * R, y = cy + Math.sin(ang) * R;
+    const delay = (i * 0.022).toFixed(3) + "s";
+
+    if(i === 0){
+      // 中央：オパール
+      out += `<defs><radialGradient id="op${big?'B':'M'}" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="#FFFDF8"/><stop offset="45%" stop-color="#F7E4E8"/>
+        <stop offset="78%" stop-color="#DCEAF0"/><stop offset="100%" stop-color="#D9C6BE"/>
+      </radialGradient></defs>`;
+      out += `<circle class="bd" cx="${x}" cy="${y}" r="${r*1.25}" fill="url(#op${big?'B':'M'})"
+                stroke="rgba(0,0,0,.07)" stroke-width=".5" style="animation-delay:${delay}"/>`;
+    } else if(i === 1 || i === N-1){
+      // 両どなり：ハートのカットクリスタル
+      const s2 = r * 0.115;
+      out += `<path class="bd" transform="translate(${x},${y}) scale(${s2})"
+        d="M0,7 C-9,-1 -9,-9 -4.4,-9 C-1.6,-9 0,-6.5 0,-4.6 C0,-6.5 1.6,-9 4.4,-9 C9,-9 9,-1 0,7 Z"
+        fill="#FFFBF8" stroke="#E4D2C7" stroke-width="1.1" style="animation-delay:${delay}"/>`;
+    } else {
+      // 残りは選んだ石をくり返す
+      const st = picked.length ? picked[(i-2) % picked.length] : null;
+      if(st){
+        const gid = `g${big?'B':'M'}${st.id}`;
+        out += `<defs><radialGradient id="${gid}" cx="33%" cy="29%">
+          <stop offset="0%" stop-color="${st.hex[0]}"/>
+          <stop offset="55%" stop-color="${st.hex[1]}"/>
+          <stop offset="100%" stop-color="${st.hex[2]}"/>
+        </radialGradient></defs>`;
+        out += `<circle class="bd" cx="${x}" cy="${y}" r="${r}" fill="url(#${gid})"
+                  stroke="rgba(0,0,0,.06)" stroke-width=".5" style="animation-delay:${delay}"/>`;
+      } else {
+        out += `<circle cx="${x}" cy="${y}" r="${r*0.62}" fill="#EEDDD4"/>`;
+      }
+    }
+  }
+  svg.innerHTML = out;
+}
+
+/* ── 石カードを並べる ───────────────── */
+/* 石の本文（写真＋説明）を組み立てる */
+function stoneBodyHTML(s){
+  return photoTag(s) + s.body.split("\n\n").map(p=>`<p>${p}</p>`).join("");
+}
+
+function renderStones(){
+  $("stoneList").innerHTML = state.candidates.map(({s,starred}) => {
+    const on   = state.picked.some(p => p.id === s.id);
+    const full = state.picked.length >= 3 && !on;
+    const read = state.read.includes(s.id);   // お話を読んだ石か
+    const open = state.open.includes(s.id);   // いま開いているか
+    return `
+    <article class="stone${on?' picked':''}${read?' read':''}${open?' open':''}" data-id="${s.id}">
+      <button type="button" class="stone-main" aria-expanded="${open}">
+        <span class="bead" style="${beadStyle(s)}"></span>
+        <span class="stone-txt">
+          <span class="stone-name">${s.name}${starred?'<span class="star">★ 数のご縁</span>':''}</span>
+          <span class="stone-en">${s.en}</span>
+          <span class="stone-lead">${s.lead}</span>
+          <span class="stone-more">${open ? "石のお話をとじる" : (read ? "石のお話をもう一度読む" : "石のお話を読む")}<i></i></span>
+        </span>
+      </button>
+      <div class="stone-body" data-loaded="${read?'1':'0'}">${read ? stoneBodyHTML(s) : ''}</div>
+      ${read
+        ? `<button type="button" class="stone-pick"${full?" disabled":""}>
+             ${on ? "選んでいます　✓" : (full ? "選べるのは3つまでです" : "この石を選ぶ")}
+           </button>`
+        : `<span class="stone-readnote">お話を読むと、選べるようになります</span>`}
+    </article>`;
+  }).join("");
+}
+
+/* ── 石カードの操作 ─────────────────── */
+$("stoneList").addEventListener("click", e => {
+  const card = e.target.closest(".stone"); if(!card) return;
+  const st = STONES.find(s => s.id === card.dataset.id);
+
+  if(e.target.closest(".stone-main")){
+    // 「読んだ石」として記録する（一度読んだら、ずっと選べる）
+    if(!state.read.includes(st.id)) state.read.push(st.id);
+    // 開閉を切り替える
+    const i = state.open.indexOf(st.id);
+    if(i > -1) state.open.splice(i,1); else state.open.push(st.id);
+    renderStones();
+    return;
+  }
+  if(e.target.closest(".stone-pick")){
+    const i = state.picked.findIndex(p => p.id === st.id);
+    if(i > -1) state.picked.splice(i,1);
+    else { if(state.picked.length >= 3) return; state.picked.push(st); }
+    renderStones();
+    updateBracelet();
+  }
+});
+
+/* ── ブレスレットの見た目を更新 ─────── */
+function updateBracelet(){
+  drawBracelet($("braceletMini"), state.picked, false);
+  renderStyleSelection();
+  renderSizeSelection();
+
+  const altStyle = state.braceletStyle && state.braceletStyle !== "natural";
+  $("braceletMini").hidden = !!altStyle;
+  $("styleMiniIcon").hidden = !altStyle;
+  if(altStyle) $("styleMiniIcon").textContent = BRACELET_TYPES[state.braceletStyle].mini;
+
+  const n = 3 - state.picked.length;
+  if(n > 0){
+    $("miniCap").innerHTML =
+      `<p class="bracelet-cap">あと <b>${n}</b> つ選べます</p>`;
+  } else if(!state.braceletStyle){
+    $("miniCap").innerHTML = `<button class="btn" id="chooseStyle">仕立てを1つ選ぶ</button>`;
+    $("chooseStyle").addEventListener("click", () => {
+      $("styleErr").textContent = "ブレスレットのタイプを1つ選んでください";
+      $("styleSection").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  } else if(!state.wristSize){
+    $("miniCap").innerHTML = `<button class="btn" id="chooseSize">手首のサイズを選ぶ</button>`;
+    $("chooseSize").addEventListener("click", () => {
+      $("sizeErr").textContent = "手首のサイズを1つ選んでください";
+      $("sizeSection").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  } else {
+    $("miniCap").innerHTML = `<button class="btn" id="go2">これで仕上げる</button>`;
+    $("go2").addEventListener("click", toResult);
+  }
+}
+
+/* ── 画面の切り替え ─────────────────── */
+const LABELS = ["お聞かせください","石・仕立て選び","できあがり"];
+function goStep(n){
+  state.step = n;
+  document.querySelectorAll(".step").forEach((s,i) => s.classList.toggle("active", i === n-1));
+  for(let i=0;i<3;i++){
+    const b = $("tb"+i);
+    b.className = "thread-bead" + (i === n-1 ? " on" : (i < n-1 ? " done" : ""));
+  }
+  $("threadLabel").textContent = LABELS[n-1];
+  $("braceletBox").style.display = (n === 2) ? "block" : "none";
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ── STEP1 → STEP2 ──────────────────── */
+$("go1").addEventListener("click", () => {
+  const y = +$("y").value, m = +$("m").value, d = +$("d").value, pref = $("pref").value;
+  const e = $("err1");
+  if(!y || !m || !d){ e.textContent = "生年月日を選んでください"; return; }
+  if(new Date(y, m-1, d).getDate() !== d){ e.textContent = "その日付は存在しないようです"; return; }
+  if(!pref){ e.textContent = "生まれた場所を選んでください"; return; }
+  if(state.colors.length === 0){ e.textContent = "好きな色を1つ以上選んでください"; return; }
+  if(!state.wish){ e.textContent = "叶ってほしいことを1つ選んでください"; return; }
+  e.textContent = "";
+
+  state.num = numerology(y,m,d);
+  state.candidates = pickCandidates(y,m,d,pref);
+  state.picked = [];
+  state.read = [];
+  state.open = [];
+  state.braceletStyle = null;
+  state.wristSize = null;
+  $("styleErr").textContent = "";
+  $("sizeErr").textContent = "";
+
+  const nm = NUMEROLOGY[state.num];
+  $("numCard").innerHTML =
+    `<p class="eyebrow" style="margin-bottom:15px">NUMEROLOGY</p>
+     <div class="numcard-n">${state.num}</div>
+     <div class="numcard-k">${nm.k}</div>
+     <p class="numcard-b">${nm.b}</p>`;
+
+  renderStones();
+  updateBracelet();
+  goStep(2);
+});
+
+$("back1").addEventListener("click", () => goStep(1));
+
+/* ── STEP2 → STEP3 ──────────────────── */
+function toResult(){
+  if(state.picked.length !== 3) return;
+  if(!state.braceletStyle){
+    $("styleErr").textContent = "ブレスレットのタイプを1つ選んでください";
+    $("styleSection").scrollIntoView({behavior:"smooth", block:"start"});
+    return;
+  }
+
+  if(!state.wristSize){
+    $("sizeErr").textContent = "手首のサイズを1つ選んでください";
+    $("sizeSection").scrollIntoView({behavior:"smooth", block:"start"});
+    return;
+  }
+
+  const type = BRACELET_TYPES[state.braceletStyle];
+  const showDrawing = state.braceletStyle === "natural";
+  $("resultBraceletDrawing").hidden = !showDrawing;
+  if(showDrawing) drawBracelet($("braceletBig"), state.picked, true);
+  $("bigCap").textContent = state.picked.map(s => s.name).join("　・　");
+
+  $("resultTypeEnglish").textContent = type.en;
+  $("resultTypeName").textContent = type.name;
+  $("resultTypeDescription").innerHTML = type.result;
+  $("resultTypePlaceholderName").textContent = type.name;
+  const typeImg = $("resultTypeImage");
+  typeImg.hidden = false;
+  typeImg.alt = `${type.name}の完成イメージ`;
+  typeImg.src = type.image;
+
+  $("orderRecap").innerHTML = `
+    <div class="recap-row">
+      <span class="recap-label">選んだ石</span>
+      <span class="recap-value">${state.picked.map(s=>s.name).join("　/　")}</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">仕立て</span>
+      <span class="recap-value">${type.name}</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">手首サイズ</span>
+      <span class="recap-value">${state.wristSize} cm</span>
+    </div>`;
+
+  $("resultStones").innerHTML = state.picked.map(s => `
+    <article class="result-stone">
+      <div class="result-head">
+        <span class="bead" style="${beadStyle(s)}"></span>
+        <span class="stone-txt">
+          <span class="stone-name">${s.name}</span>
+          <span class="stone-en">${s.en}</span>
+          <span class="stone-lead">${s.lead}</span>
+        </span>
+      </div>
+      ${photoTag(s)}
+      <div class="result-body">${s.body.split("\n\n").map(p=>`<p>${p}</p>`).join("")}</div>
+    </article>`).join("");
+
+  const y = $("y").value, m = $("m").value, d = $("d").value;
+  const wl = WISHES.find(w => w.k === state.wish);
+  const free = $("freeWish").value.trim();
+  const txt =
+`【石の診断結果】
+生年月日：${y}年${m}月${d}日
+生まれた場所：${$("pref").value}
+好きな色：${state.colors.join("・")}
+叶ってほしいこと：${wl.t}
+選んだ石：${state.picked.map(s=>s.name).join("／")}
+ブレスレットタイプ：${type.name}
+手首サイズ：${state.wristSize}cm
+数のご縁：${state.num}（${NUMEROLOGY[state.num].k}）
+願いごと：${free}`;
+
+  $("summary").textContent = txt;
+  const shopReady = SHOP_URL && SHOP_URL !== "#";
+  $("baseLink").href = shopReady ? SHOP_URL : "#";
+  $("baseLink").classList.toggle("shop-pending", !shopReady);
+  $("baseLink").setAttribute("aria-disabled", String(!shopReady));
+  if(shopReady){
+    $("baseLink").target = "_blank";
+    $("baseLink").rel = "noopener";
+    $("shopNote").textContent = "";
+  }else{
+    $("baseLink").removeAttribute("target");
+    $("shopNote").textContent = "小春のご注文ページは準備中です";
+  }
+  $("tsugiWish").textContent = wl.t;
+  $("copied").textContent = "";
+  goStep(3);
+}
+
+/* ── コピー ─────────────────────────── */
+$("copyBtn").addEventListener("click", async () => {
+  const t = $("summary").textContent;
+  try{
+    await navigator.clipboard.writeText(t);
+    $("copied").textContent = "コピーしました";
+  }catch(_){
+    const ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{
+      const ok = document.execCommand("copy");
+      $("copied").textContent = ok ? "コピーしました" : "長押しして選択・コピーしてください";
+    }
+    catch(__){ $("copied").textContent = "長押しして選択・コピーしてください"; }
+    document.body.removeChild(ta);
+  }
+});
+
+$("baseLink").addEventListener("click", e => {
+  if(!SHOP_URL || SHOP_URL === "#"){
+    e.preventDefault();
+    $("shopNote").textContent = "小春のご注文ページは準備中です";
+  }
+});
+
+/* ── やり直し ───────────────────────── */
+$("redo").addEventListener("click", () => {
+  state.picked = [];
+  state.braceletStyle = null;
+  state.wristSize = null;
+  $("styleErr").textContent = "";
+  $("sizeErr").textContent = "";
+  renderStones();
+  updateBracelet();
+  goStep(2);
+});
+</script>
+</body>
+</html>
+
