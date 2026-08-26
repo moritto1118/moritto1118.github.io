@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<!--
+════════════════════════════════════════════════════════════
+  小春ジュエリー　石の診断　3タイプ対応版
+  koharu_app_02_3types.html
+  2026年8月19日
+
+  ■ このファイルの位置づけ
+    診断の仕組みと石のデータを完成させた「土台」です。
+    このあと、見た目と体験のデザインを重ねていきます。
+
+  ■ デザインを変えるときに、触らないでほしいところ
+    ・STONES（石40種類のデータ）の中身
+    ・numerology() 数秘の計算
+    ・pickCandidates() 石の候補を選ぶ計算
+    ・drawBracelet() ブレスレットの絵を描く処理
+    ・JavaScript が使っている id
+        y / m / d / pref / colorChips / wishGrid / freeWish / go1 / err1
+        numCard / stoneList / back1 / braceletBox / braceletMini / miniCap
+        braceletBig / bigCap / resultStones / summary / copyBtn / copied
+        baseLink / redo / tsugiWish / koharuLink / threadLabel / tb0 tb1 tb2
+    ・JavaScript が使っているクラス
+        .chip / .wish / .stone / .stone-main / .stone-pick / .stone-body
+        .step / .thread-bead / .photo-box
+
+  ■ 自由に変えていいところ
+    ・:root の色（下にまとまっています）
+    ・上記以外の CSS すべて
+    ・新しいクラスを足すこと
+    ・飾りの画像や囲いを足すこと
+    ・文章
+
+  ■ 石の写真について
+    images フォルダに「石のID.webp」の名前で入れるだけで表示されます。
+    （例：images/amethyst.webp）
+    webp / png / jpg / jpeg のどれでも大丈夫です。
+    写真がない石は、色だけで表示されます。
+
+  ■ 決まっている配色と書体
+    背景 #F6E9E2 ／ 本文 #523325 ／ 薄い文字 #7A5B48
+    カード #FFFBF8 ／ ボタン 桜紅 #D9738F ／ 罫線 #E7D6CC
+    見出し Kaisei Opti 太字 ／ 本文 Zen Kaku Gothic New 中字
+════════════════════════════════════════════════════════════
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>あなたに合う石を見つける｜小春ジュエリー</title>
+<meta name="description" content="生年月日・好きな色・願いから、あなたに寄り添う天然石をお選びします。和歌山の小さな工房から、世界にひとつのブレスレットを。">
+<meta name="theme-color" content="#FFF4FA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Opti:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ══ 小春ジュエリー 配色 ═════════════════
+     ここを書き換えれば、ページ全体の色が変わります。 */
+  --haichi:#FFF4FA;      /* 03版の明るいミルキーピンク */
+  --shiro:#FFFBF8;       /* カードの白 */
+  --sumi:#523325;        /* 本文の文字（こげ茶） */
+  --sumi-usu:#7A5B48;    /* 薄い文字（説明・補足） */
+  --sakura:#D9738F;      /* ボタン・アクセント（桜紅） */
+  --sakura-koi:#C25E7C;  /* ボタンを押したとき */
+  --sakura-usu:#FBE4EA;  /* 選んだときの淡い背景 */
+  --kasumi:#E7D6CC;      /* 罫線・枠 */
+  --banner-pink:#BE3F72;      /* 03版の華やかなピンク */
+  --banner-pink-koi:#9E2F5C;  /* 03版の深いジュエリーピンク */
+  --banner-pink-usu:#FFE0EF;  /* 03版の淡い花びら色 */
+  --banner-line:#F2B9D5;      /* 03版のローズパール色 */
+  --gold:#B98A32;             /* 03版の金属のきらめき */
+  --gold-soft:#F1D58F;        /* 03版のシャンパンゴールド */
+  --rose-glow:#FF8EC3;        /* 03版の明るいピンクの光 */
+  /* ══ 書体 ════════════════════════════ */
+  --mincho:"Kaisei Opti","Hiragino Mincho ProN","Yu Mincho",YuMincho,serif;
+  --gothic:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:var(--haichi)}
+body{
+  min-height:100svh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 50% -8%,rgba(255,255,255,.99) 0 14%,transparent 36%),
+    radial-gradient(circle at 100% 16%,rgba(255,142,195,.24) 0 9%,transparent 31%),
+    radial-gradient(circle at 0 58%,rgba(255,214,235,.42) 0 9%,transparent 30%),
+    linear-gradient(180deg,#FFFFFF 0%,#FFF9FC 44%,var(--haichi) 100%);
+  color:var(--sumi);
+  font-family:var(--gothic);
+  font-weight:500;
+  font-size:16px;
+  line-height:1.9;
+  letter-spacing:.03em;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;z-index:80;inset:0 0 auto;height:4px;pointer-events:none;
+  background:linear-gradient(90deg,transparent 4%,var(--rose-glow) 20%,var(--gold-soft) 38%,var(--gold) 50%,var(--gold-soft) 62%,var(--rose-glow) 80%,transparent 96%);
+}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 96px}
+
+/* ── ブランドの華やかなロゴ ────────── */
+.brand-keyvisual{
+  width:min(76vw,310px);margin:28px auto 18px;
+  position:relative;left:6px;
+  border-radius:50%;overflow:hidden;
+  border:1px solid rgba(242,185,213,.78);
+  background:#FBEEE5;
+  box-shadow:0 18px 44px rgba(190,63,114,.13);
+}
+.brand-keyvisual img{
+  display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;
+  transform:translateX(3.5mm);
+}
+
+/* ── 糸と珠のステップ表示 ─────────────── */
+.thread{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;padding:34px 0 30px;
+}
+.thread-bead{
+  width:11px;height:11px;border-radius:50%;
+  background:var(--kasumi);flex:none;
+  transition:background .5s ease,transform .5s ease;
+}
+.thread-bead.on{background:var(--sakura);transform:scale(1.35)}
+.thread-bead.done{background:var(--sakura)}
+.thread-line{
+  width:42px;height:1px;background:var(--kasumi);flex:none;
+}
+.thread-label{
+  text-align:center;font-family:var(--mincho);
+  font-size:13px;letter-spacing:.22em;color:var(--sumi-usu);
+  margin-bottom:6px;
+}
+.app-brand{
+  padding-top:28px;text-align:center;font-family:var(--mincho);
+  font-size:11px;letter-spacing:.25em;color:var(--sakura);
+}
+.progress-names{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  max-width:360px;margin:-18px auto 38px;
+  font-size:11px;line-height:1.5;text-align:center;color:var(--sumi-usu);
+}
+.progress-names span{display:flex;flex-direction:column;gap:2px;align-items:center}
+.progress-names b{
+  font-family:var(--mincho);font-size:12px;font-weight:700;
+  color:var(--sakura);letter-spacing:.08em;
+}
+
+/* ── 見出し ────────────────────────── */
+.eyebrow{
+  font-family:var(--mincho);font-size:12px;letter-spacing:.3em;
+  color:var(--sakura);text-align:center;margin-bottom:16px;
+}
+h1{
+  font-family:var(--mincho);font-weight:700;
+  font-size:clamp(23px,5.6vw,31px);line-height:1.65;
+  letter-spacing:.06em;text-align:center;margin-bottom:20px;
+}
+h2{
+  font-family:var(--mincho);font-weight:700;
+  font-size:clamp(19px,4.4vw,24px);line-height:1.7;
+  letter-spacing:.06em;text-align:center;margin-bottom:14px;
+}
+.lede{
+  text-align:center;font-size:14.5px;line-height:2.1;
+  color:var(--sumi-usu);margin-bottom:40px;
+}
+.lede-sep{
+  display:block;width:26px;height:1px;background:var(--kasumi);
+  margin:26px auto;
+}
+.intro-copy{
+  max-width:590px;margin:0 auto 42px;padding:28px 24px;
+  background:rgba(255,251,248,.68);border:1px solid rgba(231,214,204,.9);
+  border-radius:24px;box-shadow:0 18px 50px rgba(82,51,37,.055);
+  font-size:14.5px;line-height:2.15;color:var(--sumi-usu);text-align:left;
+}
+.intro-copy p + p{margin-top:14px}
+.intro-copy .intro-em{
+  font-family:var(--mincho);font-size:15.5px;line-height:2;
+  color:var(--sumi);font-weight:700;
+}
+
+/* ── フォーム ───────────────────────── */
+.field{margin-bottom:34px}
+.field-head{
+  display:flex;align-items:baseline;gap:4px 10px;
+  flex-wrap:wrap;margin-bottom:13px;
+}
+.field-label{
+  font-family:var(--mincho);font-size:16px;
+  letter-spacing:.1em;font-weight:700;flex:none;
+}
+.field-note{font-size:12px;color:var(--sumi-usu);letter-spacing:.04em}
+
+.dob{display:flex;gap:8px;align-items:center}
+.dob select{flex:1;min-width:0}
+.dob span{font-size:13px;color:var(--sumi-usu);flex:none}
+
+select{
+  width:100%;padding:13px 14px;
+  font-family:var(--gothic);font-size:15px;color:var(--sumi);
+  background:var(--shiro);
+  border:1px solid var(--kasumi);border-radius:14px;
+  appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23D9738F' stroke-width='1.3' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;
+  cursor:pointer;
+}
+select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{
+  outline:2px solid var(--sakura);outline-offset:2px;
+}
+textarea{
+  width:100%;padding:14px;min-height:110px;resize:vertical;
+  font-family:var(--gothic);font-size:15px;line-height:1.9;color:var(--sumi);
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:14px;
+}
+textarea::placeholder{color:#B79C8E}
+
+/* 色チップ */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 15px 9px 11px;
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:999px;
+  font-family:var(--gothic);font-size:14px;color:var(--sumi);
+  cursor:pointer;transition:border-color .2s,background .2s,opacity .2s;
+}
+.chip:hover{border-color:var(--sakura)}
+.chip-dot{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.09);
+}
+.chip[aria-pressed="true"]{
+  border-color:var(--sakura);background:var(--sakura-usu);
+  font-weight:500;
+}
+.chip[data-full="1"][aria-pressed="false"]{opacity:.38;cursor:default}
+
+/* 願いカード */
+.wishes{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.wish{
+  text-align:left;padding:15px 16px;
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:16px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+  font-family:var(--gothic);color:var(--sumi);
+}
+.wish:hover{border-color:var(--sakura)}
+.wish[aria-pressed="true"]{border-color:var(--sakura);background:var(--sakura-usu)}
+.wish-t{
+  display:block;font-family:var(--mincho);font-size:15.5px;
+  letter-spacing:.08em;font-weight:700;margin-bottom:3px;
+}
+.wish-s{display:block;font-size:11.5px;color:var(--sumi-usu);line-height:1.6}
+.wish-hint{
+  font-size:12px;color:var(--sumi-usu);line-height:1.85;
+  margin-top:11px;
+}
+
+/* ── ボタン ────────────────────────── */
+.btn{
+  display:block;width:100%;padding:17px;
+  font-family:var(--mincho);font-size:16px;letter-spacing:.18em;font-weight:700;
+  color:var(--shiro);
+  background:linear-gradient(135deg,var(--banner-pink-koi),var(--banner-pink));
+  border:none;border-radius:999px;cursor:pointer;
+  box-shadow:0 14px 34px rgba(158,47,92,.30),inset 0 2px rgba(255,255,255,.30);
+  transition:background .25s,opacity .25s,transform .2s,box-shadow .25s;
+}
+.btn:hover:not(:disabled){
+  background:linear-gradient(135deg,#8F2852,#B8376C);transform:translateY(-1px);
+}
+.btn:disabled{background:#EEC7D8;box-shadow:none;cursor:default}
+.btn-ghost{
+  display:block;width:100%;padding:15px;margin-top:11px;
+  font-family:var(--gothic);font-size:14px;letter-spacing:.1em;
+  color:var(--sumi-usu);background:transparent;
+  border:1px solid var(--kasumi);border-radius:999px;cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+.btn-ghost:hover{border-color:var(--sakura);color:var(--sakura)}
+.err{
+  font-size:13px;color:#A8465C;font-weight:500;text-align:center;
+  margin-top:14px;min-height:20px;
+}
+
+/* ── 数秘の読み ─────────────────────── */
+.numcard{
+  background:var(--shiro);border:1px solid var(--kasumi);
+  padding:28px 24px;margin-bottom:38px;text-align:center;border-radius:22px;
+  box-shadow:0 14px 38px rgba(82,51,37,.05);
+}
+.numcard-n{
+  font-family:var(--mincho);font-size:44px;line-height:1;
+  color:var(--sakura);font-weight:400;margin-bottom:6px;
+}
+.numcard-k{
+  font-family:var(--mincho);font-size:15px;letter-spacing:.2em;
+  font-weight:700;margin-bottom:12px;
+}
+.numcard-b{font-size:13.5px;line-height:2;color:var(--sumi-usu);text-align:left}
+
+/* ── 石カード ──────────────────────── */
+.stones{display:flex;flex-direction:column;gap:11px;margin-bottom:26px}
+.stone{
+  background:var(--shiro);border:1px solid var(--kasumi);
+  transition:border-color .25s,box-shadow .25s;
+  overflow:hidden;border-radius:18px;
+}
+.stone.picked{
+  border-color:var(--sakura);
+  box-shadow:0 0 0 1px var(--sakura);
+}
+.stone-main{
+  display:flex;align-items:flex-start;gap:15px;
+  padding:16px 17px;width:100%;text-align:left;
+  background:none;border:none;cursor:pointer;font-family:var(--gothic);
+}
+.bead{
+  width:52px;height:52px;border-radius:50%;flex:none;
+  box-shadow:inset 0 -3px 7px rgba(0,0,0,.17),
+             inset 0 3px 6px rgba(255,255,255,.5),
+             0 1px 3px rgba(82,51,37,.16);
+  position:relative;overflow:hidden;background-size:cover;background-position:center;
+}
+.bead::after{
+  content:"";position:absolute;top:19%;left:25%;
+  width:24%;height:19%;border-radius:50%;
+  background:rgba(255,255,255,.62);filter:blur(2.5px);
+}
+.stone-txt{flex:1;min-width:0;padding-top:2px}
+.stone-name{
+  font-family:var(--mincho);font-size:17px;letter-spacing:.07em;
+  font-weight:700;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;
+  line-height:1.5;
+}
+.star{color:var(--sakura);font-size:11.5px;letter-spacing:.08em;white-space:nowrap}
+.stone-en{
+  display:block;
+  font-size:10px;letter-spacing:.16em;color:#9C8172;
+  text-transform:uppercase;margin-top:2px;line-height:1.5;
+}
+.stone-lead{
+  display:block;
+  font-size:13.5px;line-height:1.85;color:var(--sumi-usu);margin-top:7px;
+}
+.stone-more{
+  display:inline-flex;width:fit-content;
+  font-family:var(--mincho);
+  font-size:13.5px;color:var(--sakura);margin-top:13px;
+  letter-spacing:.12em;align-items:center;gap:8px;
+  border:1px solid var(--sakura);border-radius:999px;
+  padding:8px 17px;background:var(--sakura-usu);
+}
+.stone-more i{
+  display:inline-block;width:6px;height:6px;border-right:1px solid var(--sakura);
+  border-bottom:1px solid var(--sakura);transform:rotate(45deg) translateY(-2px);
+  transition:transform .3s;
+}
+.stone.open .stone-more i{transform:rotate(225deg) translateY(-1px)}
+.stone-body{
+  display:none;
+  margin:0 17px;padding:0 0 18px;
+  border-top:1px solid var(--kasumi);
+}
+.stone.open .stone-body{display:block}
+.stone-body p{
+  font-size:14px;line-height:2.05;color:var(--sumi);
+  margin-top:15px;
+}
+.stone-pick{
+  display:block;width:calc(100% - 34px);margin:0 17px 17px;
+  padding:12px;font-family:var(--mincho);font-size:14px;letter-spacing:.15em;
+  background:transparent;color:var(--sakura);
+  border:1px solid var(--sakura);border-radius:2px;cursor:pointer;
+  transition:background .2s,color .2s;
+}
+.stone-pick:hover{background:var(--sakura-usu)}
+.stone.picked .stone-pick{background:var(--sakura);color:var(--shiro)}
+.stone-pick[disabled]{
+  border-color:var(--kasumi);color:#BCA294;cursor:default;background:transparent;
+}
+/* 石のお話を読み終わってから現れる「選ぶ」ボタン */
+@keyframes pickin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.stone.read .stone-pick{animation:pickin .4s ease backwards}
+.stone-readnote{
+  display:block;margin:0 17px 17px;padding:11px;
+  text-align:center;font-size:12px;letter-spacing:.06em;
+  color:#A8907F;background:var(--haichi);border-radius:2px;
+}
+
+/* ── 石の大きな写真 ────────────────── */
+.photo-box{
+  margin-top:16px;
+  border:1px solid var(--kasumi);
+  background:var(--haichi);
+  overflow:hidden;border-radius:14px;
+  line-height:0;
+}
+.photo-box img{
+  display:block;width:100%;height:auto;
+  aspect-ratio:1;object-fit:cover;
+}
+.photo-fallback{
+  display:none;aspect-ratio:1;place-items:center;padding:22px;text-align:center;
+  color:var(--sumi-usu);font-family:var(--mincho);font-size:13px;line-height:1.8;
+  background:
+    radial-gradient(circle at 35% 30%,rgba(255,255,255,.95) 0 6%,transparent 7%),
+    radial-gradient(circle at 50% 50%,var(--stone-light) 0 25%,var(--stone-mid) 52%,var(--stone-dark) 73%,transparent 74%),
+    linear-gradient(145deg,#fff,var(--haichi));
+}
+.photo-box.photo-missing img{display:none}
+.photo-box.photo-missing .photo-fallback{display:grid}
+
+/* ── ブレスレット（署名要素） ─────────── */
+.braceletbox{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:rgba(255,251,248,.96);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-top:1px solid var(--kasumi);
+  box-shadow:0 -4px 18px rgba(82,51,37,.07);
+}
+.braceletbox-in{
+  max-width:660px;margin:0 auto;padding:11px 20px;
+  display:flex;align-items:center;gap:15px;
+}
+.bracelet{display:block;width:62px;height:62px;flex:none}
+.bracelet-side{flex:1;min-width:0}
+.bracelet-cap{
+  font-family:var(--mincho);font-size:13.5px;
+  letter-spacing:.12em;color:var(--sumi-usu);
+}
+.bracelet-cap b{color:var(--sakura);font-weight:600;font-size:16px}
+.bracelet-side .btn{padding:13px;font-size:15px}
+.bracelet-big{width:100%;max-width:230px;height:auto;aspect-ratio:1;margin:0 auto}
+.bigcap{
+  text-align:center;font-family:var(--mincho);font-size:14px;
+  letter-spacing:.14em;color:var(--sumi-usu);margin-top:14px;line-height:1.9;
+}
+.step2-pad{height:88px}
+@keyframes beadin{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+.bracelet .bd{transform-origin:center;transform-box:fill-box;animation:beadin .45s cubic-bezier(.3,1.5,.6,1) backwards}
+
+/* ── 結果 ───────────────────────────── */
+.result-stone{
+  background:var(--shiro);border:1px solid var(--kasumi);
+  padding:22px 20px;margin-bottom:12px;border-radius:18px;
+}
+.result-head{display:flex;align-items:flex-start;gap:15px;margin-bottom:6px}
+.result-body p{font-size:14px;line-height:2.05;margin-top:14px}
+.fixed-note{
+  background:var(--sakura-usu);padding:20px 21px;
+  margin-bottom:30px;font-size:13.5px;line-height:2;border-radius:18px;
+}
+.fixed-note strong{
+  display:block;font-family:var(--mincho);font-size:15px;
+  letter-spacing:.1em;margin-bottom:7px;font-weight:700;
+}
+.summary{
+  background:var(--shiro);border:1px dashed var(--kasumi);
+  padding:19px 20px;margin-bottom:14px;
+  font-size:13px;line-height:2;white-space:pre-wrap;
+  font-family:var(--gothic);color:var(--sumi-usu);border-radius:16px;
+}
+.price{
+  text-align:center;font-family:var(--mincho);
+  font-size:15px;letter-spacing:.1em;margin-bottom:6px;
+}
+.price em{font-style:normal;font-size:22px;color:var(--sakura)}
+.price-s{
+  text-align:center;font-size:12px;color:var(--sumi-usu);
+  margin-bottom:24px;letter-spacing:.04em;
+}
+.copied{
+  text-align:center;font-size:12.5px;color:var(--sakura);
+  min-height:19px;margin-top:8px;letter-spacing:.06em;
+}
+.closing{
+  text-align:center;font-family:var(--mincho);
+  font-size:15px;line-height:2.2;letter-spacing:.08em;
+  color:var(--sumi-usu);margin:38px 0 28px;
+}
+
+/* ── 小春だよりへの道 ──────────────── */
+.tsugi{
+  border-top:1px solid var(--kasumi);
+  margin-top:44px;padding-top:36px;
+}
+.tsugi-lead{
+  text-align:center;font-size:14px;line-height:2.15;
+  color:var(--sumi-usu);margin-bottom:22px;
+}
+.tsugi-lead b{
+  font-family:var(--mincho);font-weight:700;
+  color:var(--sakura);font-size:15px;letter-spacing:.06em;
+  white-space:nowrap;
+}
+.tsugi-name{
+  text-align:center;font-family:var(--mincho);
+  font-size:17px;letter-spacing:.14em;font-weight:700;margin-bottom:8px;
+}
+.tsugi-sub{
+  text-align:center;font-size:12px;color:var(--sumi-usu);
+  letter-spacing:.06em;margin-bottom:20px;
+}
+/* 小春だよりのボタン（主役より一回り小さいピンク） */
+.btn-tsugi{
+  display:block;width:auto;max-width:340px;margin:0 auto;
+  padding:14px 26px;
+  font-family:var(--mincho);font-size:14.5px;letter-spacing:.14em;font-weight:700;
+  color:var(--shiro);
+  background:linear-gradient(135deg,var(--banner-pink-koi),var(--banner-pink));
+  border:none;border-radius:999px;cursor:pointer;
+  text-align:center;text-decoration:none;
+  box-shadow:0 7px 18px rgba(194,94,124,.16);
+  transition:background .25s,transform .2s,box-shadow .25s;
+}
+.btn-tsugi:hover{
+  background:linear-gradient(135deg,#8F2852,#B8376C);transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(158,47,92,.26);
+}
+.tsugi-omake{
+  text-align:center;font-size:11.5px;color:var(--sumi-usu);
+  letter-spacing:.05em;margin-top:11px;line-height:1.9;
+}
+/* 小春だよりの特典カード */
+.tokuten{
+  max-width:340px;margin:0 auto 22px;
+  background:var(--shiro);
+  border:1px solid var(--kasumi);
+  border-radius:14px;
+  padding:20px 18px 18px;
+  text-align:center;
+}
+.tokuten-lead{
+  font-size:12px;letter-spacing:.1em;color:var(--sakura);
+  margin:0 0 12px;
+}
+.tokuten-list{
+  list-style:none;margin:0 0 14px;padding:0;
+  font-family:var(--mincho);font-weight:700;
+  font-size:15.5px;line-height:2.05;letter-spacing:.06em;
+  color:var(--sumi);
+}
+.tokuten-icon{ margin-right:7px; }
+.tokuten-note{
+  font-size:11.5px;line-height:1.95;color:var(--sumi-usu);
+  margin:0;letter-spacing:.03em;
+}
+
+/* ── 仕立ての選択 ───────────────────── */
+.style-section{
+  margin:46px 0 30px;padding-top:38px;border-top:1px solid var(--kasumi);
+  scroll-margin-top:22px;
+}
+.style-lede{
+  max-width:560px;margin:0 auto 24px;text-align:center;
+  font-size:13.5px;line-height:2;color:var(--sumi-usu);
+}
+.style-price{
+  display:inline-flex;align-items:center;gap:8px;margin-top:13px;
+  padding:7px 15px;border:1px solid var(--banner-line);border-radius:999px;
+  background:linear-gradient(135deg,#FFF8FC,var(--banner-pink-usu));
+  color:var(--sumi);font-family:var(--mincho);font-weight:700;
+}
+.style-grid{display:grid;gap:16px}
+.style-card{
+  display:grid;grid-template-columns:148px 1fr;gap:0;width:100%;
+  padding:0;text-align:left;overflow:hidden;
+  color:var(--sumi);background:var(--shiro);border:1px solid var(--kasumi);
+  border-radius:22px;cursor:pointer;font-family:var(--gothic);
+  transition:border-color .2s,box-shadow .2s,transform .2s;
+}
+.style-card:hover:not([aria-disabled="true"]){
+  border-color:var(--sakura);transform:translateY(-1px);
+}
+.style-card[aria-pressed="true"]{
+  border-color:var(--sakura);box-shadow:0 0 0 1px var(--sakura),0 16px 42px rgba(82,51,37,.08);
+}
+.style-card[aria-disabled="true"]{opacity:.56;cursor:default}
+.style-media{position:relative;min-height:188px;background:#F3E4DC;overflow:hidden}
+.style-media img{display:block;width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.style-media img:not([hidden]) + .style-placeholder,
+.result-type-media img:not([hidden]) + .style-placeholder{display:none}
+.style-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;padding:14px;text-align:center;
+  color:var(--sumi-usu);background:
+    radial-gradient(circle at 50% 38%,rgba(255,255,255,.9) 0 13%,transparent 14%),
+    radial-gradient(circle at 42% 50%,rgba(217,115,143,.2) 0 7%,transparent 8%),
+    radial-gradient(circle at 58% 50%,rgba(122,91,72,.14) 0 7%,transparent 8%),
+    linear-gradient(145deg,#FFF8F4,#EEDFD7);
+}
+.style-placeholder b{font-family:var(--mincho);font-size:13px;letter-spacing:.08em}
+.style-placeholder small{font-size:10px;letter-spacing:.08em}
+.style-copy{padding:20px 20px 18px}
+.style-no{font-size:10px;letter-spacing:.18em;color:var(--sakura);font-weight:700}
+.style-name{
+  display:block;margin:4px 0 9px;font-family:var(--mincho);
+  font-size:17px;line-height:1.55;letter-spacing:.05em;font-weight:700;
+}
+.style-card-price{
+  display:inline-flex;align-items:center;width:fit-content;margin:0 0 12px;
+  padding:6px 13px;border:1px solid var(--banner-line);border-radius:999px;
+  background:linear-gradient(135deg,#FFF8FC,var(--banner-pink-usu));
+  color:var(--banner-pink-koi);font-family:var(--mincho);
+  font-size:13px;line-height:1.4;letter-spacing:.06em;font-weight:700;
+}
+.style-desc{display:block;font-size:12.5px;line-height:1.9;color:var(--sumi-usu)}
+.style-select-label{
+  display:inline-flex;margin-top:12px;color:var(--sakura);font-family:var(--mincho);
+  font-size:12.5px;letter-spacing:.08em;font-weight:700;
+}
+.style-lock,.style-error{
+  margin-top:14px;min-height:22px;text-align:center;font-size:12.5px;color:var(--sumi-usu);
+}
+.style-error{color:#A8465C}
+
+/* ── 手首サイズの選択 ───────────────── */
+.size-section{
+  margin:46px 0 30px;padding-top:38px;border-top:1px solid var(--kasumi);
+  scroll-margin-top:22px;
+}
+.size-grid{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+  max-width:460px;margin:0 auto;
+}
+.size-btn{
+  min-width:78px;padding:15px 10px;
+  font-family:var(--mincho);font-size:17px;letter-spacing:.06em;font-weight:700;
+  color:var(--sumi);background:var(--shiro);
+  border:1px solid var(--kasumi);border-radius:14px;cursor:pointer;
+  transition:border-color .2s,box-shadow .2s,transform .2s,background .2s;
+}
+.size-btn small{
+  display:block;font-family:var(--gothic);font-size:10.5px;
+  font-weight:400;color:var(--sumi-usu);letter-spacing:.1em;margin-top:2px;
+}
+.size-btn:hover:not([aria-disabled="true"]){
+  border-color:var(--sakura);transform:translateY(-1px);
+}
+.size-btn[aria-pressed="true"]{
+  border-color:var(--sakura);background:var(--sakura-usu);
+  box-shadow:0 0 0 1px var(--sakura);
+}
+.size-btn[aria-pressed="true"] small{color:var(--sakura)}
+.size-btn[aria-disabled="true"]{opacity:.5;cursor:default}
+.size-note{
+  max-width:460px;margin:20px auto 0;padding:15px 18px;
+  background:var(--haichi);border-radius:14px;
+  font-size:12.5px;line-height:1.95;color:var(--sumi-usu);text-align:center;
+}
+.size-lock,.size-error{
+  margin-top:14px;min-height:22px;text-align:center;font-size:12.5px;color:var(--sumi-usu);
+}
+.size-error{color:#A8465C}
+
+/* ── 完成画面：選んだ内容のまとめ ────── */
+.order-recap{
+  max-width:520px;margin:30px auto 6px;
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:18px;
+  padding:8px 22px;
+}
+.recap-row{
+  display:flex;align-items:baseline;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--kasumi);
+}
+.order-recap .recap-row:last-child{border-bottom:none}
+.recap-label{
+  flex:none;width:88px;
+  font-family:var(--mincho);font-size:12.5px;letter-spacing:.1em;
+  color:var(--sumi-usu);
+}
+.recap-value{
+  flex:1;font-family:var(--mincho);font-size:15.5px;
+  letter-spacing:.05em;font-weight:700;line-height:1.8;
+}
+@media (max-width:420px){
+  .size-btn{min-width:calc(33.333% - 7px);padding:13px 6px;font-size:16px}
+}
+
+/* ── 選んだ仕立ての結果 ─────────────── */
+.result-kicker{text-align:center;font-family:var(--mincho);font-size:14px;color:var(--sumi-usu)}
+.result-english{
+  text-align:center;font-family:var(--mincho);font-size:12px;letter-spacing:.28em;
+  color:var(--sakura);margin:3px 0 24px;
+}
+.result-type{
+  background:var(--shiro);border:1px solid var(--kasumi);border-radius:24px;
+  overflow:hidden;margin:30px 0;box-shadow:0 18px 50px rgba(82,51,37,.06);
+}
+.result-type-media{position:relative;aspect-ratio:16/10;background:#F2E3DB;overflow:hidden}
+.result-type-media img{display:block;width:100%;height:100%;object-fit:cover}
+.result-type-copy{padding:24px 22px 25px;text-align:center}
+.result-type-copy .eyebrow{margin-bottom:8px}
+.result-type-copy h3{
+  font-family:var(--mincho);font-size:20px;line-height:1.6;letter-spacing:.06em;margin-bottom:12px;
+}
+.result-type-copy p{font-size:13.5px;line-height:2;color:var(--sumi-usu);text-align:left}
+.selected-stones-title{
+  margin:38px 0 18px;text-align:center;font-family:var(--mincho);
+  font-size:18px;letter-spacing:.08em;
+}
+.clasp-note{
+  margin:28px 0 34px;padding:22px 21px;border:1px solid var(--kasumi);
+  border-radius:18px;background:rgba(255,251,248,.7);font-size:13px;line-height:2;
+}
+.clasp-note strong{
+  display:block;margin-bottom:8px;font-family:var(--mincho);font-size:15px;letter-spacing:.08em;
+}
+.shop-pending{opacity:.66;box-shadow:none;cursor:not-allowed}
+.shop-note{text-align:center;min-height:20px;margin-top:8px;font-size:12px;color:var(--sumi-usu)}
+.style-mini-icon{
+  width:62px;height:62px;flex:none;border:1px solid var(--kasumi);border-radius:50%;
+  display:grid;place-items:center;background:var(--sakura-usu);font-family:var(--mincho);
+  font-size:11px;line-height:1.35;text-align:center;color:var(--sakura);
+}
+
+.step{display:none;animation:fade .5s ease}
+.step.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+@media (max-width:420px){
+  .wishes{grid-template-columns:1fr}
+  .thread-line{width:30px}
+  .style-card{grid-template-columns:1fr}
+  .style-media{min-height:0;aspect-ratio:16/9}
+  .intro-copy{padding:24px 20px;border-radius:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="brand-keyvisual" aria-label="小春 アミュレットジュエリー">
+  <img src="data:image/webp;base64,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"
+       alt="銀杏と天然石の輪で描いた 小春 KOHARU AMULET JEWELRY のロゴ"
+       width="720" height="720" decoding="async">
+</header>
+
+<p class="app-brand">KOHARU · STONE DIAGNOSIS</p>
+<div class="thread-label" id="threadLabel">お聞かせください</div>
+<div class="thread" aria-hidden="true">
+  <span class="thread-bead on" id="tb0"></span>
+  <span class="thread-line"></span>
+  <span class="thread-bead" id="tb1"></span>
+  <span class="thread-line"></span>
+  <span class="thread-bead" id="tb2"></span>
+</div>
+<div class="progress-names" aria-label="診断の進み具合">
+  <span><b>1</b>入力</span>
+  <span><b>2</b>石・仕立て選び</span>
+  <span><b>3</b>完成</span>
+</div>
+
+<!-- ══ STEP 1 ══════════════════════════ -->
+<section class="step active" id="step1">
+  <p class="eyebrow">koharu amulet Jewelry</p>
+  <div class="intro-copy">
+    <p class="intro-em">
+      石には、それぞれ個性があります。<br>
+      そして、その人が今どんな状態にいるかによって、<br>
+      寄り添ってくれる石も変わってきます。
+    </p>
+    <p>
+      選んでいただくストーンは、それぞれ個性があり、<br>
+      その時々で丸玉、カット、コインなど形状が変わります。<br>
+      それも、ご縁で惹かれあった石で、あなただけのオリジナルの<br>
+      ブレスレットに生まれ変わります。
+    </p>
+    <p>では、さっそく生年月日と生まれた場所、好きな色と、今いちばん叶ってほしいことを教えてください。</p>
+    <p>数秘、星の巡り、クリスタルヒーリングでの経験をもとに、あなたに寄り添う石をお選びします。</p>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><span class="field-label">生年月日</span></div>
+    <div class="dob">
+      <select id="y" aria-label="生まれた年"></select><span>年</span>
+      <select id="m" aria-label="生まれた月"></select><span>月</span>
+      <select id="d" aria-label="生まれた日"></select><span>日</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">生まれた場所</span>
+      <span class="field-note">土地のエネルギーを見ます</span>
+    </div>
+    <select id="pref" aria-label="生まれた都道府県"></select>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">好きな色</span>
+      <span class="field-note">3つまで選べます</span>
+    </div>
+    <div class="chips" id="colorChips"></div>
+  </div>
+
+  <div class="field">
+    <div class="field-head"><span class="field-label">今、いちばん叶ってほしいことを教えてください</span></div>
+    <div class="wishes" id="wishGrid"></div>
+    <p class="wish-hint">願いは、ひとつだけ選んでください。いちばん叶ってほしいことに絞ることで、その願いに寄り添う石がはっきりと見えてきます。</p>
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">今の願いを教えてください。</span>
+    </div>
+    <p class="wish-hint" style="margin:0 0 12px">
+      ここに書いたことは、ブレスレットと共にお送りする鑑定書をお書きするときの大切な手がかりになります。<br>
+      さらに詳しく、生まれた市や町、生まれた時刻まで分かれば、書き添えてください。より詳しくお調べできます。<br>
+      （わからない場合は、空白でも大丈夫です）
+    </p>
+    <textarea id="freeWish" aria-label="今の願い"></textarea>
+  </div>
+
+  <button class="btn" id="go1">石を選ぶ</button>
+  <p class="err" id="err1" role="alert" aria-live="polite"></p>
+</section>
+
+<script>
+/* ══════════════════════════════════════
+   小春ジュエリー 石データベース（40種類）
+
+   写真について：
+   images フォルダに「石のID.webp」という名前で入れるだけで、
+   自動的にその石の写真が表示されます。
+   （例：images/amethyst.webp）
+   webp / png / jpg / jpeg のどれでも大丈夫です。
+   写真がない石は、これまでどおり色だけで表示されます。
+   ══════════════════════════════════════ */
+const STONES = [
+  {
+    id: "amethyst", name: "アメジスト", en: "Amethyst",
+    color: ["紫"], hex: ["#B9A0D4", "#7E5FA8", "#5C4080"],
+    wish: ["浄化", "恋愛", "癒し"], num: [7, 9],
+    lead: "心を静めて、本当の答えを見せてくれる石",
+    body: "和名を紫水晶といい、古くから「愛の守護石」として大切にされてきました。感情がざわついているとき、その波を静かに沈めて、頭で考えた答えではなく、心の奥にある本当の望みに気づかせてくれます。\n\n強い浄化の力を持ちながら、その働き方はとても穏やか。無理に何かを変えるのではなく、あなたが自分のペースで整っていくのを、そばで見守るように支えてくれます。眠りが浅いとき、考えごとが止まらないとき、枕元に置いておくのもおすすめです。\n\n迷いの多い時期をすごしている方、直感をもっと信じられるようになりたい方に、そっと寄り添ってくれる一粒です。"
+  },
+  {
+    id: "peridot", name: "ペリドット", en: "Peridot",
+    color: ["緑"], hex: ["#D3E08A", "#A8C24E", "#7A9130"],
+    wish: ["癒し", "自信", "浄化"], num: [3, 5],
+    lead: "重たい気持ちを、光のほうへ連れ出してくれる石",
+    body: "太陽の光をそのまま閉じ込めたような、明るい黄緑色。古代エジプトでは「太陽の宝石」と呼ばれ、闇や不安を遠ざけるお守りとして身につけられていました。\n\nこの石が得意なのは、嫉妬や執着、誰かと比べてしまう気持ちなど、自分でも扱いに困る重たい感情をやわらげること。責める代わりに「もう手放してもいいよ」と、明るいほうへ視線を向けさせてくれます。\n\nなんとなく気持ちが晴れない日が続いている方、もう一度前を向くきっかけがほしい方に。心の風通しをよくしてくれる、あたたかな石です。"
+  },
+  {
+    id: "aquamarine", name: "アクアマリン", en: "Aquamarine",
+    color: ["青"], hex: ["#CDE9EF", "#8FCBD9", "#5E9FB0"],
+    wish: ["恋愛", "癒し", "浄化"], num: [2, 6],
+    lead: "言いたいことが、やさしい言葉になって出てくる石",
+    body: "名前の由来は、ラテン語の「海の水」。船乗りたちが安全な航海を願って持ち歩いた、お守りの石として知られています。\n\n「勇気の石」とも呼ばれ、伝えたいのに言えないこと、飲み込んでしまった気持ちを、やわらかい言葉にほどいて外に出す手助けをしてくれます。強く言い切る勇気ではなく、相手を思いやりながら本音を伝える、そんな種類の勇気です。\n\nパートナーや家族との関係で、すれ違いや誤解を感じている方に。あなたの中の言葉が、ちゃんと相手に届くように支えてくれます。"
+  },
+  {
+    id: "pinktourmaline", name: "ピンクトルマリン", en: "Pink Tourmaline",
+    color: ["ピンク"], hex: ["#F0B4CC", "#D9739E", "#A84A72"],
+    wish: ["恋愛", "癒し"], num: [2, 6],
+    lead: "傷ついた心を、いちばん深いところから癒す石",
+    body: "深い愛のエネルギーを持つ石で、ハートのあたりにあたたかい灯りをともすように働きかけると言われています。\n\n恋愛の石として有名ですが、この石が最初に向き合うのは、相手ではなくあなた自身。過去に傷ついた記憶や、自分を後回しにしてきた癖を、責めずにゆっくりほどいていきます。自分をちゃんと大切にできるようになると、不思議と人からの愛も受け取りやすくなる。その順番を、この石はよく知っています。\n\n恋の痛みを抱えている方、もう一度やわらかい気持ちで人と向き合いたい方に、いちばん近くにいてほしい石です。"
+  },
+  {
+    id: "citrine", name: "シトリン", en: "Citrine",
+    color: ["黄"], hex: ["#F7DFA0", "#E5B84B", "#B88A28"],
+    wish: ["金運", "自信", "仕事"], num: [3, 8],
+    lead: "豊かさの流れを、明るく呼び込む石",
+    body: "黄水晶とも呼ばれ、古くから「商売繁盛の石」「富をもたらす石」として愛されてきました。商いをする人が、お店や財布に忍ばせてきた歴史があります。\n\nただお金を呼ぶというより、この石が高めてくれるのは「受け取る力」。自分には価値がある、受け取っていい、と思えるようになると、豊かさは自然と流れ込んでくる。その土台の部分を、明るく照らしてくれます。\n\n新しい挑戦を始めたい方、収入や仕事の流れを変えていきたい方に。太陽のような前向きさを分けてくれる石です。"
+  },
+  {
+    id: "pearlwhite", name: "淡水パール（ホワイト）", en: "Freshwater Pearl",
+    color: ["白"], hex: ["#FBF7F0", "#EFE4D4", "#D6C6B0"],
+    wish: ["浄化", "恋愛", "癒し"], num: [2, 9],
+    lead: "まっさらな気持ちに戻して、新しく始めさせてくれる石",
+    body: "貝の中で長い時間をかけて育つ、生命が生んだ宝石。母から子へ受け継がれることも多く、慈愛と守りの象徴とされてきました。\n\n淡水パールの働きは、余計なものを削ぎ落として、心をまっさらな状態に戻すこと。過去の出来事や人の言葉に引きずられているとき、その重さをそっと洗い流して、いまのあなたに戻してくれます。\n\n節目を迎える方、心機一転して新しい自分で歩き出したい方に。清らかさと女性らしいやわらかさを、同時に授けてくれる一粒です。"
+  },
+  {
+    id: "carnelian", name: "カーネリアン", en: "Carnelian",
+    color: ["オレンジ"], hex: ["#F0A878", "#D9683C", "#A8451F"],
+    wish: ["自信", "仕事"], num: [1, 5],
+    lead: "「やってみよう」の一歩を、後ろから押してくれる石",
+    body: "燃えるような橙色を持ち、古代エジプトやローマでは戦士や旅人が、勇気と生命力を求めて身につけていました。ナポレオンが愛用した石としても知られています。\n\n頭では分かっているのに動けない、そんなときに力を貸してくれるのがこの石。迷いを断ち切って、最初の一歩を踏み出す瞬間のエネルギーを後押ししてくれます。\n\n新しいことを始めたい方、先延ばしにしている大事な用事がある方に。読んで終わりにせず、行動に変えたいときの相棒です。"
+  },
+  {
+    id: "moonstone", name: "ムーンストーン", en: "Moonstone",
+    color: ["白"], hex: ["#F2F2F7", "#DCDCE6", "#B8B8C6"],
+    wish: ["癒し", "恋愛", "浄化"], num: [2, 7],
+    lead: "心の満ち欠けに、静かに寄り添ってくれる石",
+    body: "「女神の石」と呼ばれ、月の満ち欠けと同じリズムで人の心に寄り添うと言われてきました。表面をゆらめく青白い光は、シラーと呼ばれる、この石だけの輝きです。\n\n感情には波があって当たり前。上がるときも下がるときもある——それを否定せず、そのまま受けとめて整えてくれるのがムーンストーンです。感受性が豊かで、周りの空気を敏感に感じ取ってしまう方ほど、この石の穏やかさに助けられます。\n\n心のリズムを大切にしたい方、新しい始まりを迎える方に。夜の海のように静かに支えてくれる石です。"
+  },
+  {
+    id: "smokyquartz", name: "スモーキークォーツ", en: "Smoky Quartz",
+    color: ["茶"], hex: ["#C4A88F", "#8B6B52", "#5C4432"],
+    wish: ["浄化", "癒し"], num: [4, 8],
+    lead: "地に足をつけて、ちゃんと現実を歩かせてくれる石",
+    body: "煙水晶とも呼ばれる、やさしい茶色の水晶。大地とのつながりを強め、根を張るように心を安定させてくれる「グラウンディング」の代表的な石です。\n\n不安や心配ごとを吸い取って、地面に流してくれるような働きをします。考えすぎて眠れない夜、気持ちだけが先走ってしまうとき、この石はあなたを静かに現実に引き戻してくれます。\n\nふわふわと落ち着かない時期をすごしている方、目の前のことに集中したい方に。守りの力も強く、お守りとして長く持ち歩ける石です。"
+  },
+  {
+    id: "aquaaura", name: "アクアオーラ", en: "Aqua Aura",
+    color: ["白", "青"], hex: ["#E8F4FA", "#B8D9EC", "#9FC5DE"],
+    wish: ["浄化", "仕事"], num: [7, 1],
+    lead: "視界をひらいて、新しい可能性を見せてくれる石",
+    body: "水晶にプラチナを蒸着させて生まれた、虹色に輝く石。天然石と人の手仕事が出会って生まれた、めずらしい存在です。\n\n水晶が持つ強い浄化の力に、プラチナの華やかさが加わることで、意識をひとつ上の視点へ引き上げてくれると言われています。行き詰まって同じところをぐるぐるしているとき、「そこじゃない道もあるよ」と教えてくれるような働きです。\n\n新しいアイデアがほしい方、直感やひらめきを大切にしたい方に。持っているだけで気分が晴れやかになる、光の石です。"
+  },
+  {
+    id: "incarose", name: "インカローズ", en: "Rhodochrosite",
+    color: ["ピンク"], hex: ["#EFA0B8", "#C4527A", "#94304F"],
+    wish: ["恋愛", "自信"], num: [1, 6],
+    lead: "情熱を思い出させてくれる、愛の石",
+    body: "和名を菱マンガン鉱、別名ロードクロサイト。インカ帝国の王が愛したという伝説から、この名で呼ばれています。「バラ色の人生」を象徴する石です。\n\n恋愛の石として名高いですが、その力の源は自己愛。自分を大切に扱えるようになったとき、人は自然と魅力的になり、まっすぐな愛を受け取れるようになります。長く眠っていた情熱や、忘れかけていた「こうなりたい」という願いを呼び起こしてくれる石でもあります。\n\n新しい恋を始めたい方、もう一度自分の人生に情熱を取り戻したい方に。"
+  },
+  {
+    id: "iolite", name: "アイオライト", en: "Iolite",
+    color: ["紫", "青"], hex: ["#B0B4DB", "#7B7FB5", "#54588C"],
+    wish: ["仕事", "自信", "浄化"], num: [1, 7],
+    lead: "迷いの中で、進むべき方角を指し示す石",
+    body: "かつてバイキングたちが、太陽の位置を知るための羅針盤として使ったと伝えられ、「バイキングコンパス」とも呼ばれます。\n\nその名の通り、この石が得意なのは方向を示すこと。選択肢が多すぎてどれを選べばいいか分からないとき、周りの声に流されそうなとき、あなた自身が本当に進みたい方角に意識を戻してくれます。\n\n人生の転機にいる方、大きな決断を控えている方に。静かな青紫の光が、あなたの内側の羅針盤を目覚めさせてくれます。"
+  },
+  {
+    id: "blueapatite", name: "ブルーアパタイト", en: "Blue Apatite",
+    color: ["青"], hex: ["#7FC4E0", "#2E8BC0", "#1B5F8C"],
+    wish: ["仕事", "自信"], num: [3, 5],
+    lead: "目標に向かう意志を、はっきりさせてくれる石",
+    body: "透きとおった青が印象的な石で、意志力と自己表現力を高めるはたらきがあると言われています。\n\n「なんとなくやりたい」を「これをやる」に変えるのが、この石の得意分野。ぼんやりした願いに輪郭を与え、そこに向かって進む集中力を保たせてくれます。同時に、自分の考えを人に伝える力も後押ししてくれるので、発信する仕事をしている方とも相性がいい石です。\n\n新しく何かを始めたい方、目標を最後までやり切りたい方に。"
+  },
+  {
+    id: "greenaventurine", name: "グリーンアベンチュリン", en: "Green Aventurine",
+    color: ["緑"], hex: ["#B5D9BC", "#7FB88C", "#528A62"],
+    wish: ["癒し", "金運", "浄化"], num: [6, 4, 8],
+    lead: "深呼吸をひとつ、思い出させてくれる石",
+    body: "森林浴をしているような、やわらかい緑色。「ヒーリングストーン」の代表格として、心身の疲れをやさしくほぐす石として知られています。同時に「チャンスの石」という別名も持っています。\n\n頑張りすぎているとき、この石は「少し休んでもいいよ」と伝えてくれます。緊張がゆるむと視野が広がって、これまで見落としていた道や機会が見えてくる。癒しと幸運がひとつながりであることを、この石はよく知っています。\n\n人間関係に気を使いすぎてしまう方、なんとなく疲れが取れない方に。持っているだけで肩の力が抜ける、そんな存在です。"
+  },
+  {
+    id: "amazonite", name: "アマゾナイト", en: "Amazonite",
+    color: ["青", "緑"], hex: ["#A8E0DA", "#6BC4BA", "#3F918A"],
+    wish: ["癒し", "浄化", "自信"], num: [5, 2],
+    lead: "「これでいい」と思えるようにしてくれる石",
+    body: "アマゾン川の名を持つ、澄んだ青緑色の石。「ホープストーン（希望の石）」とも呼ばれ、迷いや不安を晴らして前を向かせてくれます。\n\nこの石が整えてくれるのは、心のバランス。不安から出た決断と、希望から出た決断はまったく違うものになります。恐れが薄れると、自分の選択に「これでいい」と納得できるようになる——そういう変化を後押ししてくれます。\n\n人間関係のストレスを感じている方、自分の選択に自信を持ちたい方に。"
+  },
+  {
+    id: "charoite", name: "チャロアイト", en: "Charoite",
+    color: ["紫"], hex: ["#B79FCE", "#8B6FA8", "#5E4676"],
+    wish: ["浄化", "癒し", "仕事"], num: [9, 7],
+    lead: "古い自分を脱いで、生まれ変わらせてくれる石",
+    body: "ロシアのチャロ川流域でしか採れない、紫のマーブル模様が美しい希少な石。世界三大ヒーリングストーンのひとつに数えられています。\n\n「変容の石」と呼ばれ、長く握りしめてきた考え方や、もう合わなくなった人間関係を手放す力を貸してくれます。手放すのは痛みを伴うこともありますが、この石はその過程を怖がらずに通り抜けられるよう、静かに支えてくれます。\n\n人生の転換期にいる方、そろそろ変わりたいと感じている方に。"
+  },
+  {
+    id: "garnet", name: "ガーネット", en: "Garnet",
+    color: ["赤"], hex: ["#C4566B", "#8B2635", "#5C1620"],
+    wish: ["恋愛", "自信", "仕事"], num: [1, 8],
+    lead: "積み重ねたものを、実らせてくれる石",
+    body: "ざくろの実に由来する名を持つ、深い赤の石。古くから「実りの石」として、努力を成果に結びつけるお守りとされてきました。\n\n情熱と生命力を高める石ですが、その熱は瞬間的な勢いではなく、続ける力としての熱。これまで積み重ねてきたものがなかなか形にならないとき、最後のひと押しをしてくれます。また、変わらぬ愛を象徴する石でもあり、大切な人との絆を深めたいときにも選ばれてきました。\n\nやる気を取り戻したい方、あと一歩のところで踏ん張りたい方に。"
+  },
+  {
+    id: "labradorite", name: "ラブラドライト", en: "Labradorite",
+    color: ["青", "黒"], hex: ["#A8B4BE", "#6B7E8C", "#3F4C57"],
+    wish: ["浄化", "仕事", "自信"], num: [7, 9],
+    lead: "自分の内側の声を、信じさせてくれる石",
+    body: "見る角度によって青や金の閃光がひらめく、神秘的な石。この輝きは「ラブラドレッセンス」と呼ばれ、この石だけが持つ特徴です。\n\n「魔法の石」とも称され、直感力を研ぎ澄ますと同時に、外からの余計なエネルギーから持ち主を守ってくれます。人の意見に振り回されやすいとき、この石は「あなたが感じていることは正しいよ」と、内側の声を信じる後押しをしてくれます。\n\n人と接する機会が多い方、自分の感覚を大切に生きたい方に。"
+  },
+  {
+    id: "lapislazuli", name: "ラピスラズリ", en: "Lapis Lazuli",
+    color: ["青"], hex: ["#4A63B0", "#26428B", "#152A5C"],
+    wish: ["仕事", "浄化", "自信"], num: [7, 8],
+    lead: "本質を見抜く目を、育ててくれる石",
+    body: "人類最古のパワーストーンのひとつとされ、古代エジプトでは「聖なる石」として神々に捧げられました。ツタンカーメンの黄金のマスクにも使われています。\n\n「真実の石」と呼ばれ、物事の本質を見抜く洞察力を高めてくれます。同時に、迷いや誘惑を退け、必要な変化を起こす強い力も持っています。持ち主に厳しさを見せることもある石ですが、それはいつも、その人が本来進むべき道へ戻すためです。\n\n大きな目標がある方、自分の生き方を見つめ直したい方に。"
+  },
+  {
+    id: "scolecite", name: "スコロライト", en: "Scolecite",
+    color: ["白"], hex: ["#F5F2F5", "#E0DBE4", "#BDB6C4"],
+    wish: ["癒し", "浄化"], num: [9, 2],
+    lead: "深いところまで、静けさを届けてくれる石",
+    body: "細い針が束になったような結晶で、白く清らかな見た目そのままに、とても穏やかな波動を持つ石です。\n\n緊張でこわばった心をゆるめ、深い安心感の中に連れていってくれます。ヒーリングや瞑想の場で好まれるのは、この石が「何かを起こす」のではなく「静けさを取り戻させる」働きをするからです。眠りの質を整えたいときにも選ばれます。\n\n気を張りつめている日々を送っている方、心からゆっくり休みたい方に。"
+  },
+  {
+    id: "onyx", name: "オニキス", en: "Onyx",
+    color: ["黒"], hex: ["#4A4A4A", "#242424", "#0F0F0F"],
+    wish: ["浄化", "自信", "仕事"], num: [4, 8],
+    lead: "ぶれない自分軸をつくってくれる石",
+    body: "深く艶やかな黒。古来より魔除けの石として、また意志を貫くためのお守りとして、世界中で身につけられてきました。\n\nこの石が育ててくれるのは、忍耐力と自分軸。誘惑や横やりに揺らがず、決めたことをやり抜く力を支えてくれます。同時に、他人の負のエネルギーを跳ね返す守りの働きも強く、人の多い場所で消耗しやすい方の助けにもなります。\n\n目標に向かって進んでいる方、周りに流されず自分を保ちたい方に。"
+  },
+  {
+    id: "fluorite", name: "フローライト", en: "Fluorite",
+    color: ["紫", "緑"], hex: ["#C2AEDB", "#9B7FC4", "#6E559B"],
+    wish: ["仕事", "浄化", "癒し"], num: [3, 7],
+    lead: "散らかった頭の中を、整理してくれる石",
+    body: "紫や緑が層になって流れる、独特の美しさを持つ石。その多彩さから「天才の石」「勉強の石」とも呼ばれます。\n\n情報が多すぎて何から手をつければいいか分からないとき、この石は思考を整理し、優先順位をつける手助けをしてくれます。集中力を保ちながらも緊張しすぎない、ちょうどいい状態に導いてくれるのが特徴です。\n\n学びや資格の勉強をしている方、頭の中をすっきりさせたい方に。デスクに置いておくのもおすすめです。"
+  },
+  {
+    id: "greenonyx", name: "グリーンオニキス", en: "Green Onyx",
+    color: ["緑"], hex: ["#4FA87D", "#2E7D5B", "#1A5238"],
+    wish: ["仕事", "浄化", "金運"], num: [4, 6],
+    lead: "続ける力を、静かに支えてくれる石",
+    body: "深く鮮やかな緑を持つオニキス。黒いオニキスの持つ強さに、緑の癒しが加わったような性質の石です。\n\n安定と持続を象徴し、物事を長く続けるための粘り強さを育ててくれます。短期間で結果を求めて疲れてしまうのではなく、自分のペースを守りながら着実に積み上げていく——そんな歩き方を支えてくれる石です。\n\n新しい習慣を身につけたい方、長期的な目標に取り組んでいる方に。"
+  },
+  {
+    id: "blacktourmaline", name: "ブラックトルマリン", en: "Black Tourmaline",
+    color: ["黒"], hex: ["#3D3D3D", "#1C1C1C", "#080808"],
+    wish: ["浄化"], num: [4, 1],
+    lead: "いちばん強い、守りのお守り",
+    body: "数あるパワーストーンの中でも、最強クラスの魔除けの石として知られています。摩擦や熱によって微弱な電気を帯びる性質があり、その特性が浄化の力と結びつけて語られてきました。\n\nこの石の役割ははっきりしていて、あなたに向かってくる悪い流れや、疲れさせるエネルギーを跳ね返すこと。守りに徹してくれるので、外に出る機会が多い方、人のエネルギーを受け取りやすい方の心強い盾になります。\n\n環境を変えたばかりの方、しっかり自分を守りたい方に。"
+  },
+  {
+    id: "rhodonite", name: "ロードナイト", en: "Rhodonite",
+    color: ["ピンク"], hex: ["#DFA0AB", "#C4737F", "#8E4A55"],
+    wish: ["癒し", "恋愛"], num: [6, 2],
+    lead: "許すことを、少しずつ教えてくれる石",
+    body: "やわらかなピンクに黒い模様が入る、優しさと強さを併せ持った石。和名を薔薇輝石といいます。\n\n心の傷を癒し、自分と他者への思いやりを育ててくれます。この石が向き合うのは、誰かを許せない気持ちや、自分を責めてしまう癖。無理に忘れさせるのではなく、その痛みを抱えたままでも前に進めるように、少しずつ心をほどいていきます。\n\n人間関係で痛い思いをした方、誰かとの関係をやり直したい方に。"
+  },
+  {
+    id: "lepidolite", name: "レピドライト", en: "Lepidolite",
+    color: ["紫"], hex: ["#D2C2E4", "#B9A5CE", "#8E7BA6"],
+    wish: ["癒し", "浄化"], num: [9, 2],
+    lead: "不安をやわらげて、安心を連れてくる石",
+    body: "紫のきらめきを含む鱗雲母。天然のリチウムを含むことから、心を落ち着かせる石として語られてきました。\n\n不安やストレスをやわらげ、揺れる感情を穏やかに整えてくれます。特に、変化の多い時期や環境が変わったときなど、心が落ち着かない場面で力になってくれる石です。眠る前の時間に、そばに置いておく方も多くいらっしゃいます。\n\n気持ちの浮き沈みが大きい方、安心して過ごせる時間を増やしたい方に。"
+  },
+  {
+    id: "chrysoprase", name: "クリソプレーズ", en: "Chrysoprase",
+    color: ["緑"], hex: ["#B0DEC0", "#7FC49B", "#4F9269"],
+    wish: ["金運", "癒し", "自信"], num: [3, 6],
+    lead: "気持ちを明るくして、運を呼び込む石",
+    body: "みずみずしい黄緑色を持ち、古代ギリシャ・ローマ時代から幸運を呼ぶ石として重宝されてきました。アレクサンダー大王が身につけていたという伝説もあります。\n\n心の重荷を軽くして、明るい気持ちを取り戻させてくれるのがこの石の得意分野。気持ちが上向くと行動が変わり、行動が変わると出会うものが変わる——そんな連鎖の入り口をつくってくれます。\n\n新しいチャンスがほしい方、毎日を明るい気持ちで過ごしたい方に。"
+  },
+  {
+    id: "pinkepidote", name: "ピンクエピドート", en: "Pink Epidote",
+    color: ["ピンク"], hex: ["#F2B0B8", "#E08B96", "#B05F6C"],
+    wish: ["癒し", "恋愛"], num: [6, 9],
+    lead: "時間をかけて、そっと回復させてくれる石",
+    body: "やわらかなピンクの中に、細かな輝きを含んだ石。見た目そのままに、とても優しい波動を持っています。\n\nこの石の癒し方は、劇的ではありません。急がず、責めず、あなたのペースに合わせてゆっくりと回復を支えてくれます。心が疲れているときほど、強い言葉より静かな寄り添いが必要になる——その役割を担ってくれる石です。\n\n心が消耗している方、自分をいたわる時間を持ちたい方に。"
+  },
+  {
+    id: "tigereye", name: "タイガーアイ", en: "Tiger's Eye",
+    color: ["茶", "黄"], hex: ["#E0B45F", "#B8842B", "#7E5714"],
+    wish: ["仕事", "金運", "自信"], num: [8, 1],
+    lead: "見極める目と、勝負どころの決断力をくれる石",
+    body: "光を当てると虎の目のような筋が浮かび上がる、力強い石。古くから金運と仕事運の石として、世界中で愛されてきました。\n\n「洞察力の石」と呼ばれ、物事の本質と、いま動くべきタイミングを見極める力を高めてくれます。同時に、その見極めを行動に移す決断力も後押ししてくれるので、仕事で結果を出したい方との相性がとてもいい石です。\n\nキャリアを前に進めたい方、大きな目標に挑んでいる方に。"
+  },
+  {
+    id: "sunstone", name: "サンストーン", en: "Sunstone",
+    color: ["オレンジ"], hex: ["#F2BE8F", "#E89B5C", "#B96D32"],
+    wish: ["自信", "仕事", "恋愛"], num: [1, 3],
+    lead: "自分を信じる力を、太陽のように灯す石",
+    body: "内側にきらきらとした輝きを宿す、太陽の名を持つ石。ムーンストーンと対をなす存在として語られることもあります。\n\nこの石が高めてくれるのは、自己肯定感。「自分なんて」という気持ちが薄れ、自分の存在をそのまま認められるようになると、人前に出ることや自分を表現することが、驚くほど軽くなります。明るい前向きさを、内側から生み出す力をくれる石です。\n\n自信を取り戻したい方、もっと自分らしく輝きたい方に。"
+  },
+  {
+    id: "prehnite", name: "プレナイト", en: "Prehnite",
+    color: ["緑"], hex: ["#DCE8B0", "#C4D69B", "#96A86C"],
+    wish: ["浄化", "癒し"], num: [6, 9],
+    lead: "いらないものを手放して、心を整える石",
+    body: "薄い黄緑の中に、うっすらと光を透かす美しい石。「予言の石」という別名も持ち、内側の感覚を澄ませてくれると言われています。\n\n心の中に溜まった不要な感情や、抱え込みすぎた思いを手放す手助けをしてくれます。何かを足すのではなく、引いて整える——部屋の片づけをしたあとのような、すっきりとした心地よさを届けてくれる石です。\n\n頭も心もごちゃごちゃしている方、身の回りを整理したい方に。"
+  },
+  {
+    id: "sodalite", name: "ソーダライト", en: "Sodalite",
+    color: ["青"], hex: ["#4A5C96", "#2E4272", "#1A2749"],
+    wish: ["仕事", "浄化"], num: [7, 4],
+    lead: "感情に飲まれず、冷静に考えさせてくれる石",
+    body: "深い藍色に白い模様が入る、落ち着いた佇まいの石。理性と論理を司る石として知られています。\n\n感情が高ぶって判断を誤りそうなとき、この石は一歩引いた視点を取り戻させてくれます。冷たくなるのではなく、落ち着いて考えられる状態に整えるということ。目標に向かって一貫した行動をとりたいときにも、頼りになります。\n\n大事な判断を控えている方、感情に振り回されたくない方に。"
+  },
+  {
+    id: "whitetopaz", name: "ホワイトトパーズ", en: "White Topaz",
+    color: ["白"], hex: ["#F7F7F7", "#E8E8E8", "#C4C4C4"],
+    wish: ["浄化", "仕事", "自信"], num: [1, 8],
+    lead: "進みたい道を、明るく照らしてくれる石",
+    body: "無色透明で、光を受けるとダイヤモンドのように輝く石。11月の誕生石としても知られています。\n\n浄化の力が高く、心と場のエネルギーを澄ませてくれると同時に、成功へ向かう道を照らす石とされてきました。何を望んでいるのかがはっきりしてくると、迷いが減り、進むスピードが自然と上がります。その明晰さを届けてくれる石です。\n\n新しいスタートを切る方、目指すものをはっきりさせたい方に。"
+  },
+  {
+    id: "pinkopal", name: "ピンクオパール", en: "Pink Opal",
+    color: ["ピンク"], hex: ["#F5CFCF", "#E8B5B5", "#BC8888"],
+    wish: ["恋愛", "癒し"], num: [2, 6],
+    lead: "やわらかな魅力を、引き出してくれる石",
+    body: "「キューピットストーン」とも呼ばれる、優しい桃色の石。愛と美をもたらす石として、女性を中心に長く愛されてきました。\n\nこの石が引き出すのは、あなたの中にもともとある、やわらかさや思いやり。無理に作り込んだ魅力ではなく、自然体でいるときのあなたの良さが表に出てくるように働きかけてくれます。恋愛においても、飾らない自分で相手と向き合えるようになります。\n\n恋愛運を高めたい方、自分らしい優しさを大切にしたい方に。"
+  },
+  {
+    id: "rutilequartz", name: "ルチルクオーツ", en: "Rutilated Quartz",
+    color: ["黄", "白"], hex: ["#EFE0BC", "#DBC48B", "#B39B57"],
+    wish: ["金運", "仕事", "自信"], num: [8, 1],
+    lead: "強い運を呼び込む、金運の代表格",
+    body: "透明な水晶の中に、金色の針が走る美しい石。和名を金針水晶といい、パワーストーンの中でも屈指の人気を誇ります。\n\n古くから「幸運を呼ぶ石」として名高く、金運・仕事運・勝負運を強力に後押しすると言われてきました。針の一本一本がアンテナのように働き、チャンスや情報を引き寄せると語られます。大きな目標に挑むときの、力強い味方になってくれる石です。\n\n事業や仕事で結果を出したい方、金運を高めたい方に。"
+  },
+  {
+    id: "kunzite", name: "クンツァイト", en: "Kunzite",
+    color: ["ピンク", "紫"], hex: ["#EBC8DF", "#DDB5CE", "#B18AA4"],
+    wish: ["恋愛", "癒し"], num: [2, 9],
+    lead: "愛を受け取ることを、許してくれる石",
+    body: "淡いピンクからライラック色へ移ろう、繊細で上品な石。無条件の愛を象徴する石として知られています。\n\nこの石が向き合うのは、「愛を受け取る」ことの難しさ。与えることは得意でも、受け取ることには罪悪感を覚えてしまう——そんな方の心を、ゆっくりとほどいてくれます。心を開いても大丈夫だと、静かに教えてくれる存在です。\n\n人に頼るのが苦手な方、愛されることに慣れたい方に。"
+  },
+  {
+    id: "malachite", name: "マラカイト", en: "Malachite",
+    color: ["緑"], hex: ["#3F9973", "#1F6B4B", "#0F4530"],
+    wish: ["浄化", "仕事", "癒し"], num: [5, 9],
+    lead: "悪い流れを断ち切って、新しくする石",
+    body: "深緑の縞模様が特徴的な、存在感のある石。古代エジプトでは魔除けとして、また顔料としても使われてきた歴史があります。\n\n「変容と保護の石」と呼ばれ、危険や悪い流れを察知して持ち主を守ると同時に、停滞した状況を動かす力を持っています。同じところで足踏みしているとき、この石は流れを断ち切って新しい展開を呼び込んでくれます。\n\n今の状況を変えたい方、しっかり守られたい方に。"
+  },
+  {
+    id: "tanzanite", name: "タンザナイト", en: "Tanzanite",
+    color: ["紫", "青"], hex: ["#A5A5D9", "#6B6BB5", "#464682"],
+    wish: ["浄化", "仕事", "癒し"], num: [7, 9],
+    lead: "深い気づきへ、導いてくれる石",
+    body: "タンザニアのごく限られた場所でしか採れない、希少な青紫の石。見る角度によって青にも紫にも表情を変えます。\n\n高い精神性を象徴し、内側の気づきや直感を深めてくれる石とされています。日々の忙しさの中で見失っていた「自分は本当は何を大切にしたいのか」という問いに、静かに答えを返してくれるような働きです。\n\n人生の意味を考えている方、内面と向き合う時間を持ちたい方に。"
+  },
+  {
+    id: "chrysocolla", name: "クリソコラ", en: "Chrysocolla",
+    color: ["青", "緑"], hex: ["#5FB5B5", "#3B8B8B", "#22605F"],
+    wish: ["恋愛", "癒し", "自信"], num: [2, 5],
+    lead: "本当の気持ちを、言葉にする力をくれる石",
+    body: "青と緑が溶け合った、海のような色を持つ石。「女神の石」と呼ばれ、女性性を高めるお守りとされてきました。\n\nコミュニケーション能力と自己表現力を高め、飲み込んでしまった気持ちを言葉にする手助けをしてくれます。伝えたいのに伝わらないもどかしさを抱えているとき、この石は言葉の詰まりをやさしくほどいてくれます。\n\n人間関係を良くしたい方、自分の気持ちを素直に伝えたい方に。"
+  },
+  {
+    id: "orangemoonstone", name: "オレンジムーンストーン", en: "Orange Moonstone",
+    color: ["オレンジ", "白"], hex: ["#F5D5BC", "#E8C4A8", "#BF9878"],
+    wish: ["恋愛", "自信", "癒し"], num: [3, 6],
+    lead: "新しい始まりを、あたたかく後押しする石",
+    body: "淡いオレンジに、絹のような光沢を宿す石。ムーンストーンの持つ穏やかさに、太陽のようなあたたかみが加わった性質を持ちます。\n\n感受性を高めながら、その繊細さが不安ではなく喜びに向かうよう支えてくれます。新しい環境や新しい関係に踏み出すとき、緊張をほぐしながら「大丈夫」と背中に手を添えてくれるような石です。\n\n新生活を迎える方、前向きな変化を望んでいる方に。"
+  }
+];
+
+/* 仕立て画像が未登録の間は、カード内の仮画像を表示します。 */
+function typeImageFallback(img){
+  img.hidden = true;
+}
+</script>
+
+<!-- ══ STEP 2 ══════════════════════════ -->
+<section class="step" id="step2">
+  <p class="eyebrow">石を選ぶ</p>
+  <h1>あなたと相性の良い石</h1>
+  <h2>この中から、3つ選んでください</h2>
+  <p class="lede">
+    お選びした候補の中に、<br>あなたの願いに寄り添う石があります。
+    <span class="lede-sep"></span>
+    まずは「石のお話を読む」から、<br>ひとつずつ石の意味にふれてみてください。<br>
+    お話を読んでいただいた石から、お選びいただけます。
+    <span class="lede-sep"></span>
+    最後は、どうか直感で選んでください。<br>
+    あなたの直感が加わることで、あなたにぴったりの一本に仕上がります。
+  </p>
+
+  <div class="numcard" id="numCard"></div>
+  <div class="stones" id="stoneList"></div>
+
+  <section class="style-section" id="styleSection" aria-labelledby="styleHeading">
+    <p class="eyebrow">仕立てを選ぶ</p>
+    <h2 id="styleHeading">お好きなタイプを、ひとつ選んでください</h2>
+    <div class="style-lede">
+      <p>3種類の石を選んだら、次にブレスレットの仕立てをお選びください。</p>
+      <p>お選びいただいた3種類の石を、それぞれの仕立てに合わせて、世界にひとつだけのブレスレットに仕上げます。</p>
+      <p class="style-price">各タイプ　11,000円</p>
+      <p style="margin-top:9px">ブレスレット送付と一緒に鑑定書をお付けしてお届けします。</p>
+    </div>
+
+    <div class="style-grid" id="braceletStyleGrid">
+      <button type="button" class="style-card" data-style="natural" aria-pressed="false" aria-disabled="true">
+        <span class="style-media">
+          <img src="images/bracelet-type1.webp" alt="天然石の一連タイプの完成イメージ" loading="lazy" onerror="typeImageFallback(this)">
+          <span class="style-placeholder"><b>天然石の一連タイプ</b><small>完成イメージ準備中</small></span>
+        </span>
+        <span class="style-copy">
+          <span class="style-no">TYPE 1</span>
+          <span class="style-name">天然石の一連タイプ</span>
+          <span class="style-card-price">11,000円</span>
+          <span class="style-desc">お選びいただいた3種類の石を主役に、4ミリの小さめストーンで軽やかに仕上げます。<br><br>真ん中には、ハートのカットクリスタルを2個、リボンの形に。中央には、小さく上質なオパールを添えています。<br><br>この3つは、一連の天然石タイプにお入れすることであなたに寄り添うお守りになります。</span>
+          <span class="style-select-label">このタイプを選ぶ</span>
+        </span>
+      </button>
+
+      <button type="button" class="style-card" data-style="clear" aria-pressed="false" aria-disabled="true">
+        <span class="style-media">
+          <img src="images/bracelet-type2.webp" alt="水晶とローズクォーツとシルバーカラーチェーンの完成イメージ" loading="lazy" onerror="typeImageFallback(this)">
+          <span class="style-placeholder"><b>水晶とローズクォーツ × SILVER</b><small>完成イメージ準備中</small></span>
+        </span>
+        <span class="style-copy">
+          <span class="style-no">TYPE 2</span>
+          <span class="style-name">水晶とローズクォーツ × SILVER</span>
+          <span class="style-card-price">11,000円</span>
+          <span class="style-desc">4ミリ玉の水晶とローズクォーツを使った、やさしく透明感のあるブレスレット。<br><br>そこに、お選びいただいた3種類の石をあしらって、サージカルステンレスのシルバーカラーチェーンを重ねます。<br><br>天然石と繊細なチェーンが手元で寄り添う、軽やかな二連ブレスレットです。素材の美しさを生かして、シンプルに仕上げます。</span>
+          <span class="style-select-label">このタイプを選ぶ</span>
+        </span>
+      </button>
+
+      <button type="button" class="style-card" data-style="pearl" aria-pressed="false" aria-disabled="true">
+        <span class="style-media">
+          <img src="images/bracelet-type3.webp" alt="淡水パールとゴールドカラーチェーンの完成イメージ" loading="lazy" onerror="typeImageFallback(this)">
+          <span class="style-placeholder"><b>淡水パール × GOLD</b><small>完成イメージ準備中</small></span>
+        </span>
+        <span class="style-copy">
+          <span class="style-no">TYPE 3</span>
+          <span class="style-name">淡水パール × GOLD</span>
+          <span class="style-card-price">11,000円</span>
+          <span class="style-desc">小粒の淡水パールを使った、上品でやわらかな印象のブレスレット。<br><br>そこに、お選びいただいた3種類の石をあしらった、サージカルステンレスのゴールドカラーチェーンを重ねます。<br><br>淡水パールのやさしい艶とゴールドカラーの輝きが手元を彩る、上品な二連ブレスレットです。素材の美しさを生かして、シンプルに仕上げます。</span>
+          <span class="style-select-label">このタイプを選ぶ</span>
+        </span>
+      </button>
+    </div>
+
+    <p class="style-lock" id="styleLock">先に石を3つ選んでください</p>
+    <p class="style-error" id="styleErr" role="alert" aria-live="polite"></p>
+    <div class="fixed-note" style="margin-top:20px">
+      写真は完成イメージです。<br>
+      お選びいただく石によって、色や形、配置は一つひとつ異なります。<br>
+      世界にひとつだけの組み合わせとしてお楽しみください。
+    </div>
+  </section>
+
+  <section class="size-section" id="sizeSection" aria-labelledby="sizeHeading">
+    <p class="eyebrow">サイズを選ぶ</p>
+    <h2 id="sizeHeading">手首のサイズを、お選びください</h2>
+    <div class="style-lede">
+      <p>お作りするブレスレットの大きさを決めるために、<br>手首のサイズを教えてください。</p>
+    </div>
+
+    <div class="size-grid" id="sizeGrid"></div>
+
+    <div class="size-note">
+      メジャーなどで手首をピッタリのサイズで測って選んでください。
+    </div>
+
+    <p class="size-lock" id="sizeLock">先に仕立てを選んでください</p>
+    <p class="size-error" id="sizeErr" role="alert" aria-live="polite"></p>
+  </section>
+
+  <button class="btn-ghost" id="back1">前に戻る</button>
+  <div class="step2-pad"></div>
+</section>
+
+<!-- ══ STEP 3 ══════════════════════════ -->
+<section class="step" id="step3">
+  <p class="eyebrow">できあがり</p>
+  <h2>ありがとうございます</h2>
+  <p class="result-kicker">あなたの</p>
+  <p class="result-english">YOUR AMULET</p>
+  <p class="lede">お選びいただいた石と仕立てをもとに、あなたと共に幸せになっていく、世界にひとつだけのブレスレットをお作りしますね。</p>
+
+  <article class="result-type" id="resultType">
+    <div class="result-type-media">
+      <img id="resultTypeImage" src="" alt="" onerror="typeImageFallback(this)">
+      <div class="style-placeholder" id="resultTypePlaceholder"><b id="resultTypePlaceholderName"></b><small>完成イメージ準備中</small></div>
+    </div>
+    <div class="result-type-copy">
+      <p class="eyebrow" id="resultTypeEnglish"></p>
+      <h3 id="resultTypeName"></h3>
+      <div id="resultTypeDescription"></div>
+    </div>
+  </article>
+
+  <div id="resultBraceletDrawing" style="margin:30px 0 8px" hidden>
+    <svg class="bracelet bracelet-big" id="braceletBig" viewBox="0 0 200 200" role="img" aria-label="選んだ石でできたブレスレットの図"></svg>
+    <p class="bigcap" id="bigCap"></p>
+  </div>
+
+  <div class="order-recap" id="orderRecap"></div>
+
+  <h3 class="selected-stones-title">お選びいただいた3種類の石</h3>
+  <div id="resultStones"></div>
+
+  <p class="price">各タイプ　<em>11,000円</em></p>
+  <p class="price-s">ブレスレットと共に、鑑定書をお付けしてお届けします。</p>
+
+  <div class="clasp-note">
+    <strong>留め具について</strong>
+    標準は、着け外しが簡単なサージカルステンレスでできた上質のマグネット仕様でお作りします。<br>
+    サージカルステンレスアジャスター仕様をご希望の方は、追加料金なしで変更いたします。<br>
+    ご注文の際、備考欄に「アジャスター希望」とご記入ください。
+  </div>
+
+  <div class="field">
+    <div class="field-head">
+      <span class="field-label">ご注文のときに</span>
+      <span class="field-note">下の内容をコピーして、備考欄に貼り付けてください。</span>
+    </div>
+    <p class="wish-hint" style="margin:0 0 14px">アジャスター仕様をご希望の方は、コピーした内容の最後に「アジャスター希望」と書き添えてください。</p>
+    <div class="summary" id="summary"></div>
+    <button class="btn-ghost" id="copyBtn" style="margin-top:0">この内容をコピーする</button>
+    <p class="copied" id="copied"></p>
+  </div>
+
+  <p class="closing">
+    あなたの生まれた日と、願いにあわせて書いた鑑定書もお付けします。<br>
+    石の意味、これからの流れ、そしてあなたへのメッセージを。<br><br>
+    あなたを幸せへと導く一本になりますように。
+  </p>
+
+  <a class="btn shop-pending" id="baseLink" href="#" aria-disabled="true"
+     style="text-align:center;text-decoration:none">ブレスレットのご注文へ</a>
+  <p class="shop-note" id="shopNote">小春のご注文ページは準備中です</p>
+  <button class="btn-ghost" id="redo">もう一度、選び直す</button>
+
+  <!-- 次の願いへ（小春だより） -->
+  <div class="tsugi">
+    <p class="tsugi-lead">
+      今回は、今のあなたにそっと寄り添う「<b id="tsugiWish">恋愛・ご縁</b>」の石をお選びしました。<br>
+      この組み合わせは、「今」のあなたが、自分の心で選んだものです。
+      <span class="lede-sep"></span>
+      あなたの毎日が、この石たちとともに、より素敵なものになりますように。
+    </p>
+    <p class="tsugi-name">小春だより</p>
+    <p class="tsugi-sub">石のお話と、心がふっと軽くなるメッセージを</p>
+
+    <div class="tokuten">
+      <p class="tokuten-lead">ご登録の方へ、ふたつのプレゼント</p>
+      <ul class="tokuten-list">
+        <li><span class="tokuten-icon">💗</span>愛の共鳴画像</li>
+        <li><span class="tokuten-icon">🎧</span>528Hz瞑想音声</li>
+      </ul>
+      <p class="tokuten-note">ブレスレットと一緒に、<br>ほっと心をゆるめる時間にお楽しみください。</p>
+    </div>
+
+    <a class="btn-tsugi" id="koharuLink" href="#" target="_blank" rel="noopener">無料で小春だよりを受け取る</a>
+    <p class="tsugi-omake">メールとLINEでお届けします・いつでも解除できます</p>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<!-- 画面下に貼りつくブレスレット（STEP2のあいだだけ表示） -->
+<div class="braceletbox" id="braceletBox" style="display:none">
+  <div class="braceletbox-in">
+    <svg class="bracelet" id="braceletMini" viewBox="0 0 200 200" role="img" aria-label="選んだ石でできていくブレスレット"></svg>
+    <div class="style-mini-icon" id="styleMiniIcon" hidden></div>
+    <div class="bracelet-side" id="miniCap"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════ 設定 ══════════════════════
+   リンク先を変えたいときは、ここだけ書き換えてください。 */
+const SHOP_URL   = "https://amuletkoharu.base.shop";              // 小春のBASEショップ（商品登録後は商品ページURLに変更）
+const KOHARU_URL = "https://my36p.com/p/r/JzxMoFxR";              // 小春だより（無料メルマガ＋LINE）の登録フォーム
+const PRODUCT_PRICE = "11,000円";                                 // 3タイプ共通価格
+
+/* 03版と同じ公開済みの石写真を読み込みます。
+   40枚は https://moritto.net/images/ に保存されています。 */
+const PHOTO_DIR = "https://moritto.net/images/";
+const PHOTO_EXT = ["webp", "png", "jpg", "jpeg", "JPG", "PNG"];
+/* ════════════════════════════════════ */
+
+/* ── 写真：拡張子を順番に試して、あったものを表示する ── */
+function photoNext(img){
+  const i = (+img.dataset.ext) + 1;
+  if(i < PHOTO_EXT.length){
+    img.dataset.ext = i;
+    img.src = PHOTO_DIR + img.dataset.sid + "." + PHOTO_EXT[i];
+  }else{
+    const box = img.closest(".photo-box");
+    if(box) box.classList.add("photo-missing"); // 写真欄を消さず、石色の代替表示を残す
+  }
+}
+function photoTag(s){
+  return `<div class="photo-box" style="--stone-light:${s.hex[0]};--stone-mid:${s.hex[1]};--stone-dark:${s.hex[2]}">
+    <img data-sid="${s.id}" data-ext="0" loading="lazy"
+         src="${PHOTO_DIR}${s.id}.${PHOTO_EXT[0]}"
+         alt="${s.name}の写真" onerror="photoNext(this)">
+    <span class="photo-fallback" aria-hidden="true">${s.name}<br>STONE IMAGE</span>
+  </div>`;
+}
+
+const COLORS = [
+  {k:"赤",     c:"#B03A4A"},
+  {k:"オレンジ",c:"#E08A4A"},
+  {k:"黄",     c:"#E5C05A"},
+  {k:"緑",     c:"#6FA87C"},
+  {k:"青",     c:"#5A8FB8"},
+  {k:"紫",     c:"#8B76AE"},
+  {k:"ピンク", c:"#E2A0B8"},
+  {k:"白",     c:"#F2EFEA"},
+  {k:"茶",     c:"#9C7A5C"},
+  {k:"黒",     c:"#3A3A3A"}
+];
+
+const WISHES = [
+  {k:"恋愛", t:"恋愛・ご縁",     s:"大切な人との関係、これからの出会い"},
+  {k:"癒し", t:"癒し・安心",     s:"心を休めたい、穏やかに過ごしたい"},
+  {k:"仕事", t:"仕事・目標",     s:"やりたいことを形にしていきたい"},
+  {k:"金運", t:"金運・豊かさ",   s:"収入や暮らしの流れを整えたい"},
+  {k:"浄化", t:"浄化・厄除け",   s:"重たいものを手放して、守られたい"},
+  {k:"自信", t:"自信・行動力",   s:"自分を信じて、一歩を踏み出したい"}
+];
+
+const BRACELET_TYPES = {
+  natural:{
+    name:"天然石の一連タイプ",
+    en:"KOHARU'S AMULET",
+    image:"images/bracelet-type1.webp",
+    mini:"一連",
+    result:`<p><strong>そして、真ん中には</strong><br>
+      ハートのカットクリスタルを2個、リボンの形に。<br>
+      中央には、小さく上質なオパールを添えています。<br>
+      この3つは、一連の天然石タイプにお入れする、小春からのお守りです。<br>
+      4ミリの小さめストーンで、軽やかに仕上げます。</p>`
+  },
+  clear:{
+    name:"水晶とローズクォーツ × SILVER",
+    en:"CLEAR AMULET",
+    image:"images/bracelet-type2.webp",
+    mini:"二連\nSILVER",
+    result:`<p>4ミリ玉の水晶とローズクォーツに、お選びいただいた3種類の石をあしらったシルバーカラーチェーンを重ねます。<br>
+      透明感のある、軽やかな二連ブレスレットに仕上げます。</p>`
+  },
+  pearl:{
+    name:"淡水パール × GOLD",
+    en:"PEARL AMULET",
+    image:"images/bracelet-type3.webp",
+    mini:"二連\nGOLD",
+    result:`<p>小粒の淡水パールに、お選びいただいた3種類の石をあしらったゴールドカラーチェーンを重ねます。<br>
+      やさしい艶と輝きを楽しめる、上品な二連ブレスレットに仕上げます。</p>`
+  }
+};
+
+const NUMEROLOGY = {
+  1:{k:"はじまりの一",b:"あなたの中には、自分の足で道をひらいていく力があります。誰かの後についていくより、まだ誰も歩いていない場所に最初の足あとをつけるほうが、本当は性に合っている。今年その力が動き出そうとしているなら、迷わず一歩目を踏み出してください。"},
+  2:{k:"寄り添いの二",b:"あなたは、人の心の機微をとても細やかに受け取る方です。だからこそ気を使いすぎて、自分を後回しにしてしまうこともあるかもしれません。与えるのと同じくらい、受け取ることを自分に許してあげてください。それがあなたの流れを整えます。"},
+  3:{k:"よろこびの三",b:"楽しむこと、表現すること、笑うこと。あなたにとってそれは息抜きではなく、力の源そのものです。義務でいっぱいになると本来の輝きが曇ってしまう方なので、心が弾むことを日々の真ん中に置いてあげてください。"},
+  4:{k:"土台の四",b:"あなたは、こつこつと積み上げることのできる、なかなかいない種類の方です。派手さはなくても、あなたが築いたものは崩れません。すぐに結果が出なくても大丈夫。あなたの努力は、必ず後から形になって返ってきます。"},
+  5:{k:"うつろいの五",b:"同じ場所にとどまり続けることが、あなたにとっては窮屈さになります。変化を怖がる必要はありません。動くことで運がひらけていくタイプなので、心が「そろそろ」と言っているなら、その声を信じてあげてください。"},
+  6:{k:"愛の六",b:"あなたは、そばにいる人をあたためる力を持っています。家族、友人、パートナー。あなたがいるだけで安心する人がきっといるはずです。ただ、その優しさをいちばん先に向けるべき相手は、あなた自身でもあります。"},
+  7:{k:"探求の七",b:"表面的なことでは満たされず、物事の奥にあるものを知りたくなる方です。ひとりで静かに考える時間が、あなたにとっては栄養になります。その直感はよく当たります。どうか、自分の感じたことを疑わないでください。"},
+  8:{k:"実りの八",b:"あなたには、望むものを現実の形にしていく力があります。願うだけで終わらせず、ちゃんと手に入れることのできる方です。遠慮せず、大きく望んでください。受け取ることに罪悪感を持つ必要は、まったくありません。"},
+  9:{k:"めぐりの九",b:"人の痛みが分かる、あたたかい方です。ひとつの流れが終わり、次が始まる節目に立っていることが多い数でもあります。手放すのはさみしいけれど、その先に必ず新しいものが入ってきます。安心して、両手を空けてください。"}
+};
+
+const PREFS = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県","海外・その他"];
+
+/* ── 状態 ───────────────────────────── */
+const state = {step:1, colors:[], wish:null, num:null, candidates:[], picked:[], braceletStyle:null, wristSize:null, read:[], open:[]};
+
+const $ = id => document.getElementById(id);
+
+/* ── 初期化：フォームを組み立てる ────── */
+(function initForm(){
+  const now = new Date().getFullYear();
+  let yh = '<option value="">選ぶ</option>';
+  for(let v=now; v>=1930; v--) yh += `<option value="${v}">${v}</option>`;
+  $("y").innerHTML = yh;
+
+  let mh = '<option value="">選ぶ</option>';
+  for(let v=1; v<=12; v++) mh += `<option value="${v}">${v}</option>`;
+  $("m").innerHTML = mh;
+
+  let dh = '<option value="">選ぶ</option>';
+  for(let v=1; v<=31; v++) dh += `<option value="${v}">${v}</option>`;
+  $("d").innerHTML = dh;
+
+  $("pref").innerHTML = '<option value="">選んでください</option>' +
+    PREFS.map(p => `<option value="${p}">${p}</option>`).join("");
+
+  $("colorChips").innerHTML = COLORS.map(c =>
+    `<button type="button" class="chip" aria-pressed="false" data-color="${c.k}">
+       <span class="chip-dot" style="background:${c.c}"></span>${c.k}
+     </button>`).join("");
+
+  $("wishGrid").innerHTML = WISHES.map(w =>
+    `<button type="button" class="wish" aria-pressed="false" data-wish="${w.k}">
+       <span class="wish-t">${w.t}</span><span class="wish-s">${w.s}</span>
+     </button>`).join("");
+
+  $("koharuLink").href = KOHARU_URL;
+})();
+
+/* ── 色チップ（3つまで） ─────────────── */
+$("colorChips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if(!b) return;
+  const k = b.dataset.color;
+  const i = state.colors.indexOf(k);
+  if(i > -1) state.colors.splice(i,1);
+  else { if(state.colors.length >= 3) return; state.colors.push(k); }
+  const full = state.colors.length >= 3;
+  document.querySelectorAll(".chip").forEach(c => {
+    const on = state.colors.includes(c.dataset.color);
+    c.setAttribute("aria-pressed", on);
+    c.dataset.full = (full && !on) ? "1" : "0";
+  });
+});
+
+/* ── 願い（1つ） ────────────────────── */
+$("wishGrid").addEventListener("click", e => {
+  const b = e.target.closest(".wish"); if(!b) return;
+  state.wish = b.dataset.wish;
+  document.querySelectorAll(".wish").forEach(w =>
+    w.setAttribute("aria-pressed", w.dataset.wish === state.wish));
+});
+
+/* ── ブレスレットの仕立て（1つ） ────── */
+$("braceletStyleGrid").addEventListener("click", e => {
+  const b = e.target.closest(".style-card"); if(!b) return;
+  if(state.picked.length !== 3) return;
+  state.braceletStyle = b.dataset.style;
+  $("styleErr").textContent = "";
+  renderStyleSelection();
+  updateBracelet();
+});
+
+function renderStyleSelection(){
+  const ready = state.picked.length === 3;
+  document.querySelectorAll(".style-card").forEach(card => {
+    const on = card.dataset.style === state.braceletStyle;
+    card.setAttribute("aria-pressed", on);
+    card.setAttribute("aria-disabled", !ready);
+    const label = card.querySelector(".style-select-label");
+    if(label) label.textContent = on ? "選んでいます　✓" : "このタイプを選ぶ";
+  });
+  $("styleLock").textContent = ready
+    ? (state.braceletStyle ? "選んだ仕立てでお作りします" : "ブレスレットのタイプを1つ選んでください")
+    : "先に石を3つ選んでください";
+}
+
+/* ── 手首サイズ（1つ） ──────────────── */
+const WRIST_SIZES = [14, 15, 16, 17, 18, 19, 20];
+
+$("sizeGrid").innerHTML = WRIST_SIZES.map(v =>
+  `<button type="button" class="size-btn" data-size="${v}" aria-pressed="false" aria-disabled="true">
+     ${v}<small>cm</small>
+   </button>`).join("");
+
+$("sizeGrid").addEventListener("click", e => {
+  const b = e.target.closest(".size-btn"); if(!b) return;
+  if(!state.braceletStyle) return;              // 仕立てを選ぶまでは押せない
+  state.wristSize = +b.dataset.size;
+  $("sizeErr").textContent = "";
+  renderSizeSelection();
+  updateBracelet();
+});
+
+function renderSizeSelection(){
+  const ready = !!state.braceletStyle && state.picked.length === 3;
+  document.querySelectorAll(".size-btn").forEach(b => {
+    b.setAttribute("aria-pressed", +b.dataset.size === state.wristSize);
+    b.setAttribute("aria-disabled", !ready);
+  });
+  $("sizeLock").textContent = ready
+    ? (state.wristSize ? `${state.wristSize}cm でお作りします` : "手首のサイズを1つ選んでください")
+    : (state.picked.length === 3 ? "先に仕立てを選んでください" : "先に石を3つ選んでください");
+}
+
+/* ── 数秘：全部の数字を1桁になるまで足す ── */
+function numerology(y,m,d){
+  let n = String(y) + String(m).padStart(2,"0") + String(d).padStart(2,"0");
+  while(n.length > 1) n = String(n.split("").reduce((a,c)=>a+ +c, 0));
+  return +n === 0 ? 9 : +n;
+}
+
+/* ── 土地と生年月日から、ゆらぎの種をつくる ── */
+function seed(str){
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h,16777619); }
+  return h >>> 0;
+}
+function jitter(sd, id){
+  const h = seed(sd + "|" + id);
+  return (h % 1000) / 1000 * 2.4;   // 0〜2.4 の重み
+}
+
+/* ── 候補をえらぶ ───────────────────── */
+function pickCandidates(y,m,d,pref){
+  const sd = `${y}-${m}-${d}-${pref}-${state.colors.join("")}-${state.wish}`;
+  const scored = STONES.map(s => {
+    let sc = jitter(sd, s.id);
+    if(s.wish.includes(state.wish)) sc += 6;
+    state.colors.forEach(c => { if(s.color.includes(c)) sc += 4; });
+    if(s.num.includes(state.num)) sc += 5;
+    return {s, sc, starred: s.num.includes(state.num)};
+  }).sort((a,b) => b.sc - a.sc);
+
+  // 願いに合う石を必ず4つは入れて、残りは総合点の高いものから
+  const wishHit = scored.filter(x => x.s.wish.includes(state.wish)).slice(0,4);
+  const rest = scored.filter(x => !wishHit.includes(x)).slice(0, 9 - wishHit.length);
+  return [...wishHit, ...rest].sort((a,b) => b.sc - a.sc);
+}
+
+/* ── 珠の描画 ───────────────────────── */
+function beadStyle(st){
+  const [l,m2,dk] = st.hex;
+  return `background:radial-gradient(circle at 33% 29%, ${l} 0%, ${m2} 52%, ${dk} 100%)`;
+}
+
+/* ── ブレスレットのSVGを描く（署名の絵） ── */
+function drawBracelet(svg, picked, big){
+  const cx = 100, cy = 100, R = big ? 72 : 70, r = big ? 8.4 : 8;
+  const N = 26;                 // 珠の数
+  let out = "";
+  // 糸
+  out += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#E7D6CC" stroke-width="1"/>`;
+
+  for(let i=0;i<N;i++){
+    const ang = (i / N) * Math.PI * 2 - Math.PI/2;   // 12時から時計まわり
+    const x = cx + Math.cos(ang) * R, y = cy + Math.sin(ang) * R;
+    const delay = (i * 0.022).toFixed(3) + "s";
+
+    if(i === 0){
+      // 中央：オパール
+      out += `<defs><radialGradient id="op${big?'B':'M'}" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="#FFFDF8"/><stop offset="45%" stop-color="#F7E4E8"/>
+        <stop offset="78%" stop-color="#DCEAF0"/><stop offset="100%" stop-color="#D9C6BE"/>
+      </radialGradient></defs>`;
+      out += `<circle class="bd" cx="${x}" cy="${y}" r="${r*1.25}" fill="url(#op${big?'B':'M'})"
+                stroke="rgba(0,0,0,.07)" stroke-width=".5" style="animation-delay:${delay}"/>`;
+    } else if(i === 1 || i === N-1){
+      // 両どなり：ハートのカットクリスタル
+      const s2 = r * 0.115;
+      out += `<path class="bd" transform="translate(${x},${y}) scale(${s2})"
+        d="M0,7 C-9,-1 -9,-9 -4.4,-9 C-1.6,-9 0,-6.5 0,-4.6 C0,-6.5 1.6,-9 4.4,-9 C9,-9 9,-1 0,7 Z"
+        fill="#FFFBF8" stroke="#E4D2C7" stroke-width="1.1" style="animation-delay:${delay}"/>`;
+    } else {
+      // 残りは選んだ石をくり返す
+      const st = picked.length ? picked[(i-2) % picked.length] : null;
+      if(st){
+        const gid = `g${big?'B':'M'}${st.id}`;
+        out += `<defs><radialGradient id="${gid}" cx="33%" cy="29%">
+          <stop offset="0%" stop-color="${st.hex[0]}"/>
+          <stop offset="55%" stop-color="${st.hex[1]}"/>
+          <stop offset="100%" stop-color="${st.hex[2]}"/>
+        </radialGradient></defs>`;
+        out += `<circle class="bd" cx="${x}" cy="${y}" r="${r}" fill="url(#${gid})"
+                  stroke="rgba(0,0,0,.06)" stroke-width=".5" style="animation-delay:${delay}"/>`;
+      } else {
+        out += `<circle cx="${x}" cy="${y}" r="${r*0.62}" fill="#EEDDD4"/>`;
+      }
+    }
+  }
+  svg.innerHTML = out;
+}
+
+/* ── 石カードを並べる ───────────────── */
+/* 石の本文（写真＋説明）を組み立てる */
+function stoneBodyHTML(s){
+  return photoTag(s) + s.body.split("\n\n").map(p=>`<p>${p}</p>`).join("");
+}
+
+function renderStones(){
+  $("stoneList").innerHTML = state.candidates.map(({s,starred}) => {
+    const on   = state.picked.some(p => p.id === s.id);
+    const full = state.picked.length >= 3 && !on;
+    const read = state.read.includes(s.id);   // お話を読んだ石か
+    const open = state.open.includes(s.id);   // いま開いているか
+    return `
+    <article class="stone${on?' picked':''}${read?' read':''}${open?' open':''}" data-id="${s.id}">
+      <button type="button" class="stone-main" aria-expanded="${open}">
+        <span class="bead" style="${beadStyle(s)}"></span>
+        <span class="stone-txt">
+          <span class="stone-name">${s.name}${starred?'<span class="star">★ 数のご縁</span>':''}</span>
+          <span class="stone-en">${s.en}</span>
+          <span class="stone-lead">${s.lead}</span>
+          <span class="stone-more">${open ? "石のお話をとじる" : (read ? "石のお話をもう一度読む" : "石のお話を読む")}<i></i></span>
+        </span>
+      </button>
+      <div class="stone-body" data-loaded="${read?'1':'0'}">${read ? stoneBodyHTML(s) : ''}</div>
+      ${read
+        ? `<button type="button" class="stone-pick"${full?" disabled":""}>
+             ${on ? "選んでいます　✓" : (full ? "選べるのは3つまでです" : "この石を選ぶ")}
+           </button>`
+        : `<span class="stone-readnote">お話を読むと、選べるようになります</span>`}
+    </article>`;
+  }).join("");
+}
+
+/* ── 石カードの操作 ─────────────────── */
+$("stoneList").addEventListener("click", e => {
+  const card = e.target.closest(".stone"); if(!card) return;
+  const st = STONES.find(s => s.id === card.dataset.id);
+
+  if(e.target.closest(".stone-main")){
+    // 「読んだ石」として記録する（一度読んだら、ずっと選べる）
+    if(!state.read.includes(st.id)) state.read.push(st.id);
+    // 開閉を切り替える
+    const i = state.open.indexOf(st.id);
+    if(i > -1) state.open.splice(i,1); else state.open.push(st.id);
+    renderStones();
+    return;
+  }
+  if(e.target.closest(".stone-pick")){
+    const i = state.picked.findIndex(p => p.id === st.id);
+    if(i > -1) state.picked.splice(i,1);
+    else { if(state.picked.length >= 3) return; state.picked.push(st); }
+    renderStones();
+    updateBracelet();
+  }
+});
+
+/* ── ブレスレットの見た目を更新 ─────── */
+function updateBracelet(){
+  drawBracelet($("braceletMini"), state.picked, false);
+  renderStyleSelection();
+  renderSizeSelection();
+
+  const altStyle = state.braceletStyle && state.braceletStyle !== "natural";
+  $("braceletMini").hidden = !!altStyle;
+  $("styleMiniIcon").hidden = !altStyle;
+  if(altStyle) $("styleMiniIcon").textContent = BRACELET_TYPES[state.braceletStyle].mini;
+
+  const n = 3 - state.picked.length;
+  if(n > 0){
+    $("miniCap").innerHTML =
+      `<p class="bracelet-cap">あと <b>${n}</b> つ選べます</p>`;
+  } else if(!state.braceletStyle){
+    $("miniCap").innerHTML = `<button class="btn" id="chooseStyle">仕立てを1つ選ぶ</button>`;
+    $("chooseStyle").addEventListener("click", () => {
+      $("styleErr").textContent = "ブレスレットのタイプを1つ選んでください";
+      $("styleSection").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  } else if(!state.wristSize){
+    $("miniCap").innerHTML = `<button class="btn" id="chooseSize">手首のサイズを選ぶ</button>`;
+    $("chooseSize").addEventListener("click", () => {
+      $("sizeErr").textContent = "手首のサイズを1つ選んでください";
+      $("sizeSection").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  } else {
+    $("miniCap").innerHTML = `<button class="btn" id="go2">これで仕上げる</button>`;
+    $("go2").addEventListener("click", toResult);
+  }
+}
+
+/* ── 画面の切り替え ─────────────────── */
+const LABELS = ["お聞かせください","石・仕立て選び","できあがり"];
+function goStep(n){
+  state.step = n;
+  document.querySelectorAll(".step").forEach((s,i) => s.classList.toggle("active", i === n-1));
+  for(let i=0;i<3;i++){
+    const b = $("tb"+i);
+    b.className = "thread-bead" + (i === n-1 ? " on" : (i < n-1 ? " done" : ""));
+  }
+  $("threadLabel").textContent = LABELS[n-1];
+  $("braceletBox").style.display = (n === 2) ? "block" : "none";
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ── STEP1 → STEP2 ──────────────────── */
+$("go1").addEventListener("click", () => {
+  const y = +$("y").value, m = +$("m").value, d = +$("d").value, pref = $("pref").value;
+  const e = $("err1");
+  if(!y || !m || !d){ e.textContent = "生年月日を選んでください"; return; }
+  if(new Date(y, m-1, d).getDate() !== d){ e.textContent = "その日付は存在しないようです"; return; }
+  if(!pref){ e.textContent = "生まれた場所を選んでください"; return; }
+  if(state.colors.length === 0){ e.textContent = "好きな色を1つ以上選んでください"; return; }
+  if(!state.wish){ e.textContent = "叶ってほしいことを1つ選んでください"; return; }
+  e.textContent = "";
+
+  state.num = numerology(y,m,d);
+  state.candidates = pickCandidates(y,m,d,pref);
+  state.picked = [];
+  state.read = [];
+  state.open = [];
+  state.braceletStyle = null;
+  state.wristSize = null;
+  $("styleErr").textContent = "";
+  $("sizeErr").textContent = "";
+
+  const nm = NUMEROLOGY[state.num];
+  $("numCard").innerHTML =
+    `<p class="eyebrow" style="margin-bottom:15px">NUMEROLOGY</p>
+     <div class="numcard-n">${state.num}</div>
+     <div class="numcard-k">${nm.k}</div>
+     <p class="numcard-b">${nm.b}</p>`;
+
+  renderStones();
+  updateBracelet();
+  goStep(2);
+});
+
+$("back1").addEventListener("click", () => goStep(1));
+
+/* ── STEP2 → STEP3 ──────────────────── */
+function toResult(){
+  if(state.picked.length !== 3) return;
+  if(!state.braceletStyle){
+    $("styleErr").textContent = "ブレスレットのタイプを1つ選んでください";
+    $("styleSection").scrollIntoView({behavior:"smooth", block:"start"});
+    return;
+  }
+
+  if(!state.wristSize){
+    $("sizeErr").textContent = "手首のサイズを1つ選んでください";
+    $("sizeSection").scrollIntoView({behavior:"smooth", block:"start"});
+    return;
+  }
+
+  const type = BRACELET_TYPES[state.braceletStyle];
+  const showDrawing = state.braceletStyle === "natural";
+  $("resultBraceletDrawing").hidden = !showDrawing;
+  if(showDrawing) drawBracelet($("braceletBig"), state.picked, true);
+  $("bigCap").textContent = state.picked.map(s => s.name).join("　・　");
+
+  $("resultTypeEnglish").textContent = type.en;
+  $("resultTypeName").textContent = type.name;
+  $("resultTypeDescription").innerHTML = type.result;
+  $("resultTypePlaceholderName").textContent = type.name;
+  const typeImg = $("resultTypeImage");
+  typeImg.hidden = false;
+  typeImg.alt = `${type.name}の完成イメージ`;
+  typeImg.src = type.image;
+
+  $("orderRecap").innerHTML = `
+    <div class="recap-row">
+      <span class="recap-label">選んだ石</span>
+      <span class="recap-value">${state.picked.map(s=>s.name).join("　/　")}</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">仕立て</span>
+      <span class="recap-value">${type.name}</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">手首サイズ</span>
+      <span class="recap-value">${state.wristSize} cm</span>
+    </div>
+    <div class="recap-row">
+      <span class="recap-label">価格</span>
+      <span class="recap-value">${PRODUCT_PRICE}</span>
+    </div>`;
+
+  $("resultStones").innerHTML = state.picked.map(s => `
+    <article class="result-stone">
+      <div class="result-head">
+        <span class="bead" style="${beadStyle(s)}"></span>
+        <span class="stone-txt">
+          <span class="stone-name">${s.name}</span>
+          <span class="stone-en">${s.en}</span>
+          <span class="stone-lead">${s.lead}</span>
+        </span>
+      </div>
+      ${photoTag(s)}
+      <div class="result-body">${s.body.split("\n\n").map(p=>`<p>${p}</p>`).join("")}</div>
+    </article>`).join("");
+
+  const y = $("y").value, m = $("m").value, d = $("d").value;
+  const wl = WISHES.find(w => w.k === state.wish);
+  const free = $("freeWish").value.trim();
+  const txt =
+`【石の診断結果】
+生年月日：${y}年${m}月${d}日
+生まれた場所：${$("pref").value}
+好きな色：${state.colors.join("・")}
+叶ってほしいこと：${wl.t}
+選んだ石：${state.picked.map(s=>s.name).join("／")}
+ブレスレットタイプ：${type.name}
+価格：${PRODUCT_PRICE}
+手首サイズ：${state.wristSize}cm
+数のご縁：${state.num}（${NUMEROLOGY[state.num].k}）
+願いごと：${free}`;
+
+  $("summary").textContent = txt;
+  const shopReady = SHOP_URL && SHOP_URL !== "#";
+  $("baseLink").href = shopReady ? SHOP_URL : "#";
+  $("baseLink").classList.toggle("shop-pending", !shopReady);
+  $("baseLink").setAttribute("aria-disabled", String(!shopReady));
+  if(shopReady){
+    $("baseLink").target = "_blank";
+    $("baseLink").rel = "noopener";
+    $("shopNote").textContent = "";
+  }else{
+    $("baseLink").removeAttribute("target");
+    $("shopNote").textContent = "小春のご注文ページは準備中です";
+  }
+  $("tsugiWish").textContent = wl.t;
+  $("copied").textContent = "";
+  goStep(3);
+}
+
+/* ── コピー ─────────────────────────── */
+$("copyBtn").addEventListener("click", async () => {
+  const t = $("summary").textContent;
+  try{
+    await navigator.clipboard.writeText(t);
+    $("copied").textContent = "コピーしました";
+  }catch(_){
+    const ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{
+      const ok = document.execCommand("copy");
+      $("copied").textContent = ok ? "コピーしました" : "長押しして選択・コピーしてください";
+    }
+    catch(__){ $("copied").textContent = "長押しして選択・コピーしてください"; }
+    document.body.removeChild(ta);
+  }
+});
+
+$("baseLink").addEventListener("click", e => {
+  if(!SHOP_URL || SHOP_URL === "#"){
+    e.preventDefault();
+    $("shopNote").textContent = "小春のご注文ページは準備中です";
+  }
+});
+
+/* ── やり直し ───────────────────────── */
+$("redo").addEventListener("click", () => {
+  state.picked = [];
+  state.braceletStyle = null;
+  state.wristSize = null;
+  $("styleErr").textContent = "";
+  $("sizeErr").textContent = "";
+  renderStones();
+  updateBracelet();
+  goStep(2);
+});
+</script>
+</body>
+</html>
