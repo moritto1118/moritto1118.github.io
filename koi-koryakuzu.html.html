@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>恋愛パターン鑑定｜ホントの自分で、なぜか？愛される。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3ECEF;          /* 薄桜鼠 */
+  --ink:#33272E;         /* 墨梅 */
+  --ink-soft:#6B5A63;
+  --plum:#7C2D4A;        /* 深紅梅 */
+  --plum-deep:#5E2138;
+  --thread:#C4344F;      /* 赤い糸 */
+  --gold:#A8813F;        /* 金茶 */
+  --card:#FFFCFA;
+  --line:#E3D3DA;
+  --wash:#F9F4F1;
+  --shadow:0 10px 30px rgba(94,33,56,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Zen Kaku Gothic New",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.9;
+  font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:"Shippori Mincho",serif;}
+
+/* ===== 赤い糸プログレス ===== */
+.thread-bar{
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(to bottom,var(--bg) 70%,transparent);
+  padding:14px 18px 10px;
+}
+.thread-track{position:relative;height:26px;max-width:720px;margin:0 auto;}
+.thread-track svg{width:100%;height:26px;display:block;}
+.thread-base{stroke:var(--line);stroke-width:1.4;fill:none;}
+.thread-fill{stroke:var(--thread);stroke-width:2;fill:none;stroke-linecap:round;
+  transition:stroke-dashoffset .8s cubic-bezier(.65,0,.35,1);}
+.thread-knot{fill:var(--thread);transition:transform .8s cubic-bezier(.65,0,.35,1);}
+.thread-label{
+  text-align:center;font-size:11px;letter-spacing:.18em;color:var(--ink-soft);margin-top:2px;
+}
+
+/* ===== レイアウト ===== */
+.stage{max-width:720px;margin:0 auto;padding:8px 20px 90px;}
+.panel{display:none;animation:fadein .5s ease both;}
+.panel.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion:reduce){
+  .panel,.q-card{animation:none!important;}
+  .thread-fill,.thread-knot{transition:none!important;}
+}
+
+/* ===== 表紙 ===== */
+.cover{text-align:center;padding-top:34px;}
+.cover-crest{width:74px;height:74px;margin:0 auto 20px;display:block;}
+.cover .eyebrow{
+  font-size:12px;letter-spacing:.42em;color:var(--gold);margin-bottom:14px;font-weight:700;
+}
+.cover h1{
+  font-family:"Shippori Mincho",serif;font-weight:800;
+  font-size:clamp(30px,6.4vw,44px);letter-spacing:.1em;line-height:1.5;color:var(--plum-deep);
+}
+.cover h1 .small{display:block;font-size:.42em;letter-spacing:.34em;color:var(--ink-soft);font-weight:600;margin-top:10px;}
+.cover-lead{
+  max-width:520px;margin:26px auto 0;text-align:left;color:var(--ink);
+}
+.cover-lead p{margin-bottom:1.1em;}
+.cover-points{
+  margin:28px auto 0;max-width:520px;background:var(--card);border:1px solid var(--line);
+  border-radius:4px;padding:22px 26px;text-align:left;box-shadow:var(--shadow);
+}
+.cover-points .cp-title{font-family:"Shippori Mincho",serif;font-size:14px;letter-spacing:.24em;color:var(--plum);margin-bottom:10px;font-weight:700;}
+.cover-points p{font-size:14px;color:var(--ink-soft);margin-bottom:.5em;}
+.cover-note{font-size:12px;color:var(--ink-soft);margin-top:22px;letter-spacing:.06em;}
+
+/* ===== ボタン ===== */
+.btn{
+  display:inline-block;border:none;cursor:pointer;
+  font-family:"Shippori Mincho",serif;font-weight:700;letter-spacing:.26em;
+  padding:16px 46px 16px 52px;font-size:16px;border-radius:2px;
+  background:var(--plum);color:#FFF9F5;
+  box-shadow:0 8px 22px rgba(124,45,74,.28);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.btn:hover{transform:translateY(-2px);background:var(--plum-deep);box-shadow:0 12px 26px rgba(124,45,74,.34);}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px;}
+.btn.ghost{
+  background:transparent;color:var(--plum);box-shadow:none;
+  border:1px solid var(--plum);padding:13px 30px 13px 34px;font-size:13.5px;letter-spacing:.2em;
+}
+.btn.ghost:hover{background:rgba(124,45,74,.06);transform:none;}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
+.nav-row{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:34px;}
+.nav-row .spacer{flex:1;}
+.center{text-align:center;}
+
+/* ===== 見出し ===== */
+.sec-head{margin:26px 0 8px;}
+.sec-head .no{
+  font-family:"Shippori Mincho",serif;color:var(--gold);font-size:12.5px;letter-spacing:.3em;font-weight:700;
+}
+.sec-head h2{
+  font-family:"Shippori Mincho",serif;font-weight:800;font-size:24px;letter-spacing:.14em;color:var(--plum-deep);
+  margin-top:4px;
+}
+.sec-head .desc{color:var(--ink-soft);font-size:13.5px;margin-top:8px;}
+
+/* ===== 基本情報フォーム ===== */
+.form-card{
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  padding:26px 26px 30px;margin-top:18px;box-shadow:var(--shadow);
+}
+.field{margin-bottom:22px;}
+.field label{
+  display:block;font-family:"Shippori Mincho",serif;font-weight:700;
+  font-size:14px;letter-spacing:.14em;color:var(--plum-deep);margin-bottom:8px;
+}
+.field .hint{font-size:12px;color:var(--ink-soft);letter-spacing:.04em;margin-top:6px;}
+.field input[type="text"],.field input[type="date"],.field select{
+  width:100%;padding:13px 14px;font-size:16px;font-family:inherit;color:var(--ink);
+  background:var(--wash);border:1px solid var(--line);border-radius:3px;
+}
+.field input:focus,.field select:focus{outline:2px solid var(--plum);outline-offset:1px;background:#fff;}
+.dob-row{display:flex;gap:10px;}
+.dob-row select{flex:1;}
+.chip-row{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{position:relative;}
+.chip input{position:absolute;opacity:0;inset:0;cursor:pointer;}
+.chip span{
+  display:inline-block;padding:10px 20px;border:1px solid var(--line);border-radius:999px;
+  background:var(--wash);font-size:14.5px;letter-spacing:.06em;color:var(--ink-soft);
+  transition:all .15s ease;cursor:pointer;
+}
+.chip input:checked + span{
+  background:var(--plum);border-color:var(--plum);color:#FFF9F5;font-weight:700;
+  box-shadow:0 4px 12px rgba(124,45,74,.25);
+}
+.chip input:focus-visible + span{outline:3px solid var(--gold);outline-offset:2px;}
+
+/* ===== 質問カード ===== */
+.q-card{
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  padding:22px 24px 24px;margin-top:18px;box-shadow:var(--shadow);
+  animation:fadein .5s ease both;
+}
+.q-num{
+  font-family:"Shippori Mincho",serif;color:var(--gold);font-size:12px;letter-spacing:.26em;font-weight:700;
+}
+.q-text{
+  font-family:"Shippori Mincho",serif;font-weight:700;font-size:17px;letter-spacing:.06em;
+  color:var(--ink);margin:6px 0 14px;line-height:1.7;
+}
+.opt{display:block;position:relative;margin-bottom:10px;}
+.opt input{position:absolute;opacity:0;inset:0;cursor:pointer;}
+.opt span{
+  display:block;padding:13px 16px 13px 44px;border:1px solid var(--line);border-radius:3px;
+  background:var(--wash);font-size:14.5px;line-height:1.7;color:var(--ink);
+  transition:all .15s ease;cursor:pointer;position:relative;
+}
+.opt span::before{
+  content:"";position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  width:15px;height:15px;border-radius:50%;border:1.6px solid #C9AEB9;background:#fff;
+  transition:all .15s ease;
+}
+.opt input:checked + span{
+  background:#FBF1F4;border-color:var(--plum);box-shadow:inset 3px 0 0 var(--plum);
+}
+.opt input:checked + span::before{border-color:var(--plum);background:var(--plum);box-shadow:inset 0 0 0 3px #FBF1F4;}
+.opt input:focus-visible + span{outline:3px solid var(--gold);outline-offset:2px;}
+.q-warn{display:none;color:var(--thread);font-size:13px;margin-top:14px;letter-spacing:.06em;}
+.q-warn.show{display:block;}
+
+/* ===== 鑑定中 ===== */
+.loading{text-align:center;padding-top:70px;}
+.loading .moon{width:88px;height:88px;margin:0 auto 26px;position:relative;}
+.loading .moon svg{width:100%;height:100%;animation:spinSlow 7s linear infinite;}
+@keyframes spinSlow{to{transform:rotate(360deg);}}
+.loading h2{font-family:"Shippori Mincho",serif;font-size:21px;letter-spacing:.3em;color:var(--plum-deep);font-weight:700;}
+.loading p{color:var(--ink-soft);font-size:13.5px;margin-top:14px;min-height:1.9em;letter-spacing:.08em;}
+
+/* ===== 鑑定書 ===== */
+.report{display:none;}
+.report.active{display:block;animation:fadein .7s ease both;}
+.r-sheet{
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  box-shadow:var(--shadow);padding:40px 36px 44px;margin-top:16px;position:relative;overflow:hidden;
+}
+.r-sheet + .r-sheet{margin-top:26px;}
+.r-sheet::before{
+  content:"";position:absolute;inset:10px;border:1px solid rgba(168,129,63,.35);border-radius:2px;pointer-events:none;
+}
+.r-cover{text-align:center;padding-top:52px;padding-bottom:56px;}
+.r-cover .eyebrow{font-size:11.5px;letter-spacing:.44em;color:var(--gold);font-weight:700;margin-bottom:16px;}
+.r-cover h2{
+  font-family:"Shippori Mincho",serif;font-weight:800;font-size:clamp(24px,5vw,32px);
+  letter-spacing:.16em;color:var(--plum-deep);line-height:1.6;
+}
+.r-cover .r-name{
+  font-family:"Shippori Mincho",serif;font-size:17px;letter-spacing:.2em;color:var(--ink);margin-top:26px;font-weight:600;
+}
+.r-cover .r-date{font-size:12px;color:var(--ink-soft);letter-spacing:.2em;margin-top:8px;}
+.seal{
+  width:76px;height:76px;margin:30px auto 0;border-radius:50%;
+  border:2.2px solid var(--thread);color:var(--thread);
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Shippori Mincho",serif;font-weight:800;font-size:15px;letter-spacing:.1em;
+  line-height:1.4;transform:rotate(-6deg);opacity:.88;
+}
+.r-h{
+  font-family:"Shippori Mincho",serif;font-weight:800;font-size:20px;letter-spacing:.16em;
+  color:var(--plum-deep);margin-bottom:4px;
+}
+.r-h-no{font-family:"Shippori Mincho",serif;font-size:11.5px;letter-spacing:.3em;color:var(--gold);font-weight:700;}
+.r-rule{height:1px;background:linear-gradient(to right,var(--gold),transparent);margin:12px 0 20px;}
+.r-sheet p{margin-bottom:1.15em;}
+.r-sheet p:last-child{margin-bottom:0;}
+.type-name{
+  font-family:"Shippori Mincho",serif;font-weight:800;font-size:clamp(26px,5.4vw,34px);
+  letter-spacing:.14em;color:var(--plum);text-align:center;margin:10px 0 2px;
+}
+.type-alias{
+  text-align:center;font-family:"Shippori Mincho",serif;font-size:14px;letter-spacing:.24em;
+  color:var(--gold);font-weight:700;margin-bottom:20px;
+}
+.r-sub{
+  font-family:"Shippori Mincho",serif;font-weight:700;font-size:15.5px;letter-spacing:.1em;
+  color:var(--plum);margin:22px 0 8px;padding-left:12px;border-left:3px solid var(--gold);
+}
+.r-quote{
+  background:var(--wash);border:1px solid var(--line);border-radius:3px;
+  padding:16px 18px;font-size:14px;color:var(--ink);margin:14px 0 18px;
+}
+.radar-wrap{max-width:360px;margin:6px auto 10px;}
+.radar-wrap svg{width:100%;height:auto;display:block;}
+.trait-table{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:14px;}
+.trait-table th,.trait-table td{
+  border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;
+}
+.trait-table th{
+  background:var(--wash);font-family:"Shippori Mincho",serif;font-weight:700;
+  letter-spacing:.08em;color:var(--plum-deep);width:9em;font-size:13.5px;
+}
+.step-block{margin:16px 0 0;}
+.step-item{display:flex;gap:14px;margin-bottom:16px;}
+.step-item .sno{
+  flex:none;width:34px;height:34px;border-radius:50%;border:1.4px solid var(--gold);
+  color:var(--gold);font-family:"Shippori Mincho",serif;font-weight:800;font-size:15px;
+  display:flex;align-items:center;justify-content:center;margin-top:2px;
+}
+.step-item .sbody b{
+  display:block;font-family:"Shippori Mincho",serif;font-size:15px;letter-spacing:.08em;
+  color:var(--plum-deep);margin-bottom:3px;
+}
+.step-item .sbody p{font-size:14.5px;margin-bottom:0;}
+.plan-month{margin-bottom:18px;}
+.plan-month .pm-title{
+  font-family:"Shippori Mincho",serif;font-weight:700;color:var(--plum);letter-spacing:.12em;
+  font-size:15px;margin-bottom:6px;
+}
+.plan-month p{font-size:14.5px;}
+.r-close{
+  text-align:center;font-family:"Shippori Mincho",serif;letter-spacing:.14em;line-height:2.3;
+  color:var(--ink);padding:8px 0;
+}
+.r-sign{
+  text-align:right;font-family:"Shippori Mincho",serif;font-size:14px;letter-spacing:.2em;
+  color:var(--ink-soft);margin-top:22px;
+}
+.r-disclaimer{font-size:11.5px;color:var(--ink-soft);margin-top:18px;line-height:1.8;}
+.print-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:30px 0 10px;}
+
+/* ===== 本編の鍵（有料部分） ===== */
+.lock-intro{text-align:center;font-family:"Shippori Mincho",serif;letter-spacing:.12em;line-height:2.1;color:var(--ink);margin-bottom:6px;}
+.lock-books{margin:18px 0 8px;border-top:1px solid var(--line);}
+.lock-book{display:flex;gap:14px;align-items:baseline;padding:11px 2px;border-bottom:1px solid var(--line);}
+.lock-book .lb-no{flex:none;width:5.2em;font-family:"Shippori Mincho",serif;font-size:12px;letter-spacing:.2em;color:var(--gold);font-weight:700;}
+.lock-book .lb-t{font-family:"Shippori Mincho",serif;font-weight:700;letter-spacing:.08em;color:var(--plum-deep);font-size:15px;}
+.lock-teaser{position:relative;margin:14px 0 4px;padding:16px 18px 30px;background:var(--wash);border:1px solid var(--line);border-radius:3px;font-size:14px;max-height:9.5em;overflow:hidden;}
+.lock-teaser::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5em;background:linear-gradient(to bottom,rgba(249,244,241,0),var(--wash) 85%);}
+.lock-teaser .lt-h{font-family:"Shippori Mincho",serif;font-weight:700;color:var(--plum);letter-spacing:.1em;margin-bottom:6px;}
+.lock-special{text-align:center;color:var(--thread);font-weight:700;font-size:14.5px;margin:18px 0 0;letter-spacing:.06em;}
+.lock-buy{text-align:center;margin:26px 0 6px;padding:24px 16px 22px;border:1.4px solid var(--gold);border-radius:3px;background:var(--card);}
+.lock-buy .lb-price{font-family:"Shippori Mincho",serif;font-weight:800;font-size:clamp(22px,4.6vw,28px);color:var(--plum-deep);letter-spacing:.1em;margin:4px 0 16px;}
+.lock-buy .lb-what{font-size:13.5px;color:var(--ink-soft);letter-spacing:.06em;}
+.lock-buy a.btn{display:inline-block;text-decoration:none;}
+.lock-code{margin:26px auto 0;max-width:420px;text-align:center;}
+.lock-code label{display:block;font-size:13.5px;color:var(--ink);margin-bottom:10px;letter-spacing:.04em;}
+.lock-code .code-row{display:flex;gap:10px;}
+.lock-code input{flex:1;min-width:0;font:inherit;font-size:16px;letter-spacing:.12em;text-transform:uppercase;padding:12px 14px;border:1.4px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);}
+.lock-code input:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-color:var(--plum);}
+.lock-code .btn{padding:12px 20px;letter-spacing:.1em;white-space:nowrap;}
+.code-msg{min-height:1.6em;font-size:13px;margin-top:10px;color:var(--thread);}
+.lock-member{font-size:12.5px;color:var(--ink-soft);margin-top:14px;line-height:1.8;}
+.r-invite{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:3px;background:var(--wash);text-align:center;font-size:14px;}
+.r-invite a{color:var(--plum);font-weight:700;}
+.resume-row{margin-top:14px;}
+@media (max-width:520px){.lock-code .code-row{flex-direction:column;}}
+
+/* ===== 印刷（A4鑑定書） ===== */
+@media print{
+  @page{size:A4;margin:16mm 15mm;}
+  body{background:#fff;font-size:11.5pt;color:#222;}
+  .thread-bar,.print-row,.no-print{display:none!important;}
+  .stage{max-width:none;padding:0;}
+  .r-sheet{
+    box-shadow:none;border:none;border-radius:0;padding:0 2mm;margin:0!important;
+    page-break-after:always;
+  }
+  .r-sheet::before{display:none;}
+  .r-sheet:last-of-type{page-break-after:auto;}
+  .report{display:block!important;}
+}
+@media (max-width:520px){
+  .r-sheet{padding:30px 20px 34px;}
+  .btn{padding:15px 34px 15px 40px;letter-spacing:.2em;}
+}
+</style>
+</head>
+<body>
+
+<div class="thread-bar no-print" id="threadBar" aria-hidden="true">
+  <div class="thread-track">
+    <svg viewBox="0 0 700 26" preserveAspectRatio="none">
+      <path class="thread-base" d="M4,16 C120,4 220,26 350,14 C480,2 580,24 696,12"/>
+      <path class="thread-fill" id="threadFill" d="M4,16 C120,4 220,26 350,14 C480,2 580,24 696,12"/>
+      <circle class="thread-knot" id="threadKnot" cx="4" cy="16" r="4.4"/>
+    </svg>
+  </div>
+  <div class="thread-label" id="threadLabel">はじまり</div>
+</div>
+
+<main class="stage">
+
+  <!-- ========== 表紙 ========== -->
+  <section class="panel active" id="panel-cover">
+    <div class="cover">
+      <svg class="cover-crest" viewBox="0 0 74 74" aria-hidden="true">
+        <circle cx="37" cy="37" r="34" fill="none" stroke="#A8813F" stroke-width="1.1"/>
+        <path d="M14,44 C24,30 34,52 44,36 C52,24 60,40 63,30" fill="none" stroke="#C4344F" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="63" cy="30" r="2.6" fill="#C4344F"/>
+      </svg>
+      <div class="eyebrow">恋愛パターン鑑定</div>
+      <h1 class="serif">恋の攻略図
+        <span class="small">— ホントの自分で、なぜか？愛される。—</span>
+      </h1>
+      <div class="cover-lead">
+        <p>恋愛には、その人だけの「クセ」があります。追いかけると燃えるのに、追われると冷めてしまう。長く続くのに、心から好きな人ができない。想われるのに、なぜか選ぶのはいつも同じような人——。</p>
+        <p>この鑑定は、生年月日から読み解く生まれ持った資質と、25の質問から浮かび上がる心のクセを重ね合わせて、<b>「自分に合った恋の進め方」</b>を一冊の鑑定書（A4・4枚相当）にまとめてお渡しするものです。</p>
+      </div>
+      <div class="cover-points">
+        <div class="cp-title">この鑑定でわかること</div>
+        <p>一、あなたの恋愛タイプと、生まれ持った資質</p>
+        <p>二、同じ恋を繰り返してしまう「本当の理由」</p>
+        <p>三、あなた専用の恋愛攻略パターン（五つの段階）</p>
+        <p>四、相性の良い相手・今年の恋の流れ・90日の実践プラン</p>
+      </div>
+      <p class="cover-note">所要時間：約7〜10分／全25問＋基本情報<br>あなたの恋愛タイプ（第一の書）までは無料でご覧いただけます</p>
+      <div class="center" style="margin-top:26px;">
+        <button class="btn" onclick="goTo('basic')">鑑定をはじめる</button>
+      </div>
+      <div class="center resume-row" id="resumeRow" hidden>
+        <button class="btn ghost" onclick="resumeReport()">前回の鑑定書を開く</button>
+      </div>
+      <p class="cover-note" id="unlockNotice" hidden style="margin-top:14px;color:var(--plum);">本編の鍵が開きました。鑑定を受けると、鑑定書がすべてご覧いただけます。</p>
+    </div>
+  </section>
+
+  <!-- ========== 基本情報 ========== -->
+  <section class="panel" id="panel-basic">
+    <div class="sec-head">
+      <div class="no">序ノ章</div>
+      <h2>あなたのこと</h2>
+      <p class="desc">生年月日からは数秘術・星座・今年の恋の流れを、その他の情報からは統計的な傾向を読み解きます。</p>
+    </div>
+    <div class="form-card">
+      <div class="field">
+        <label for="inName">お名前（ニックネーム可）</label>
+        <input type="text" id="inName" placeholder="例：みっこ" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>生年月日</label>
+        <div class="dob-row">
+          <select id="inYear" aria-label="年"></select>
+          <select id="inMonth" aria-label="月"></select>
+          <select id="inDay" aria-label="日"></select>
+        </div>
+        <p class="hint">星座・数秘術・パーソナルイヤーの算出に使います。</p>
+      </div>
+      <div class="field">
+        <label>血液型</label>
+        <div class="chip-row" id="bloodChips">
+          <label class="chip"><input type="radio" name="blood" value="A"><span>A型</span></label>
+          <label class="chip"><input type="radio" name="blood" value="B"><span>B型</span></label>
+          <label class="chip"><input type="radio" name="blood" value="O"><span>O型</span></label>
+          <label class="chip"><input type="radio" name="blood" value="AB"><span>AB型</span></label>
+          <label class="chip"><input type="radio" name="blood" value="X"><span>わからない</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="inRegion">生まれた場所</label>
+        <select id="inRegion">
+          <option value="">選んでください</option>
+          <option value="hokkaido">北海道・東北</option>
+          <option value="kanto">関東</option>
+          <option value="chubu">中部・北陸</option>
+          <option value="kinki">近畿</option>
+          <option value="chushi">中国・四国</option>
+          <option value="kyushu">九州・沖縄</option>
+          <option value="abroad">海外</option>
+        </select>
+      </div>
+      <div class="q-warn" id="basicWarn">未入力の項目があります。すべて入力してください。</div>
+      <div class="nav-row">
+        <button class="btn ghost" onclick="goTo('cover')">戻る</button>
+        <span class="spacer"></span>
+        <button class="btn" onclick="submitBasic()">次へ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 質問セクション（JSで生成） ========== -->
+  <section class="panel" id="panel-q1"></section>
+  <section class="panel" id="panel-q2"></section>
+  <section class="panel" id="panel-q3"></section>
+  <section class="panel" id="panel-q4"></section>
+  <section class="panel" id="panel-q5"></section>
+
+  <!-- ========== 鑑定中 ========== -->
+  <section class="panel" id="panel-loading">
+    <div class="loading">
+      <div class="moon">
+        <svg viewBox="0 0 88 88" aria-hidden="true">
+          <circle cx="44" cy="44" r="40" fill="none" stroke="#E3D3DA" stroke-width="1.2"/>
+          <path d="M44,4 A40,40 0 0 1 84,44" fill="none" stroke="#C4344F" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="44" cy="44" r="26" fill="none" stroke="#A8813F" stroke-width="1" stroke-dasharray="3 5"/>
+        </svg>
+      </div>
+      <h2>鑑定中</h2>
+      <p id="loadingMsg">生年月日から資質を読み解いています…</p>
+    </div>
+  </section>
+
+  <!-- ========== 鑑定書 ========== -->
+  <section class="report" id="report"></section>
+
+</main>
+<script>
+/* =====================================================
+   ★ みっこさんが書き換えるのはここだけ ★
+===================================================== */
+const CONFIG={
+  price:"500円（税込）",            // 画面に出る値段
+  buyUrl:"",                        // マイスピーの決済ページURL（例："https://……"）。空のあいだは「準備中」と表示
+  inviteUrl:"",                     // 鑑定書の最後に出す恋愛部・LINEの案内URL（空なら出さない）
+  inviteText:"恋愛部では、このタイプ別の恋の進め方を毎月いっしょに実践しています。"
+};
+/* 解除コード（中身は暗号化してあります。コードを変えたいときはクーちゃんに頼んでな） */
+const CODE_SALT="koi-koryakuzu-moritto-";
+const CODE_HASHES=[
+  "3496f4e110237ba7df414fbc194b9f4ebec9faa29bb46493faa566d456acf4f5"  // 購入者（500円）
+];
+const LS_UNLOCK="koiKoryakuzu.unlocked",LS_SAVE="koiKoryakuzu.saved";
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function isUnlocked(){return lsGet(LS_UNLOCK)==="1";}
+async function codeOk(raw){
+  const c=(raw||"").toUpperCase().replace(/[\s　]/g,"").replace(/[ー－―−]/g,"-");
+  if(!c)return false;
+  try{
+    const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(CODE_SALT+c));
+    const hex=[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+    return CODE_HASHES.includes(hex);
+  }catch(e){return false;}
+}
+/* =====================================================
+   質問データ（25問・5章）
+   score keys: anx 不安 / avo 回避 / sec 安定 / chase 追い /
+   passive 受け身 / give 尽くし / ideal 理想 / rush 先急ぎ /
+   mote 被アプローチ / se 自己肯定感(±) / dame ダメ男傾向
+===================================================== */
+const SECTIONS=[
+ {no:"第一章",title:"これまでの恋",desc:"過去を責めるためではなく、パターンを見つけるための章です。"},
+ {no:"第二章",title:"心のクセ",desc:"恋をしているとき、心がどう動くかを教えてください。"},
+ {no:"第三章",title:"好みと理想",desc:"惹かれる相手には、あなたの心の形が映ります。"},
+ {no:"第四章",title:"ふるまい",desc:"実際の行動から、恋の進め方の傾向を読み取ります。"},
+ {no:"第五章",title:"望む未来",desc:"最後に、これからの恋について聞かせてください。"}
+];
+const QUESTIONS=[
+ // ---- 第一章 これまでの恋 ----
+ {sec:0,t:"男性からアプローチ（好意を向けられること）は、どのくらいありますか？",opts:[
+   {t:"よくある。告白されることも珍しくない",s:{mote:2}},
+   {t:"たまにある",s:{mote:1}},
+   {t:"ほとんどない、気づかないだけかも",s:{mote:0}},
+   {t:"待つより、自分から動くことが多い",s:{mote:0,chase:1},f:"selfStarter"}]},
+ {sec:0,t:"これまでの恋が終わるとき、いちばん多かった形は？",opts:[
+   {t:"連絡が減って、自然消滅",s:{avo:1,passive:1}},
+   {t:"相手の気持ちが離れていった",s:{anx:1,se:-1}},
+   {t:"自分の気持ちが先に冷めた",s:{avo:2}},
+   {t:"大きな喧嘩や、すれ違いの爆発",s:{rush:1,anx:1}}]},
+ {sec:0,t:"お付き合いの期間は、どのパターンが多いですか？",opts:[
+   {t:"3ヶ月続かないことが多い",s:{rush:1},f:"shortTerm"},
+   {t:"半年〜1年くらいで区切りが来る",s:{}},
+   {t:"1年以上、長く続くほう",s:{sec:1},f:"longTerm"},
+   {t:"交際経験自体がまだ少ない",s:{},f:"fewExp"}]},
+ {sec:0,t:"つい好きになってしまうのは、どんな相手ですか？",opts:[
+   {t:"簡単に振り向いてくれない、追いかけたくなる人",s:{chase:2}},
+   {t:"自分を好きになってくれた人",s:{passive:2}},
+   {t:"尊敬できる、レベルの高い人",s:{ideal:2}},
+   {t:"どこか危なっかしくて、放っておけない人",s:{dame:2,give:1}}]},
+ {sec:0,t:"マッチングアプリや紹介など、出会いの場では？",opts:[
+   {t:"会えても、2回目・3回目に続かない",s:{},f:"appStall"},
+   {t:"メッセージの段階で疲れてしまう",s:{avo:1}},
+   {t:"会う前に「なんか違う」と冷めてしまう",s:{ideal:1,avo:1}},
+   {t:"ほとんど使ったことがない",s:{}}]},
+ // ---- 第二章 心のクセ ----
+ {sec:1,t:"好きな人から返信が来ない夜。あなたの心は？",opts:[
+   {t:"不安で、何度もスマホを確認してしまう",s:{anx:2}},
+   {t:"「嫌われたかも」と理由を探して落ち込む",s:{anx:1,se:-1}},
+   {t:"「忙しいんやろな」と気にせず眠れる",s:{sec:2}},
+   {t:"こっちも既読をつけず、距離を置く",s:{avo:2}}]},
+ {sec:1,t:"好きな人の前での自分は？",opts:[
+   {t:"嫌われたくなくて、いい子を演じてしまう",s:{anx:1,se:-1}},
+   {t:"喜ばせたくて、先回りして尽くしてしまう",s:{give:2}},
+   {t:"好きなのに、素直に甘えられない",s:{avo:2}},
+   {t:"わりと、いつもの自分でいられる",s:{sec:2}}]},
+ {sec:1,t:"気持ちが盛り上がってきたとき、近いのは？",opts:[
+   {t:"今すぐ会いたい。相手の気持ちも早く確かめたい",s:{rush:2,anx:1}},
+   {t:"自分の希望は言えず、相手のペースに合わせすぎる",s:{passive:2,se:-1}},
+   {t:"傷つきたくないから、慎重に様子を見る",s:{avo:1}},
+   {t:"流れに任せて、自然に育てられる",s:{sec:1}}]},
+ {sec:1,t:"正直なところ、自分に自信は？",opts:[
+   {t:"あまりない。恋愛となると特に",s:{se:-2}},
+   {t:"見た目はまあまあ。中身に自信がない",s:{se:-1}},
+   {t:"中身は好き。見た目に自信がない",s:{se:-1}},
+   {t:"欠点も含めて、わりと好き",s:{sec:1,se:1}}]},
+ {sec:1,t:"「かわいいね」「素敵だね」と言われたら？",opts:[
+   {t:"「お世辞やろ」と疑ってしまう",s:{se:-1}},
+   {t:"嬉しい。もっと言ってほしい、認められたい",s:{ideal:1,anx:1}},
+   {t:"「ありがとう」と素直に受け取れる",s:{sec:1,se:1}},
+   {t:"照れて、冗談でかわしてしまう",s:{}}]},
+ // ---- 第三章 好みと理想 ----
+ {sec:2,t:"お相手に求める条件（年収・身長・学歴・見た目など）は？",opts:[
+   {t:"譲れない条件が3つ以上ある",s:{ideal:2}},
+   {t:"条件より、フィーリングと価値観",s:{sec:1}},
+   {t:"譲れないのは1〜2個だけ",s:{}},
+   {t:"条件どころか、まず好かれるかが不安",s:{passive:1,se:-1}}]},
+ {sec:2,t:"まわりの人から言われたことがあるのは？",opts:[
+   {t:"「理想が高い」「高望みしすぎ」",s:{ideal:2}},
+   {t:"「なんであんな男と…」「妥協しすぎ」",s:{dame:2,se:-1}},
+   {t:"「見る目あるね」「お似合い」",s:{sec:1}},
+   {t:"恋愛の話をあまりしないので、わからない",s:{avo:1}}]},
+ {sec:2,t:"ドキッとするのは、どんな男性ですか？",opts:[
+   {t:"みんなの人気者。ハイスペックな人",s:{ideal:1,chase:1}},
+   {t:"ミステリアスで、何を考えているか読めない人",s:{chase:2,dame:1}},
+   {t:"優しくて、一緒にいて安心できる人",s:{sec:1}},
+   {t:"強引に引っ張ってくれる、俺様タイプ",s:{dame:2,passive:1}}]},
+ {sec:2,t:"恋人にされて、いちばん満たされるのは？",opts:[
+   {t:"言葉で「好き」「大切」と伝えてもらうこと",s:{anx:1},f:"llWords"},
+   {t:"忙しくても、時間を作って会ってくれること",s:{},f:"llTime"},
+   {t:"察して、さりげなく支えてくれること",s:{give:1},f:"llCare"},
+   {t:"束縛せず、自分の世界を尊重してくれること",s:{avo:1},f:"llFree"}]},
+ {sec:2,t:"「いい人なんだけど、ときめかない」という経験は？",opts:[
+   {t:"しょっちゅうある。安心より刺激に惹かれる",s:{chase:2}},
+   {t:"たまにある",s:{chase:1}},
+   {t:"ほとんどない。安心できる人が好き",s:{sec:1}},
+   {t:"そもそも「ときめき」がよくわからない",s:{avo:1}}]},
+ // ---- 第四章 ふるまい ----
+ {sec:3,t:"気になる人ができたら、まずどうしますか？",opts:[
+   {t:"自分から連絡先を聞く、誘う。攻めの姿勢",s:{chase:1,rush:1}},
+   {t:"気づいてもらえるように待つ",s:{passive:2}},
+   {t:"まず友達として仲良くなり、徐々に距離を縮める",s:{sec:1}},
+   {t:"好きバレが怖くて、むしろ素っ気なくしてしまう",s:{avo:1,se:-1}}]},
+ {sec:3,t:"デートのお誘い、あなたの場合は？",opts:[
+   {t:"自分からはほぼ誘えない",s:{passive:2}},
+   {t:"好きになったら、すぐ誘ってしまう",s:{rush:1}},
+   {t:"相手の脈を見てから、タイミングよく誘う",s:{sec:1}},
+   {t:"誘われても、忙しさを理由に先延ばしにしがち",s:{avo:2}}]},
+ {sec:3,t:"恋をしているときの生活は？",opts:[
+   {t:"頭の中が恋愛一色。仕事も趣味も手につかない",s:{anx:2,give:1}},
+   {t:"恋も自分の生活も、両方大事にできる",s:{sec:2}},
+   {t:"つい仕事や趣味を優先してしまう",s:{avo:1}},
+   {t:"相手の熱量に合わせて変わる",s:{passive:1}}]},
+ {sec:3,t:"相手への不満や違和感が生まれたら？",opts:[
+   {t:"嫌われたくなくて、我慢して溜め込む",s:{give:1,anx:1,se:-1}},
+   {t:"感情のまま、すぐぶつけてしまう",s:{rush:1}},
+   {t:"タイミングを見て、言葉を選んで話し合う",s:{sec:2}},
+   {t:"言うくらいなら、静かに気持ちが冷めていく",s:{avo:2}}]},
+ {sec:3,t:"過去の恋愛をぜんぶ並べて振り返ると？",opts:[
+   {t:"相手は違うのに、毎回同じパターンで終わっている",s:{},f:"repeat"},
+   {t:"毎回ぜんぜん違うタイプ・違う終わり方",s:{}},
+   {t:"終わった恋を、ずっと引きずってしまう",s:{anx:1}},
+   {t:"振り返るほどの数がまだない",s:{},f:"fewExp"}]},
+ // ---- 第五章 望む未来 ----
+ {sec:4,t:"いちばん叶えたいのは？",opts:[
+   {t:"結婚につながる恋がしたい",s:{},f:"goalMarriage"},
+   {t:"長く続く、安心できる恋人がほしい",s:{},f:"goalPartner"},
+   {t:"まず「心から好きな人」に出会いたい",s:{},f:"goalMeet"},
+   {t:"恋愛で苦しくなる自分を、まず変えたい",s:{},f:"goalSelf"}]},
+ {sec:4,t:"それは、いつまでに？",opts:[
+   {t:"半年以内。正直、焦っている",s:{rush:1},f:"hurry"},
+   {t:"1年以内が目安",s:{}},
+   {t:"2〜3年かけてでも、ちゃんとしたご縁を",s:{}},
+   {t:"期限は決めていない",s:{}}]},
+ {sec:4,t:"新しい出会いの機会（人と知り合う場）は、月にどのくらい？",opts:[
+   {t:"週1回以上はある",s:{},f:"deaiHigh"},
+   {t:"月に数回",s:{}},
+   {t:"ほとんどない。生活圏に出会いがない",s:{},f:"deaiLow"},
+   {t:"アプリの中だけ",s:{},f:"deaiApp"}]},
+ {sec:4,t:"幸せな恋のために「自分のやり方」を変えることは？",opts:[
+   {t:"変えたい。やり方さえわかれば動ける",s:{sec:1}},
+   {t:"変えたいけど、何度も挫折してきた",s:{se:-1}},
+   {t:"できれば、ありのままの自分で愛されたい",s:{passive:1}},
+   {t:"正直、変える必要を感じていない",s:{avo:1}}]},
+ {sec:4,t:"いまの気持ちに、いちばん近いのは？",opts:[
+   {t:"恋愛に疲れた。でも、諦めたくない",s:{},f:"moodTired"},
+   {t:"焦りと不安が大きい",s:{anx:1},f:"moodHurry"},
+   {t:"新しい恋に、わくわくしている",s:{},f:"moodExcited"},
+   {t:"何から始めればいいか、わからない",s:{},f:"moodLost"}]}
+];
+
+/* =====================================================
+   鑑定文データ
+===================================================== */
+const TYPES={
+ tsuki:{name:"月待ちの人",alias:"— 想われて、恋がはじまる —",
+  essence:"あなたの恋は、月のように「待つ」ことから始まります。自分から強く求めにいくより、向けられた想いに応える形で恋が動き出す。それは決して消極的なのではなく、相手の気持ちを丁寧に受け止められる、繊細で誠実な資質の表れです。想われることで安心し、安心の中でゆっくり心を開いていく。あなたに惹かれる人は、その静かな柔らかさに癒やされています。ただし「待つ恋」には弱点があります。それは、恋の主導権も、恋の始まりも、終わりさえも、相手に委ねてしまいやすいこと。選ばれるのを待つうちに、「選ぶ」という自分の権利を手放してしまうのです。",
+  kuse:"月待ちの人がつまずくのは、「好きになってくれた人」と「自分が本当に望む人」のズレです。アプローチされると悪い気はせず、断るのも申し訳なくて、なんとなく始まる恋。けれど心のどこかで「この人でいいのかな」という小さな声が消えない。あるいは逆に、強引に引っ張ってくれる人の熱量を「愛」と読み違えて、気づけば相手のペースに飲み込まれている。どちらの場合も、恋の中心に「自分の意志」が置かれていないことが、長続きしない・満たされない本当の原因です。",
+  shadow:"注意したいのは、「受け身」が「我慢」に変わる瞬間です。誘われるまで動けない、不満があっても言えない、会う頻度も連絡の温度も全部相手任せ——そうして溜まった小さな諦めは、ある日ふっと「もういいや」という冷めに変わります。相手からすれば突然の心変わりに見えるので、話し合う機会もないまま恋が終わる。また、待つ時間が長引くほど「私は選ばれない側なのかも」と自己評価まで下げてしまいがちです。待つこと自体は罪ではありません。ただ、待つ場所と待つ相手だけは、自分で選ぶ必要があります。",
+  steps:[
+   {t:"「選ばれる」から「選ぶ」へ意識を変える",d:"恋の入り口で「この人は私を好きか」ではなく「私はこの人と一緒にいて心地よいか」を先に問う習慣をつけます。ノートに『私が恋人に求める心地よさ』を5つ書き出し、出会いのたびに照らし合わせてください。"},
+   {t:"小さな主導権を一つだけ持つ",d:"全部を引っ張る必要はありません。「次のお店は私が決める」「会いたい日を月に一度は自分から言う」——恋の中に、自分発の提案を一つ混ぜるだけで、関係の重心が真ん中に戻ります。"},
+   {t:"三回ルールで気持ちを確かめる",d:"アプローチされたら即答せず、三回会ってから心に聞く。「安心」なのか「妥協」なのか、三回会えば体の感覚が答えを出します。断る練習も、幸せな恋への大事な一歩です。"},
+   {t:"違和感は48時間以内に言葉にする",d:"我慢グセのあるあなたは、不満を溜めてから冷める傾向があります。小さな違和感は48時間以内に『責めない言い方』で伝える。「〜してくれると嬉しいな」の形なら、関係は壊れず深まります。"},
+   {t:"待つ場所を、人が通る場所へ",d:"月は美しくても、誰も見上げない場所では気づかれません。あなたの柔らかさが伝わるのは、会話が生まれる距離感の場。少人数の集まりや習い事など、繰り返し会える環境に身を置いてください。"}],
+  partnerGood:"あなたに合うのは、感情の起伏がゆるやかで、聞き上手な人。あなたの小さな変化に気づいて言葉にしてくれる、観察力のある男性です。派手さより誠実さ。ぐいぐい来るタイプより、一定のペースで距離を縮めてくれる人と組むと、あなたの「受け止める力」が最高の魅力として花開きます。",
+  partnerAvoid:"避けたいのは、熱しやすく主導権をすべて握りたがる人。最初の情熱は心地よくても、あなたの意志が置き去りにされ、我慢と冷めのパターンを再生産します。「断らせてくれない人」は、優しさではなく支配です。"},
+ suisei:{name:"彗星を追う人",alias:"— 手が届かない光に、恋をする —",
+  essence:"あなたの恋の炎は、「簡単に手に入らないもの」に向かって燃え上がります。振り向いてくれない人、既に人気のある人、何を考えているか読めない人——難易度が上がるほど、心拍数も上がる。これは狩猟本能にも似た、情熱と行動力の証です。あなたが本気で追いかけたときのエネルギーは凄まじく、普通なら諦める場面でも粘り強く距離を詰められる。恋があなたを輝かせ、恋のために努力できる人です。ただ、その炎には一つ癖があります。「追いかけている間」がいちばん燃えて、「手に入った瞬間」に酸素が減るのです。",
+  kuse:"彗星を追う人の恋が消耗戦になるのは、『恋愛感情』と『攻略したい気持ち』が混ざっているからです。返事が遅い、会ってくれない、他の人の影がある——本来なら赤信号のサインが、あなたには「もっと燃える燃料」に見えてしまう。そして手に入らない人を追ううちに、優しく想ってくれる人は「いい人だけど、ときめかない」と後回しに。気づけば、追いかける恋で傷つき、追いかけてくれる恋を退屈に感じる、というループが完成します。しんどいのは、あなたの愛が足りないからではありません。愛の向け先の選び方に、クセがあるだけです。",
+  shadow:"最大の落とし穴は、「手に入らないこと」を「価値があること」と錯覚する回路です。冷たくされるほど『私がもっと頑張れば』と燃え、優しくされると『この程度で満足していいのかな』と疑う。この回路の奥には、多くの場合『簡単に愛される自分には価値がない』という無意識の思い込みが眠っています。また、追いかけるあなたは相手に主導権を渡し続けるため、都合のいい関係に据え置かれやすいのも事実。彗星は美しい。けれど、追い続ける限り、あなたはずっと走り続けることになります。",
+  steps:[
+   {t:"「ときめき」と「不安」を仕分けする",d:"胸が高鳴ったら、まず一呼吸。それは『一緒にいて楽しいドキドキ』か『どう思われてるかわからない不安のドキドキ』か。後者は恋ではなく警報です。ノートに二列で書き分けるだけで、判断力が戻ってきます。"},
+   {t:"追う前に、追わせる余白をつくる",d:"連絡も誘いも、常にあなたが10割では相手は動く必要がありません。7割で止めて、残り3割は相手に取りに来させる。追いかける情熱を『引力』に変換できたとき、恋の力関係が変わります。"},
+   {t:"「安心する人」と三回だけ会ってみる",d:"ときめかなくても、一緒にいて楽な人と三回会う実験を。刺激に慣れた心は、安心を『退屈』と誤読します。三回目に『また会いたいかも』と思えたら、それが本物の芽です。"},
+   {t:"赤信号リストを事前に決めておく",d:"『会う約束を二回流されたら引く』『他の女性の影が見えたら引く』——冷静な今のうちに撤退ラインを紙に書き、恋に落ちたらそれに従う。燃えている最中の自分に判断させないのがコツです。"},
+   {t:"努力の矛先を、相手から自分へ",d:"追いかけるエネルギーの半分を、自分の魅力づくりに回してください。仕事、美容、学び——あなたが自分の人生に夢中になったとき、追わなくても人が寄ってくる『彗星そのもの』になれます。"}],
+  partnerGood:"あなたに合うのは、簡単には流されない芯を持ちつつ、愛情表現はまっすぐな人。適度な自分の世界を持っていて、あなたを退屈させない知的な刺激をくれる男性です。「安定しているのに、底が見えない」——この組み合わせなら、追う情熱と安心が両立します。",
+  partnerAvoid:"避けたいのは、思わせぶりで約束を曖昧にする人、既に恋人や妻がいる人、連絡の温度差で不安を煽る人。あなたの『燃える回路』を熟知して利用するタイプです。難しい恋ほど燃える自分を知っているからこそ、入り口で切る勇気を。"},
+ kagaribi:{name:"篝火の人",alias:"— 与えることで、愛を灯す —",
+  essence:"あなたは、愛する人を照らし温める篝火のような人です。相手の疲れに気づき、先回りして支え、喜ぶ顔のためなら労を惜しまない。その献身は本物の才能で、あなたと付き合った人は間違いなく「大切にされた」と感じているはずです。世話を焼くこと、必要とされることが、あなたにとっての愛情表現であり、喜びでもある。ただし篝火は、薪をくべ続けなければ燃えられません。あなたの恋の課題は、愛し方ではなく『愛されるのを受け取る側』に回れるかどうか。与えることに比べて、受け取ることが極端に苦手なのです。",
+  kuse:"篝火の人の恋が苦しくなるのは、「尽くす」と「愛される」を交換条件にしてしまうときです。これだけやってあげたのだから、大切にしてほしい——口には出さなくても、心のどこかで貸し借りの帳簿がつき始める。そして相手からの返済が少ないと、悲しみと疲れが溜まっていきます。さらに危険なのは、あなたの献身が『支えてあげたくなる人』つまり問題を抱えた男性を引き寄せやすいこと。ダメな部分の多い人ほど、あなたの世話焼きの才能が発揮される場が多いため、『必要とされている』という充実感と『幸せ』を取り違えてしまうのです。",
+  shadow:"影の側面は、自己犠牲が静かに進行することです。相手の予定が最優先になり、自分の趣味や友人との時間が削られ、気づけば生活の全てが相手仕様に。それでも不満を言えないのは、『重いと思われたくない』『尽くさない私に価値はあるのか』という不安があるから。この状態が続くと、相手はあなたの献身を「当たり前」として学習し、関係はますます一方通行になります。燃え尽きた篝火は、ある日突然消えます。あなたが壊れる前に、火の管理の仕方を変えましょう。",
+  steps:[
+   {t:"「してあげたい」か「嫌われたくない」か",d:"何かをしてあげる前に、3秒だけ自問してください。純粋にしてあげたいのか、しないと不安なのか。後者だと気づいたら、その行動は一度やめてみる。愛と不安の仕分けが、消耗を止める第一歩です。"},
+   {t:"受け取る練習を、恋の外で始める",d:"友人からの「ありがとう」や小さな親切を、お返しを考えずに受け取る練習を。『受け取り上手』は恋愛での需要が最も高い才能の一つです。奢られたら次で返そうとせず、まず全力で喜ぶ。それだけで男性の満足度は上がります。"},
+   {t:"尽くす量を7割に、お願いを一つ足す",d:"献身を7割に抑え、代わりに月に一つ、小さなお願いをしてください。「駅まで迎えに来てほしい」程度でOK。男性は『してもらう』より『してあげて感謝される』ときに愛着が深まる生き物です。"},
+   {t:"『支えたい人』ではなく『支え合える人』を",d:"出会いの場で、つい問題を抱えた人に目が行ったら要注意。『私が支えなきゃ』が発動した相手は、恋人候補から一度外す。あなたに必要なのは、患者ではなく、隣を歩けるパートナーです。"},
+   {t:"自分の火を絶やさない",d:"恋の最中こそ、趣味・友人・仕事の時間を死守してください。あなた自身の人生が燃えていることが、依存されず、燃え尽きず、長く愛される最大の条件です。"}],
+  partnerGood:"あなたに合うのは、感謝を言葉にできる人。「ありがとう」「助かった」を照れずに言え、そしてあなたに何かを『してあげたがる』人です。精神的・経済的に自立していて、あなたの献身を当然と思わない男性となら、与える喜びと受け取る幸せの両方を味わえます。",
+  partnerAvoid:"避けたいのは、いつも何かに困っている人、感謝より要求が多い人、あなたの予定より自分の都合を常に優先する人。あなたの優しさは、依存型の男性にとって最高の栄養です。『かわいそう』は恋の入り口にしないでください。"},
+ hokkyokusei:{name:"北極星の人",alias:"— 高く輝く理想を、目指す —",
+  essence:"あなたは、恋にも自分にも高い基準を持つ人です。中途半端な妥協はしたくない。尊敬できない人と、時間を無駄にしたくない。その向上心と審美眼は、あなたがこれまで努力を積み重ねて、自分を磨いてきた証拠でもあります。実際、あなたが「素敵」と感じる男性のレベルは客観的にも高く、それは目が肥えているということ。問題は、理想が高いことそのものではありません。理想の中身が『他人に自慢できるか』という物差しに、いつの間にか置き換わっていないか——そこが、あなたの恋の分かれ道です。",
+  kuse:"北極星の人がつまずくのは、『好きな人』ではなく『選ばれたい人』を追ってしまうときです。ハイスペックな彼に選ばれれば、自分の価値が証明される気がする。周囲に紹介したときの反応まで、無意識に計算してしまう。けれど、その恋の燃料は愛情ではなく承認欲求なので、うまくいかないと『振られた』以上に『価値を否定された』ダメージを受けます。また、条件で入り口を絞りすぎるため出会いの母数が減り、ようやく出会えた高条件の相手には競争率の高さから主導権を握られる——構造的に苦しい戦いを選びがちなのです。",
+  shadow:"影の側面は、理想の高さが『先に減点する防衛』になっていることです。本気になって傷つくのが怖いから、相手の欠点を先に見つけて冷める。「もっといい人がいるかも」と決めきれない。これを繰り返すと、恋愛経験が年齢に追いつかず、さらに理想だけが上がる悪循環に入ります。もう一つの罠は、憧れの人の前で『完璧な私』を演じて疲れ果てること。素を出せない恋は、たとえ成就しても続きません。北極星は目指すもの。でも、あなたが幸せになる場所は、星の上ではなく地上にあります。",
+  steps:[
+   {t:"条件を『見栄え』と『幸せ』に仕分けする",d:"譲れない条件をすべて書き出し、『人に自慢できる項目』と『毎日一緒にいて幸せな項目』に分けてください。年収や身長は前者、清潔感や誠実さや笑いのツボは後者。残すのは後者から3つだけです。"},
+   {t:"減点法から加点法へ",d:"会った人の欠点を探す癖を、意識的に逆転させます。『今日見つけた、この人のいいところ3つ』をスマホにメモ。加点法の目で見ると、同じ相手が違って見え、あなたの表情も柔らかくなります。"},
+   {t:"『尊敬』の定義を広げる",d:"地位や年収だけが尊敬ではありません。仕事への姿勢、人への接し方、逆境での立ち直り方——内面の尊敬ポイントを見つける訓練をすると、対象が一気に広がり、しかもそれは年月で目減りしません。"},
+   {t:"完璧な私を、3割脱ぐ",d:"意中の人の前でこそ、小さな失敗談や弱みを一つ見せてください。心理学でいう自己開示の返報性——先に素を見せた側が、相手の心の扉を開けます。隙のない女性より、隙のある女性が愛されるのは統計的事実です。"},
+   {t:"『私を大切にする人』を最上位条件に",d:"最後に一つだけ条件を足すなら、これです。スペックが理想通りでも、あなたを雑に扱う人はあなたの人生を下げます。逆に、あなたを丁寧に扱う人は、あなたの毎日と自己肯定感を確実に上げ続けます。"}],
+  partnerGood:"あなたに合うのは、自分の世界で努力を続けている人。分野の大小ではなく『何かに真剣な人』です。あなたの向上心を面白がり、対等に議論でき、それでいてあなたの頑張りすぎに気づいて休ませてくれる男性。条件表の外側に、その人はいることが多いのです。",
+  partnerAvoid:"避けたいのは、スペックは高いが、あなたを『選んでやっている』という態度の人。モテる自覚のある男性の一部は、女性の承認欲求を見抜いて優先順位を下げてきます。追わせられていると感じたら、その恋はあなたを消耗させます。"},
+ hayate:{name:"疾風の人",alias:"— 想いのままに、駆け出す —",
+  essence:"あなたの恋は、疾風のようにスピードが命です。好きになったら一直線。会いたい気持ちも、確かめたい気持ちも、抑えるより先に走り出す。その素直さと行動力は、恋のチャンスを掴む上で間違いなく武器です。出会いから交際までが早く、恋の初速では誰にも負けない。相手に想いがまっすぐ伝わるので、同じ熱量の人とならトントン拍子に進みます。ただし、風は速すぎると、育つ前の芽を吹き飛ばします。あなたの恋の課題は、気持ちの強さではなく『ペース配分』。恋は短距離走ではなく、駅伝なのです。",
+  kuse:"疾風の人がつまずくのは、自分の気持ちの温度と、相手の温度の差を確かめずに走るときです。男性の恋愛感情は、一般的に女性より立ち上がりが遅く、じわじわ蓄積する傾向があります。あなたの中では『もう毎日連絡して、週2で会いたい』段階でも、相手はまだ『いい人だな』の段階かもしれない。そこで距離を詰めると、相手には圧として伝わり、腰が引ける。あなたはその引きを感じてさらに不安になり、もっと確かめたくなる——この追い焚きの悪循環が、『最初は良かったのに急に冷められる』の正体です。",
+  shadow:"影の側面は、『早く安心したい』という焦りが根っこにあることです。関係が曖昧な時間に耐えられず、白黒を急いでしまう。付き合う前に気持ちを問い詰めたり、交際後すぐ将来の話を詰めたり。また、盛り上がりの勢いで相手をよく見ないまま交際に入るため、あとから価値観のズレが噴出しやすいのも特徴です。期限や年齢の焦りがあると、この傾向はさらに加速します。スピードは才能。ただし、アクセルしかない車は必ずどこかでぶつかります。あなたに必要なのは、ブレーキと地図です。",
+  steps:[
+   {t:"恋の初速に「三日ルール」を敷く",d:"想いを伝えたくなったら、三日待ってから判断する。三日後も同じ熱量なら動いてOK。この小さなクールダウンだけで、勢い任せの失敗の8割は防げます。待つ間は友人との予定で心を分散させてください。"},
+   {t:"相手の温度計を先に読む",d:"距離を詰める前に、相手からの発信量を観察します。連絡の頻度、質問の数、次の約束への積極性。あなた7：相手3になっていたら、一度あなたの発信を5まで落とす。相手が埋めに来たら、温度が育っている証拠です。"},
+   {t:"確かめたくなったら、確かめない",d:"「私のこと、どう思ってる？」が喉まで出たら、それは相手ではなく自分の不安を鎮めたいサイン。言葉の確認より、次のデートの約束が入るかどうか。行動こそが答えです。"},
+   {t:"交際前の観察期間を、儀式にする",d:"付き合う前に最低5回、できれば昼のデートも混ぜて会う。楽しい夜の顔だけでなく、店員さんへの態度、約束の守り方、疲れているときの素顔を見る。ここでの2ヶ月が、あとの2年を守ります。"},
+   {t:"スピードを、深さに変換する",d:"あなたの行動力を『会う回数』ではなく『一回の質』に使ってください。相手の話を深掘りする質問、前回の会話を覚えている一言。速く進む恋より、深く刻まれる恋のほうが、結果的に一番速く実ります。"}],
+  partnerGood:"あなたに合うのは、ペースが安定していて、あなたの勢いを面白がりつつも流されない人。「ちょっと落ち着こか」と笑って言える、器の大きな男性です。決断力のあるあなたと、持久力のある彼——役割が噛み合えば、最速で最良のご縁になります。",
+  partnerAvoid:"避けたいのは、あなた以上に急ぐ人。出会ってすぐ甘い言葉と将来の話をする男性は、情熱ではなく下心か依存の可能性があります。疾風どうしの恋は花火のように美しく、同じ速さで消えます。焦っている時期ほど、急がせる人を疑ってください。"},
+ asagiri:{name:"朝霧の人",alias:"— 心の奥を、そっと包んで —",
+  essence:"あなたは、朝霧のように静かで奥行きのある人です。誰にでも心を開くことはなく、自分の世界と時間を大切にする。恋愛においても、簡単には熱くならず、相手を注意深く観察する。その慎重さは、あなたがこれまで自分の心を守ってきた、賢さの表れです。一人でも人生を楽しめる自立心があり、依存的な恋とは無縁。ただ、その霧は時に厚くなりすぎます。好きになる前に理由をつけて冷める。距離が縮まると、息苦しくなって引いてしまう。『好きな人ができない』『恋愛感情がわからない』——それは欠陥ではなく、心の防御システムが優秀すぎるだけなのです。",
+  kuse:"朝霧の人がつまずくのは、親密さが一定ラインを越えた瞬間です。それまで順調でも、相手の熱が上がり、関係に名前がつきそうになると、急に相手の欠点が目につき始める。連絡が億劫になる。会う約束を先延ばしにしたくなる。これは心理学でいう回避傾向——過去のどこかで『期待して傷ついた』『干渉されて苦しかった』経験から、心が『深入りする前に離れる』ことを学習した状態です。本当は温かさを求めているのに、求める手前でブレーキがかかる。だから恋が『始まらない』か『深まる前に終わる』のです。",
+  shadow:"影の側面は、防御が習慣になりすぎて、自分の本音が自分でもわからなくなることです。『恋愛しなくても平気』は、本心か、諦めの上書きか。また、あなたの静かな距離の取り方は、相手には『脈なし』『冷たい』と映りやすく、せっかくの好意が育つ前に立ち消えます。仕事や趣味への没頭は素晴らしいけれど、それが『傷つかない場所への避難』になっていないかは、時々点検が必要です。霧は、晴らすものではなく、少しずつ薄めるもの。あなたのペースで大丈夫です。",
+  steps:[
+   {t:"『冷め』の中身を検品する",d:"相手に冷めを感じたら、書き出してください。それは相手の本質的な問題か、距離が縮まった怖さの言い訳か。『欠点が急に見え始めた』ときほど、後者の可能性を疑う。この検品だけで、逃しかけたご縁が救えます。"},
+   {t:"自己開示は、切手サイズから",d:"心を開くのが怖いなら、一気に開ける必要はありません。今日あった小さな失敗、好きな食べ物の理由——切手サイズの本音を一つずつ渡す。相手も同じサイズで返してくれる人なら、安心して次を渡せます。"},
+   {t:"会う約束は『気分』でなく『予定』で守る",d:"あなたは当日の気分で腰が重くなる傾向があります。会う約束は歯医者の予約と同じ『動かさない予定』にする。行けば案外楽しかった、の積み重ねが、恋の筋力を戻します。"},
+   {t:"ときめきではなく『また会いたい』を基準に",d:"あなたに劇的なときめきは来ないかもしれません。それでいいのです。別れ際に『まあ、また会ってもいいか』と思えたら合格点。恋愛感情は、あなたの場合、あとから静かに育つ型です。"},
+   {t:"逃げ場を確保したまま、恋をする",d:"『恋人ができたら自分の時間がなくなる』という恐怖が、あなたのブレーキの正体の一つ。最初から『週末の午前は自分の時間』と伝えておけばいい。逃げ場があるとわかれば、あなたは驚くほど深く愛せる人です。"}],
+  partnerGood:"あなたに合うのは、精神的に自立していて、詮索しない人。返信が遅くても騒がず、会えない週があっても揺れない、安定感のある男性です。あなたの世界を尊重しながら、扉の外で気長に待てる人。そういう人の前でだけ、霧は自然に薄れていきます。",
+  partnerAvoid:"避けたいのは、愛情確認の多い人、束縛の強い人、感情の起伏をあなたに処理させる人。あなたの防御本能が正しく警報を鳴らし、心はますます閉じます。押しの強さを愛の大きさと勘違いしないでください。"},
+ mangetsu:{name:"満月の人",alias:"— 満ちた心で、愛し愛される —",
+  essence:"あなたは、恋愛においてすでに『満ちている』人です。相手に依存せず、かといって壁も作らず、想いを言葉にでき、違和感は話し合える。心理学でいう安定型の愛着スタイル——恋愛の土台となる心の器が、しっかり育っている状態です。実際、あなたと付き合った人は安心感を覚えたはずですし、長続きする恋もできてきたのではないでしょうか。ではなぜ、今この鑑定を受けているのか。満月の人の課題は、心の内側ではなく外側——『出会いの母数』と『選び方の精度』、そして『満ちているがゆえの腰の重さ』にあることがほとんどです。",
+  kuse:"満月の人がつまずくのは、皮肉なことに『一人でも幸せ』であるからです。恋がなくても日々は充実している。だから出会いの場に足を運ぶ優先順位が下がり、気づけば生活圏に新しい人がいない。また、器が大きいぶん多少の相手なら受け止められてしまうため、『好きかどうかわからないまま、なんとなく続く』『情で切れない』という長期戦に入りやすい。恋愛力は高いのに、恋愛市場に出ていない——もったいない状態です。あなたに必要なのは心の修行ではなく、行動の設計だけです。",
+  shadow:"注意したいのは、安定しているがゆえの『現状維持バイアス』です。今の生活を崩したくない気持ちが、無意識に恋を後回しにする。あるいは、過去の安定した恋の記憶が基準になり、新しい出会いを『あの安心感がない』と早めに閉じてしまう。安心感は最初からあるものではなく、二人で育てるものだったことを思い出してください。もう一つ、あなたの包容力は、依存型の人を引き寄せる磁力にもなります。受け止められるからといって、受け止め続ける義務はありません。",
+  steps:[
+   {t:"出会いを『予定』として先に確保する",d:"あなたの場合、気持ちの整理は不要。必要なのは物理的な接点です。月に2回、新しい人と会う予定をカレンダーに先に入れる。紹介、イベント、習い事、アプリ——手段は複数並行が鉄則です。"},
+   {t:"『好き』の点火を待たず、育てにいく",d:"安定型のあなたの恋愛感情は、爆発型ではなく培養型。第一印象で判断せず、感じの良い人とは3回会う。3回目の別れ際の気持ちを採点基準にすれば、見逃しがなくなります。"},
+   {t:"受け止める前に、対等かを測る",d:"相手の悩みや弱さを受け止めるのは3ヶ月待ってから。先に見るべきは、相手もあなたを支えられる人かどうか。会話の中で、あなたの話を深掘りしてくれる比率を観察してください。"},
+   {t:"安心と退屈を混同しない",d:"刺激が少ないことは、悪いことではありません。ただし『話したいことがある』かどうかは別問題。会う前に少し楽しみか、会った後に少し元気か。この二つがYESなら、その静かな関係は本物です。"},
+   {t:"締切を、自分の人生に合わせて引く",d:"あなたは焦らない強さがある一方、期限がないと動かない面も。結婚や出産、人生設計から逆算して『いつまでに、どこまで』を一度だけ真剣に決める。満ちた心に締切が加わると、最強です。"}],
+  partnerGood:"あなたに合うのは、同じく精神的に安定した人はもちろん、実は『少し不器用だけど誠実な人』も好相性です。あなたの器が相手を育て、育った相手があなたを支える。焦らず関係を積み上げられるあなただからこそ、伸びしろのある恋ができます。",
+  partnerAvoid:"避けたいのは、あなたの安定を『何をしても許される』と学習する人。感情の波の処理係、金銭や生活の尻拭い係にされ始めたら、それは包容力の搾取です。あなたが疲れる恋は、あなたの恋ではありません。"}
+};
+
+const ATTACH={
+ anx:{label:"不安型（愛されているか、確かめたい心）",
+  text:"あなたの愛着スタイルは『不安型』の傾向があります。恋をすると相手が心の中心になり、返信の速さや言葉の温度に気持ちが揺れやすい。それは愛が深い証拠である一方、『見捨てられるかもしれない』という古い不安が、現在の恋に上書きされている状態でもあります。大切なのは、不安をゼロにすることではなく、不安なときの行動を変えること。連絡を重ねて確かめるほど安心は遠のき、自分の生活を充実させるほど、皮肉にも愛は安定して返ってきます。"},
+ avo:{label:"回避型（近づきすぎると、息苦しくなる心）",
+  text:"あなたの愛着スタイルは『回避型』の傾向があります。自立心が高く、一人の時間で心を充電するタイプ。関係が深まり、相手の期待を感じるほど、自由を守りたい本能がブレーキを踏みます。冷たいのではなく、心の安全距離が人より広いだけ。大切なのは、距離を取りたくなったとき黙って消えるのではなく、『少し一人の時間がほしい』と言葉にすることです。それを尊重してくれる相手となら、あなたは自分のペースを保ったまま、深く長く愛せます。"},
+ sec:{label:"安定型（安心を育てられる心）",
+  text:"あなたの愛着スタイルは『安定型』——恋愛の土台がしっかり育っています。相手を信じられ、自分の気持ちも伝えられ、揉め事も対話で越えられる。この鑑定で見えたクセは、心の欠陥ではなく『行動パターンの偏り』にすぎません。つまり、やり方を変えれば結果はすぐ変わる、いちばん伸びしろのある状態です。"}
+};
+
+const NUM={
+ 1:{n:"数秘1",t:"開拓者の魂。自分の道を自分で決めたい人で、恋愛でも主導権を持てる関係が心地よいはず。ただし『弱みを見せる＝負け』と感じやすく、頼るのが苦手。あえて小さなお願いをすることが、恋の突破口になります。"},
+ 2:{n:"数秘2",t:"調和と共感の魂。相手の気持ちを察する力は天性のもので、二人の世界を育てる恋に向きます。反面、合わせすぎて自分を見失いやすい。『私はどうしたい？』と一日一回、自分に聞く習慣を。"},
+ 3:{n:"数秘3",t:"太陽のような表現者。あなたの明るさと会話力は、それ自体が強力なモテ要素です。ただ、楽しい空気を守ろうとして、深刻な話や本音を後回しにしがち。笑顔の奥の本音を見せた瞬間、恋は一段深くなります。"},
+ 4:{n:"数秘4",t:"誠実な建築家の魂。恋愛もコツコツ積み上げる型で、軽い恋には心が動きません。信頼を築く力は抜群ですが、変化や冒険を避けすぎると出会いの幅が狭まります。年に数回は、柄にもない場所へ。"},
+ 5:{n:"数秘5",t:"自由の風の魂。刺激と変化を愛し、束縛は最大の毒。恋の立ち上がりの華やかさは随一ですが、安定期に入ると物足りなさを感じやすい。『自由でいられる安定』を一緒に設計できる相手が、あなたの答えです。"},
+ 6:{n:"数秘6",t:"愛と奉仕の魂。数秘の中で最も『愛すること』に長けた数字です。家庭的な温かさは大きな魅力ですが、与えすぎ・背負いすぎの傾向も最強クラス。愛される練習・受け取る練習が、人生のテーマになります。"},
+ 7:{n:"数秘7",t:"探求者の魂。精神的な深さと知性を持ち、薄い関係では満たされません。心を開くまでに時間がかかるため、恋の序盤は誤解されがち。あなたの深さを面白がる、対話のできる相手を選んでください。"},
+ 8:{n:"数秘8",t:"実現力の魂。仕事も恋も『成果』を出せるパワーの持ち主。ただし恋愛まで目標管理になると、相手は査定されている気分になります。効率を手放した無駄な時間にこそ、あなたの恋は宿ります。"},
+ 9:{n:"数秘9",t:"博愛の魂。懐が深く、どんな人も受け入れられる成熟した精神の持ち主。反面、個人的な欲を出すのが苦手で、『私を選んで』と言えないまま恋を見送りがち。あなたが望むことは、わがままではありません。"},
+ 11:{n:"数秘11",t:"直感の魂（マスターナンバー）。人の本質を感覚で見抜く力があり、あなたの第一印象の直感はよく当たります。ただ感受性が強く、相手の感情に引きずられやすい。疲れたら一人で静かに充電することが、恋を長持ちさせる秘訣です。"},
+ 22:{n:"数秘22",t:"大きな夢を現実にする魂（マスターナンバー）。恋愛にも人生設計と同じ真剣さで向き合う人。理想が壮大なぶん、完璧な相手・完璧なタイミングを待ちすぎる傾向が。8割で動き出す勇気が、ご縁を掴みます。"},
+ 33:{n:"数秘33",t:"無条件の愛の魂（マスターナンバー）。見返りなく人を愛せる稀有な魂ですが、そのぶん自分を後回しにしがちで、恋愛では『都合のいい人』になる危険も。あなたが自分を大切に扱うほど、周囲の扱いも変わります。"}
+};
+
+const ZODIAC=[
+ {d:120,name:"やぎ座"},{d:219,name:"みずがめ座"},{d:321,name:"うお座"},{d:420,name:"おひつじ座"},
+ {d:521,name:"おうし座"},{d:622,name:"ふたご座"},{d:723,name:"かに座"},{d:823,name:"しし座"},
+ {d:923,name:"おとめ座"},{d:1024,name:"てんびん座"},{d:1123,name:"さそり座"},{d:1222,name:"いて座"},{d:1232,name:"やぎ座"}
+];
+const ZELEM={
+ "おひつじ座":"fire","しし座":"fire","いて座":"fire",
+ "おうし座":"earth","おとめ座":"earth","やぎ座":"earth",
+ "ふたご座":"air","てんびん座":"air","みずがめ座":"air",
+ "かに座":"water","さそり座":"water","うお座":"water"
+};
+const ELEM={
+ fire:{n:"火の星座",t:"恋の火力が強く、好きになったときの推進力は12星座随一。情熱がまっすぐ伝わる魅力がある一方、燃え上がりと冷めの落差も大きめです。恋の炎を長持ちさせるコツは、燃料を一気にくべないこと。"},
+ earth:{n:"地の星座",t:"恋にも現実的な安定を求める堅実派。信頼をゆっくり積み上げる恋が向いていて、一度愛したら簡単には揺らぎません。ただし慎重すぎてチャンスを見送りやすいので、『減点が無ければ進む』を合言葉に。"},
+ air:{n:"風の星座",t:"会話と知的な刺激が恋の入り口。フィーリングの合う相手とは一気に距離が縮まります。反面、気持ちが言葉の上を滑って、深い感情の共有を後回しにしがち。時には論理を置いて、感情だけを話してみて。"},
+ water:{n:"水の星座",t:"感情の深さと共感力が最大の魅力。愛する人と心が溶け合うような一体感を求めます。そのぶん相手の感情に浸かりすぎて、自分を見失う危険も。愛しながら、自分の岸を持ち続けることがテーマです。"}
+};
+
+const BLOOD={
+ A:"統計的な傾向として、A型は恋愛でも誠実さと気配りを重んじ、関係を丁寧に育てる人が多いと言われます。反面、我慢を溜め込みやすい傾向も。本音を小出しにする練習が、あなたの丁寧さを最強の武器に変えます。",
+ B:"統計的な傾向として、B型は自分の感性に正直で、恋愛でもマイペースを貫ける人が多いと言われます。その裏表のなさは大きな魅力。ただ、興味の波が相手に伝わりやすいので、冷めた時期の伝え方だけ丁寧に。",
+ O:"統計的な傾向として、O型はおおらかで面倒見がよく、恋愛でも相手を包み込む人が多いと言われます。一方で、大雑把な括りで相手を判断して細部のサインを見逃すことも。違和感のメモ習慣が精度を上げます。",
+ AB:"統計的な傾向として、AB型は客観性と独自の世界観を併せ持ち、恋愛でも冷静さを保てる人が多いと言われます。ミステリアスな魅力の反面、距離を感じさせやすいので、意識して一歩ぶん近くから話しかけて。",
+ X:"血液型は不明とのことですので、ここは参考程度に。血液型より、この鑑定の質問から見えたあなた自身の傾向のほうが、はるかに確かな手がかりです。"
+};
+
+const REGION={
+ hokkaido:"北の大地で生まれたあなたには、寒さを一緒に越える文化に根ざした、辛抱強く温かい絆の作り方が似合います。",
+ kanto:"人の流れの速い土地で生まれたあなたは、出会いの多さの中で『選ぶ目』を磨くことが恋のテーマになります。",
+ chubu:"山と海の恵み豊かな土地で生まれたあなたには、堅実に積み上げ、家庭を大切にする恋の形がよく馴染みます。",
+ kinki:"商いと笑いの文化の土地で生まれたあなたは、会話の間合いで距離を縮める天性の才を恋にも活かせます。",
+ chushi:"穏やかな気候の土地で生まれたあなたには、急がず、日だまりのように温めていく恋がよく似合います。",
+ kyushu:"情の深い土地で生まれたあなたは、一途に愛し抜く力を持つぶん、注ぐ相手の見極めが恋の鍵になります。",
+ abroad:"海の向こうで生まれたあなたは、枠にとらわれない恋の形を選べる人。世間の標準より、自分の標準を信じて。"
+};
+
+const PYEAR={
+ 1:"今年のあなたは『種まきの年』。9年周期の始まりにあたり、新しい出会い・新しい自分を始めるには最高のタイミングです。今年動いたことが、この先9年の恋の土台になります。迷ったら、始めてください。",
+ 2:"今年のあなたは『育てる年』。去年まいた種や、今ある縁をじっくり深める時期です。派手な進展より、信頼の積み重ねが実る年。焦って結果を求めず、二人の時間の質を上げることに集中してください。",
+ 3:"今年のあなたは『花ひらく年』。魅力が外に伝わりやすく、人に会うほど恋のチャンスが増える年です。誘いは断らず、楽しむ姿を見せること。あなたの笑顔そのものが、今年最大の恋愛運です。",
+ 4:"今年のあなたは『土台を固める年』。恋愛では地味に感じるかもしれませんが、生活・仕事・心を整えることが、次の大きなご縁の受け皿になります。焦りからの恋より、自分づくりが吉です。",
+ 5:"今年のあなたは『変化の年』。環境や人間関係が動きやすく、意外な場所・意外な相手との出会いが起こりやすい年です。いつもの行動範囲を意識的に破ってください。変化を怖がらないことが開運の鍵です。",
+ 6:"今年のあなたは『愛の年』。9年周期の中で最も恋愛・結婚に縁の深い年です。人を愛すること、愛を受け取ることの両方に追い風が吹きます。今年の出会いと決断は、大切に扱ってください。",
+ 7:"今年のあなたは『内側を見つめる年』。恋の答え合わせを外にではなく、自分の内に求める時期です。この鑑定を受けたのも、その流れの一つ。自分を深く知った人から、次の恋は変わります。",
+ 8:"今年のあなたは『実りの年』。これまで積み上げてきた努力や魅力が、目に見える形で返ってくる年です。恋愛でも『決まるときは早い』流れ。チャンスと感じたら、自信を持って掴みにいってください。",
+ 9:"今年のあなたは『手放しの年』。9年周期の締めくくりにあたり、終わった恋・古いパターン・執着を手放すほど、来年からの新しい9年に良い縁が入ります。この鑑定で見えたクセを手放す、絶好の年です。"
+};
+
+const FLAGS={
+ dame:"<span class='r-sub'>【重要】「ダメな男性」を引き寄せる回路について</span><p>今回の回答からは、危なっかしい人・問題を抱えた人・あなたを雑に扱う人に心が動きやすい傾向が見えています。これは「見る目がない」のではありません。『必要とされること』で自分の価値を感じる回路、あるいは『ドキドキ（不安）』を『恋』と読み違える回路が働いているだけです。対策は入り口の一点集中——出会って3回以内に「約束を守るか」「店員さんや弱い立場の人への態度」「お金と時間の使い方」の3点だけを冷静に観察してください。心が燃え始める前のこの3項目が、半年後のあなたの涙を防ぎます。</p>",
+ rushWarn:"<span class='r-sub'>「先急ぎ」があなたの恋を短くしている件</span><p>回答全体から、気持ちの高まりと同時に一気に距離を詰めたくなる傾向が強く出ています。恋の序盤で主導権を失う最大の原因は、魅力不足ではなく速度超過です。相手の温度が追いつく時間を意図的に作ること——具体的には『自分からの連絡は相手と同じ頻度まで』『会う約束は向こうからの分も待つ』。これだけで、あなたの恋の寿命は目に見えて延びます。</p>",
+ lowSE:"<span class='r-sub'>すべての土台——自己肯定感について</span><p>今回の回答からは、恋愛の場面で自分の価値を低く見積もる傾向が見えています。ここは正直にお伝えします。恋のテクニックは、自己肯定感という土台の上でしか機能しません。『こんな私を好きになってくれるなら誰でも』という基準は、あなたを大切にしない人への入場券になってしまうからです。今日からできる処方箋は二つ。①寝る前に『今日の自分の合格点』を3つ書く（些細なことで構いません）。②あなたを下げる人（バカにする友人・比較してくる人）との接触を減らす。愛される準備とは、自分を丁寧に扱う練習のことです。</p>",
+ idealWarn:"<span class='r-sub'>理想の高さと、承認欲求の見分け方</span><p>条件面の理想が高めに出ています。理想を持つのは素晴らしいこと。ただし『その条件は、彼といる毎日を幸せにするものか、人に紹介するときの私を輝かせるものか』は一度仕分けが必要です。後者が半分を超えていたら、あなたが探しているのは恋人ではなく勲章かもしれません。勲章は、あなたを抱きしめてはくれません。</p>",
+ repeat:"<span class='r-sub'>「同じパターンの繰り返し」について</span><p>あなた自身、恋が毎回同じ形で終わることに気づいています。これは実は朗報です。パターンがあるということは、原因が偶然ではなく構造にあるということ。そして構造は、変えられます。この鑑定書の攻略ステップは、まさにその構造の変え方です。相手を変えても結果は変わりません。選び方と進め方を変えれば、同じあなたのままで結果が変わります。</p>",
+ shortTerm:"<span class='r-sub'>「3ヶ月の壁」について</span><p>交際が3ヶ月前後で終わりやすい傾向が見えています。3ヶ月は心理学的にも『恋の熱が落ち着き、素の相性が問われ始める』最初の関門です。ここを越えるコツは、熱が下がることを『冷めた』と誤読しないこと。ドキドキが落ち着いた後に残る『安心』こそが、長続きする恋の本体です。3ヶ月目の停滞感は、終わりのサインではなく、第二章の始まりの合図だと覚えておいてください。</p>",
+ fewExp:"<span class='r-sub'>経験の少なさは、不利ではありません</span><p>恋愛経験がまだ少ないことを、引け目に感じる必要はまったくありません。むしろ変なクセや古傷が少ないぶん、正しい進め方を最初から身につけられる——これは経験者にはない強みです。この鑑定書を、最初の教科書にしてください。</p>"
+};
+
+const STRATEGY={
+ moteHigh:{title:"あなたの戦局——「選ぶ力」がすべてを決める",
+  text:"<p>あなたは男性からアプローチされる機会に恵まれています。つまり、あなたの戦いは『好かれること』ではなく『見極めること』。モテる人が恋愛で苦しむ場合、原因はほぼ一つで、寄ってくる人の中から選んでしまうこと——つまり選択肢の広さが、逆に判断を雑にさせるのです。</p><p>今日からの鉄則は三つ。<b>一、熱量の高さで選ばない。</b>最初に一番押してくる人が、一番あなたを幸せにする人とは限りません。むしろ序盤の熱量と長期の誠実さは別物です。<b>二、「面接する側」に立つ。</b>選ばれる側の意識でいると、条件の悪い相手にも好かれようとしてしまいます。あなたは選ぶ側。デートは相手の審査の場でもあると心得てください。<b>三、断る罪悪感を捨てる。</b>合わない人に早めにNOを伝えるのは、冷たさではなく、お互いの時間への誠実さです。</p>"},
+ moteLow:{title:"あなたの戦局——「じわじわ好感度」戦略で勝つ",
+  text:"<p>正直にお伝えします。恋愛市場には、初対面の華やかさで一気に注目を集める『瞬発型』の人と、会うほどに良さが伝わる『積み上げ型』の人がいます。あなたの回答からは後者の資質が見えます。そしてここが大事なのですが——結婚や長い恋において、最終的に選ばれているのは圧倒的に積み上げ型です。</p><p>あなたの戦略は明確です。<b>一、一発勝負の場を避け、繰り返し会える場で戦う。</b>合コンや一度きりのイベントより、習い事・コミュニティ・職場周辺・趣味の集まりなど、単純接触効果（会う回数が好意を育てる心理効果）が働く環境を主戦場にしてください。<b>二、第一印象は「清潔感と笑顔」の二点だけ整える。</b>美人に見せる必要はありません。感じがいい、をとにかく徹底する。<b>三、聞き上手の技術を磨く。</b>会話の主役を相手に譲り、相づちと質問で気持ちよく話させる。男性が『また会いたい』と感じる相手は、面白い人より、自分を面白がってくれる人です。焦らないでください。あなたの恋は、3回目・4回目から動き出す設計になっています。</p>"},
+ selfStarter:{title:"あなたの戦局——「攻めの型」を整える",
+  text:"<p>あなたは待つより自分から動ける人。この行動力は恋愛市場で確実に有利です。ただし攻め型には攻め型の作法があります。<b>一、追撃より布石。</b>押しの連打は追いかけ恋愛の入り口です。一手打ったら、相手の一手を待つ。<b>二、本命に絞りすぎない。</b>並行して複数の縁を育てることで、一人への執着と重さが自然に消え、余裕があなたの魅力を引き上げます。<b>三、動く場所を選ぶ。</b>行動力は、出会いの母数が多い場所で使ってこそ。月に一つ、新しい人間関係の入り口を開拓してください。</p>"}
+};
+
+/* =====================================================
+   状態管理・画面遷移
+===================================================== */
+const state={basic:{},answers:new Array(QUESTIONS.length).fill(null)};
+const PANELS=["cover","basic","q1","q2","q3","q4","q5","loading"];
+const THREAD_LABELS={cover:"はじまり",basic:"序ノ章 あなたのこと",q1:"第一章 これまでの恋",q2:"第二章 心のクセ",q3:"第三章 好みと理想",q4:"第四章 ふるまい",q5:"第五章 望む未来",loading:"結び"};
+let threadLen=0;
+
+function goTo(id){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("report").classList.remove("active");
+  const el=document.getElementById("panel-"+id);
+  if(el)el.classList.add("active");
+  const idx=PANELS.indexOf(id);
+  const ratio=idx<0?1:idx/(PANELS.length-1);
+  setThread(ratio,THREAD_LABELS[id]||"");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function setThread(ratio,label){
+  const fill=document.getElementById("threadFill");
+  const knot=document.getElementById("threadKnot");
+  if(!threadLen){threadLen=fill.getTotalLength();fill.style.strokeDasharray=threadLen;}
+  fill.style.strokeDashoffset=threadLen*(1-ratio);
+  const pt=fill.getPointAtLength(threadLen*ratio);
+  knot.setAttribute("cx",pt.x);knot.setAttribute("cy",pt.y);
+  if(label)document.getElementById("threadLabel").textContent=label;
+}
+
+/* ===== 基本情報 ===== */
+function initBasic(){
+  const y=document.getElementById("inYear"),m=document.getElementById("inMonth"),d=document.getElementById("inDay");
+  y.innerHTML='<option value="">年</option>';
+  for(let i=2008;i>=1946;i--)y.innerHTML+=`<option value="${i}">${i}年</option>`;
+  m.innerHTML='<option value="">月</option>';
+  for(let i=1;i<=12;i++)m.innerHTML+=`<option value="${i}">${i}月</option>`;
+  d.innerHTML='<option value="">日</option>';
+  for(let i=1;i<=31;i++)d.innerHTML+=`<option value="${i}">${i}日</option>`;
+}
+function submitBasic(){
+  const name=document.getElementById("inName").value.trim();
+  const y=+document.getElementById("inYear").value,m=+document.getElementById("inMonth").value,d=+document.getElementById("inDay").value;
+  const blood=(document.querySelector('input[name="blood"]:checked')||{}).value;
+  const region=document.getElementById("inRegion").value;
+  const warn=document.getElementById("basicWarn");
+  if(!name||!y||!m||!d||!blood||!region){warn.classList.add("show");return;}
+  warn.classList.remove("show");
+  state.basic={name,y,m,d,blood,region};
+  goTo("q1");
+}
+
+/* ===== 質問画面の生成 ===== */
+function buildQuestionPanels(){
+  for(let s=0;s<5;s++){
+    const panel=document.getElementById("panel-q"+(s+1));
+    const sec=SECTIONS[s];
+    let html=`<div class="sec-head"><div class="no">${sec.no}</div><h2>${sec.title}</h2><p class="desc">${sec.desc}</p></div>`;
+    QUESTIONS.forEach((q,qi)=>{
+      if(q.sec!==s)return;
+      html+=`<div class="q-card"><div class="q-num">問 ${String(qi+1).padStart(2,"0")}／25</div><div class="q-text">${q.t}</div>`;
+      q.opts.forEach((o,oi)=>{
+        html+=`<label class="opt"><input type="radio" name="q${qi}" value="${oi}" onchange="state.answers[${qi}]=${oi}"><span>${o.t}</span></label>`;
+      });
+      html+=`</div>`;
+    });
+    html+=`<div class="q-warn" id="warn-q${s+1}">まだ答えていない質問があります。すべて選んでください。</div>`;
+    const prev=s===0?"basic":"q"+s;
+    const nextLabel=s===4?"鑑定に進む":"次の章へ";
+    html+=`<div class="nav-row"><button class="btn ghost" onclick="goTo('${prev}')">戻る</button><span class="spacer"></span><button class="btn" onclick="nextSection(${s})">${nextLabel}</button></div>`;
+    panel.innerHTML=html;
+  }
+}
+function nextSection(s){
+  const unanswered=QUESTIONS.some((q,qi)=>q.sec===s&&state.answers[qi]===null);
+  const warn=document.getElementById("warn-q"+(s+1));
+  if(unanswered){warn.classList.add("show");return;}
+  warn.classList.remove("show");
+  if(s<4){goTo("q"+(s+2));}else{startLoading();}
+}
+
+/* ===== 鑑定中演出 ===== */
+function startLoading(){
+  goTo("loading");
+  const msgs=["生年月日から資質を読み解いています…","二十五の答えから、心のクセを解析しています…","星の流れと統計を重ねています…","あなただけの攻略図を、清書しています…"];
+  let i=0;const el=document.getElementById("loadingMsg");
+  el.textContent=msgs[0];
+  const timer=setInterval(()=>{i++;if(i<msgs.length){el.textContent=msgs[i];}else{clearInterval(timer);renderReport();}},1600);
+}
+
+/* =====================================================
+   計算ロジック
+===================================================== */
+function reduceNum(n,keepMaster){
+  while(n>9){
+    if(keepMaster&&(n===11||n===22||n===33))return n;
+    n=String(n).split("").reduce((a,b)=>a+ +b,0);
+  }
+  return n;
+}
+function lifePath(y,m,d){
+  const digits=(""+y+String(m).padStart(2,"0")+String(d).padStart(2,"0")).split("").reduce((a,b)=>a+ +b,0);
+  return reduceNum(digits,true);
+}
+function personalYear(m,d){
+  const now=new Date();
+  const s=(""+m+d+now.getFullYear()).split("").reduce((a,b)=>a+ +b,0);
+  return reduceNum(s,false);
+}
+function zodiacOf(m,d){
+  const key=m*100+d;
+  for(const z of ZODIAC){if(key<z.d)return z.name;}
+  return "やぎ座";
+}
+function ageOf(y,m,d){
+  const now=new Date();
+  let a=now.getFullYear()-y;
+  if(now.getMonth()+1<m||(now.getMonth()+1===m&&now.getDate()<d))a--;
+  return a;
+}
+function analyze(){
+  const sc={anx:0,avo:0,sec:0,chase:0,passive:0,give:0,ideal:0,rush:0,mote:0,se:0,dame:0};
+  const flags={};
+  QUESTIONS.forEach((q,qi)=>{
+    const o=q.opts[state.answers[qi]];
+    if(!o)return;
+    for(const k in (o.s||{}))sc[k]+=o.s[k];
+    if(o.f)flags[o.f]=true;
+  });
+  // タイプ決定（優先順位つき最大値）
+  const patterns=[["suisei",sc.chase],["kagaribi",sc.give],["hayate",sc.rush],["hokkyokusei",sc.ideal],["tsuki",sc.passive],["asagiri",sc.avo],["mangetsu",sc.sec*0.6]];
+  let type="mangetsu",best=-1;
+  for(const [k,v] of patterns){if(v>best){best=v;type=k;}}
+  // 愛着スタイル
+  let att="sec";
+  if(sc.anx>=sc.avo&&sc.anx>sc.sec*0.5)att="anx";
+  else if(sc.avo>sc.sec*0.5)att="avo";
+  // 戦局
+  let strat="moteLow";
+  if(flags.selfStarter)strat="selfStarter";
+  else if(sc.mote>=2)strat="moteHigh";
+  const b=state.basic;
+  return {sc,flags,type,att,strat,
+    lp:lifePath(b.y,b.m,b.d),py:personalYear(b.m,b.d),
+    zodiac:zodiacOf(b.m,b.d),age:ageOf(b.y,b.m,b.d)};
+}
+
+/* ===== レーダーチャート ===== */
+function radarSVG(sc,flags){
+  const clamp=(v)=>Math.max(1.2,Math.min(10,v));
+  const axes=[
+    ["安心力",clamp(2+sc.sec*1.1)],
+    ["行動力",clamp(2.5+sc.chase*1.2+sc.rush*0.8+(flags.selfStarter?2:0)-sc.passive*0.6)],
+    ["自己肯定感",clamp(6+sc.se*1.1)],
+    ["心を開く力",clamp(8.5-sc.avo*1.3)],
+    ["見極め力",clamp(8.5-sc.dame*1.6-sc.chase*0.4)],
+    ["ペース配分",clamp(8.5-sc.rush*1.7-sc.anx*0.4)]
+  ];
+  const cx=170,cy=150,R=100,N=axes.length;
+  const pt=(i,r)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];};
+  let grid="";
+  for(let g=1;g<=4;g++){
+    const r=R*g/4;
+    let d="";
+    for(let i=0;i<N;i++){const [x,y]=pt(i,r);d+=(i?"L":"M")+x.toFixed(1)+","+y.toFixed(1);}
+    grid+=`<path d="${d}Z" fill="none" stroke="#E3D3DA" stroke-width="${g===4?1.2:0.7}"/>`;
+  }
+  let spokes="",labels="";
+  for(let i=0;i<N;i++){
+    const [x,y]=pt(i,R);
+    spokes+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E3D3DA" stroke-width="0.7"/>`;
+    const [lx,ly]=pt(i,R+26);
+    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="middle" font-size="11.5" fill="#6B5A63" font-family="'Zen Kaku Gothic New',sans-serif">${axes[i][0]}</text>`;
+  }
+  let shape="";
+  for(let i=0;i<N;i++){const [x,y]=pt(i,R*axes[i][1]/10);shape+=(i?"L":"M")+x.toFixed(1)+","+y.toFixed(1);}
+  let dots="";
+  for(let i=0;i<N;i++){const [x,y]=pt(i,R*axes[i][1]/10);dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#7C2D4A"/>`;}
+  return `<svg viewBox="0 0 340 300" role="img" aria-label="恋愛資質のバランス図">${grid}${spokes}<path d="${shape}Z" fill="rgba(124,45,74,.16)" stroke="#7C2D4A" stroke-width="1.8"/>${dots}${labels}</svg>`;
+}
+
+/* =====================================================
+   鑑定書の組み立て
+===================================================== */
+function renderReport(){
+  lsSet(LS_SAVE,JSON.stringify({basic:state.basic,answers:state.answers}));
+  const unlocked=isUnlocked();
+  const r=analyze();
+  const b=state.basic;
+  const T=TYPES[r.type];
+  const now=new Date();
+  const dateStr=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+  const elem=ELEM[ZELEM[r.zodiac]];
+  const moodIntro={
+    moodTired:"恋に疲れながらも、諦めずにこのページを開いたこと。それ自体が、あなたの恋がまだ終わっていない何よりの証です。",
+    moodHurry:"焦りと不安の中にいるあなたへ。焦りは、幸せになりたい気持ちの裏返しです。この鑑定書は、その気持ちを正しい順番に並べ直すためにあります。",
+    moodExcited:"新しい恋へのわくわくを胸に、この鑑定を受けてくださったあなたへ。その前向きな風に、確かな地図を添えてお渡しします。",
+    moodLost:"何から始めればいいかわからない——その正直さは、実はいちばん伸びる人の入り口です。この鑑定書が、最初の一歩の場所を示します。"
+  }[Object.keys(r.flags).find(f=>f.startsWith("mood"))]||"この鑑定書は、あなたの答えと生まれ持った資質から編んだ、世界に一つの恋の攻略図です。";
+
+  const llNote={llWords:"なお、あなたは『言葉』で愛を受け取るタイプ。想いを言葉にしてくれる人かどうかは、相性の隠れた最重要項目です。",
+    llTime:"なお、あなたは『一緒に過ごす時間』で愛を感じるタイプ。多忙でも時間を作る姿勢があるかを、条件より重く見てください。",
+    llCare:"なお、あなたは『行動と気遣い』で愛を感じるタイプ。言葉が上手な人より、黙って傘を持ってきてくれる人を選んでください。",
+    llFree:"なお、あなたは『尊重』で愛を感じるタイプ。あなたの世界に土足で入らない人であることが、長続きの絶対条件です。"}[Object.keys(r.flags).find(f=>f.startsWith("ll"))]||"";
+
+  // ---- 90日プラン ----
+  const goal=r.flags.goalMarriage?"結婚につながるご縁":r.flags.goalPartner?"長く続く安心の恋":r.flags.goalMeet?"心から好きと思える出会い":"恋に苦しまない自分";
+  let m1,m2,m3;
+  if(r.flags.goalSelf||(r.sc.se<=-3)){
+    m1="<b>第1の月「土台の月」</b>——恋活はまだ焦らなくて大丈夫。①寝る前に自分の合格点を3つ書く習慣を開始。②あなたを下げる人間関係を一つ距離を置く。③この鑑定書のあなたの章を週1で読み返し、自分のクセを『知っている状態』にする。";
+  }else{
+    m1="<b>第1の月「整える月」</b>——①攻略ステップの第一・第二を日常に組み込む。②出会いの入り口を二つ確保（今の生活圏＋新しい場を一つ）。③過去の恋の終わり方を書き出し、この鑑定書と照合して自分のパターンを言語化する。";
+  }
+  if(r.strat==="moteLow"){
+    m2="<b>第2の月「接点の月」</b>——繰り返し会える場（習い事・コミュニティ・友人の輪）で、感じの良さと聞き上手を徹底する月。新しい人と最低4人、二回以上会う接点を作る。手応えのない相手でも、練習台と思えばすべて経験値になります。";
+  }else if(r.strat==="moteHigh"){
+    m2="<b>第2の月「見極めの月」</b>——寄ってくる人を、面接官の目で観察する月。①約束を守るか②弱い立場の人への態度③あなたの話を深掘りするか、の3点をチェックし、合格者とだけ3回目に進む。断る練習も月2回を目標に。";
+  }else{
+    m2="<b>第2の月「布石の月」</b>——攻めの行動力を、押しの連打ではなく布石に使う月。気になる人に一手（誘い・連絡）打ったら、必ず相手の一手を待つ。同時に、縁の入り口を複数並行で育て、一人への集中執着を構造的に防ぐ。";
+  }
+  m3="<b>第3の月「育てる月」</b>——手応えのある相手と、三回目以降の関係を育てる月。違和感は48時間以内に柔らかく言葉にする。ドキドキが落ち着いても『安心』が残っているなら、それが本物。3ヶ月目の停滞は終わりではなく第二章の合図です。月末に、この鑑定書を読み返して答え合わせを。";
+  const planExtra=[];
+  if(r.flags.deaiLow)planExtra.push("※出会いの機会が少ない現状は、恋愛力とは別の、単純な母数の問題です。プラン第1の月で必ず『新しい場』を一つ開いてください。ここを飛ばすと、他のすべてが空回りします。");
+  if(r.flags.deaiApp||r.flags.appStall)planExtra.push("※アプリで2回目に続かない場合の処方箋——初回は90分で切り上げ、別れ際に『今日の会話に出た具体的な次の約束』（あの店・あの映画）をその場で仮置きすること。次回の口実を残すのが、2回目への最短ルートです。");
+  if(r.flags.hurry)planExtra.push("※期限への焦りがあるあなたへ。焦りは判断を鈍らせ、急がせてくる相手への耐性を下げます。90日は『相手を探す期間』ではなく『選べる自分を作る期間』と定義し直してください。急がば回れは、恋愛では文字通りの真実です。");
+
+  // ---- クセ・影のフラグ文 ----
+  let kuseExtras="";
+  if(r.flags.repeat)kuseExtras+=FLAGS.repeat;
+  if(r.flags.shortTerm)kuseExtras+=FLAGS.shortTerm;
+  if(r.flags.fewExp)kuseExtras+=FLAGS.fewExp;
+  let shadowExtras="";
+  if(r.sc.dame>=3)shadowExtras+=FLAGS.dame;
+  if(r.sc.rush>=3&&r.type!=="hayate")shadowExtras+=FLAGS.rushWarn;
+  if(r.sc.se<=-3)shadowExtras+=FLAGS.lowSE;
+  if(r.sc.ideal>=4&&r.type!=="hokkyokusei")shadowExtras+=FLAGS.idealWarn;
+
+  const S=STRATEGY[r.strat];
+  const stepsHtml=T.steps.map((s,i)=>`<div class="step-item"><div class="sno">${["一","二","三","四","五"][i]}</div><div class="sbody"><b>${s.t}</b><p>${s.d}</p></div></div>`).join("");
+
+  const specialCount=(kuseExtras.match(/<p/g)||[]).length+(shadowExtras.match(/<p/g)||[]).length+planExtra.length;
+  const sheet1=`
+  <!-- ===== 一枚目：表紙・総合鑑定 ===== -->
+  <div class="r-sheet">
+    <div class="r-cover">
+      <div class="eyebrow">恋愛パターン鑑定書</div>
+      <h2>恋の攻略図</h2>
+      <div class="r-name">${esc(b.name)} 様</div>
+      <div class="r-date">鑑定日　${dateStr}</div>
+      <div class="seal">恋文<br>鑑定</div>
+    </div>
+    <p>${moodIntro}</p>
+    <div class="r-rule"></div>
+    <div class="r-h-no">第一の書</div>
+    <div class="r-h">総合鑑定 — あなたの恋愛タイプ</div>
+    <div class="r-rule"></div>
+    <div class="type-name">${T.name}</div>
+    <div class="type-alias">${T.alias}</div>
+    <p>${T.essence}</p>
+    <div class="radar-wrap">${radarSVG(r.sc,r.flags)}</div>
+    <div class="r-sub">あなたの愛着スタイル｜${ATTACH[r.att].label}</div>
+    <p>${ATTACH[r.att].text}</p>
+  </div>`;
+
+  const lockSheet=`
+  <div class="r-sheet">
+    <p class="lock-intro">ここまでが、鑑定書の第一の書です。<br>あなたが同じ恋を繰り返す理由と、その抜け出し方は<br>この先の八つの書に記してあります。</p>
+    <div class="lock-books">
+      ${[["第二の書","生まれ持った資質"],["第三の書","恋のクセの正体 — なぜ、繰り返すのか"],["第四の書","影の側面 — 気をつけたい落とし穴"],["第五の書",S.title],["第六の書","あなた専用・恋愛攻略パターン 五箇条"],["第七の書","ご縁の相性"],["第八の書","今年の恋の流れ"],["第九の書","90日の実践プラン — 「"+goal+"」へ"]].map(([n,t])=>`<div class="lock-book"><span class="lb-no">${n}</span><span class="lb-t">${t}</span></div>`).join("")}
+    </div>
+    <div class="lock-teaser"><div class="lt-h">第三の書より</div>${T.kuse.replace(/<[^>]+>/g,"").slice(0,90)}…</div>
+    ${specialCount?`<p class="lock-special">あなたの答えからは、あなただけに差し込まれる特別な章が ${specialCount} つ見つかりました。</p>`:""}
+    <div class="lock-buy no-print">
+      <div class="lb-what">鑑定書の本編（第二〜第九の書・A4で4枚）</div>
+      <div class="lb-price">${CONFIG.price}</div>
+      ${CONFIG.buyUrl?`<a class="btn" href="${CONFIG.buyUrl}" target="_blank" rel="noopener">本編を購入する</a>`:`<button class="btn" disabled>ただいま準備中です</button>`}
+      <div class="lock-code">
+        <label for="codeInput">購入後のメールに届く「解除コード」を入れてください</label>
+        <div class="code-row">
+          <input type="text" id="codeInput" placeholder="KOI-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <button class="btn" onclick="submitCode()">鑑定書を開く</button>
+        </div>
+        <div class="code-msg" id="codeMsg" role="status"></div>
+        <p class="lock-member">あなたの答えはこの端末に保存されるので、購入のあと答え直す必要はありません。</p>
+      </div>
+    </div>
+  </div>
+  <div class="print-row no-print">
+    <button class="btn ghost" onclick="retake()">もう一度鑑定する</button>
+  </div>`;
+
+  const rest=`
+  <!-- ===== 二枚目：資質とクセ ===== -->
+  <div class="r-sheet">
+    <div class="r-h-no">第二の書</div>
+    <div class="r-h">生まれ持った資質</div>
+    <div class="r-rule"></div>
+    <table class="trait-table">
+      <tr><th>年齢</th><td>${r.age}歳 — ${r.age<28?"恋の型を育てる黄金期。ここで身につけた選び方が一生の財産になります。":r.age<38?"恋愛経験と自己理解が噛み合い始める、実りの時期。過去のパターンを財産に変える適齢期です。":"人生の解像度が上がり、本当に合う人が見分けられる成熟期。若さの市場ではなく、深さの市場で選ばれる時期です。"}</td></tr>
+      <tr><th>${NUM[r.lp].n}</th><td>${NUM[r.lp].t}</td></tr>
+      <tr><th>${r.zodiac}（${elem.n}）</th><td>${elem.t}</td></tr>
+      <tr><th>血液型 ${b.blood==="X"?"—":b.blood+"型"}</th><td>${BLOOD[b.blood]}</td></tr>
+      <tr><th>生まれた土地</th><td>${REGION[b.region]}</td></tr>
+    </table>
+    <p style="font-size:12.5px;color:var(--ink-soft);">※数秘術・占星術・血液型の記述は、統計的・伝承的な傾向としてお読みください。あなたの本質は、この後の章の『答えから見えたあなた』にあります。</p>
+    <div class="r-rule"></div>
+    <div class="r-h-no">第三の書</div>
+    <div class="r-h">恋のクセの正体 — なぜ、繰り返すのか</div>
+    <div class="r-rule"></div>
+    <p>${T.kuse}</p>
+    ${kuseExtras}
+  </div>
+
+  <!-- ===== 三枚目：影と戦局 ===== -->
+  <div class="r-sheet">
+    <div class="r-h-no">第四の書</div>
+    <div class="r-h">影の側面 — 気をつけたい落とし穴</div>
+    <div class="r-rule"></div>
+    <p>${T.shadow}</p>
+    ${shadowExtras}
+    <div class="r-rule"></div>
+    <div class="r-h-no">第五の書</div>
+    <div class="r-h">${S.title}</div>
+    <div class="r-rule"></div>
+    ${S.text}
+  </div>
+
+  <!-- ===== 四枚目：攻略・相性・流れ・90日 ===== -->
+  <div class="r-sheet">
+    <div class="r-h-no">第六の書</div>
+    <div class="r-h">あなた専用・恋愛攻略パターン 五箇条</div>
+    <div class="r-rule"></div>
+    <div class="step-block">${stepsHtml}</div>
+    <div class="r-rule"></div>
+    <div class="r-h-no">第七の書</div>
+    <div class="r-h">ご縁の相性</div>
+    <div class="r-rule"></div>
+    <div class="r-sub">あなたを幸せにする相手</div>
+    <p>${T.partnerGood}${llNote?" "+llNote:""}</p>
+    <div class="r-sub">距離を置きたい相手</div>
+    <p>${T.partnerAvoid}</p>
+    <div class="r-rule"></div>
+    <div class="r-h-no">第八の書</div>
+    <div class="r-h">今年の恋の流れ</div>
+    <div class="r-rule"></div>
+    <div class="r-quote">${PYEAR[r.py]}</div>
+    <div class="r-h-no">第九の書</div>
+    <div class="r-h">90日の実践プラン — 「${goal}」へ</div>
+    <div class="r-rule"></div>
+    <div class="plan-month"><p>${m1}</p></div>
+    <div class="plan-month"><p>${m2}</p></div>
+    <div class="plan-month"><p>${m3}</p></div>
+    ${planExtra.map(p=>`<p style="font-size:13px;color:var(--ink-soft);">${p}</p>`).join("")}
+    <div class="r-rule"></div>
+    <div class="r-close">恋のクセは、直すものではなく、知って味方につけるもの。<br>ホントの自分のままで、あなたはちゃんと愛されます。<br>この一冊が、その道の灯りになりますように。</div>
+    <div class="r-sign">恋愛パターン鑑定「恋の攻略図」</div>
+    ${CONFIG.inviteUrl?`<div class="r-invite no-print">${CONFIG.inviteText}<br><a href="${CONFIG.inviteUrl}" target="_blank" rel="noopener">くわしく見てみる</a></div>`:""}
+    <p class="r-disclaimer">本鑑定は、心理学的な傾向分析と数秘術・占星術等の伝承的な統計をもとにした自己理解のための読み物であり、医学的・心理学的な診断ではありません。結果はご自身の判断の参考としてお役立てください。</p>
+  </div>
+
+  <div class="print-row no-print">
+    <button class="btn" onclick="window.print()">鑑定書を保存・印刷する（A4）</button>
+    <button class="btn ghost" onclick="retake()">もう一度鑑定する</button>
+  </div>`;
+
+  const rep=document.getElementById("report");
+  rep.innerHTML=sheet1+(unlocked?rest:lockSheet);
+  const ci=document.getElementById("codeInput");
+  if(ci)ci.addEventListener("keydown",e=>{if(e.key==="Enter")submitCode();});
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  rep.classList.add("active");
+  setThread(1,"結び — 鑑定書");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function retake(){
+  state.answers.fill(null);
+  document.querySelectorAll('#panel-q1 input,#panel-q2 input,#panel-q3 input,#panel-q4 input,#panel-q5 input').forEach(i=>i.checked=false);
+  goTo("cover");
+}
+/* ===== 解除コード・前回の鑑定 ===== */
+function loadSaved(){
+  try{const d=JSON.parse(lsGet(LS_SAVE));if(d&&d.basic&&d.basic.name&&Array.isArray(d.answers)&&d.answers.every(a=>a!==null))return d;}catch(e){}
+  return null;
+}
+function resumeReport(){
+  const d=loadSaved();if(!d)return;
+  state.basic=d.basic;
+  d.answers.forEach((a,i)=>{state.answers[i]=a;});
+  renderReport();
+}
+async function submitCode(){
+  const msg=document.getElementById("codeMsg");
+  const val=document.getElementById("codeInput").value;
+  msg.textContent="確認しています…";
+  if(await codeOk(val)){
+    lsSet(LS_UNLOCK,"1");
+    msg.textContent="";
+    renderReport();
+  }else{
+    msg.textContent="コードが一致しませんでした。メールに届いたコードを、ハイフンも含めてそのまま入れてください。";
+  }
+}
+async function checkUrlCode(){
+  const p=new URLSearchParams(location.search);
+  const c=p.get("code");
+  if(!c)return;
+  history.replaceState(null,"",location.pathname);
+  if(await codeOk(c)){
+    lsSet(LS_UNLOCK,"1");
+    if(loadSaved()){resumeReport();}
+    else{document.getElementById("unlockNotice").hidden=false;}
+  }
+}
+
+/* ===== 初期化 ===== */
+initBasic();
+buildQuestionPanels();
+setThread(0,"はじまり");
+if(loadSaved())document.getElementById("resumeRow").hidden=false;
+checkUrlCode();
+</script>
+</body>
+</html>
