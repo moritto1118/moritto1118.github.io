@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>恋の攻略図｜ホントの自分で、なぜか？愛される。恋愛パターン鑑定</title>
+<meta name="description" content="生年月日と25の質問から、自分の恋のクセと、自分に合った恋の進め方を読み解く鑑定書。第一の書は無料で読めます。">
+<meta property="og:title" content="恋の攻略図 — ホントの自分で、なぜか？愛される。—">
+<meta property="og:description" content="生年月日と25の質問から、自分に合った恋の進め方を一冊の鑑定書に。第一の書は無料。">
+<meta property="og:type" content="website">
+<!-- OGP画像ができたら有効に（SNSでシェアされた時に出る画像。1200×630） -->
+<!-- <meta property="og:image" content="https://moritto.net/images/koi-ogp.jpg"> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sakura: #F3ECEF;   /* 薄桜鼠 */
+    --kobai: #7C2D4A;    /* 深紅梅 */
+    --ito: #C4344F;      /* 赤い糸 */
+    --kincha: #A8813F;   /* 金茶 */
+    --sumi: #3B2A31;     /* 本文の墨色 */
+    --washi: #FBF8F9;    /* 和紙の白 */
+    --usuzumi: #6E5C63;  /* 補足文字 */
+    --line: #E4D6DC;
+    --thread-x: 28px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--sakura);
+    color: var(--sumi);
+    font-family: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+    font-size: 16px;
+    line-height: 2;
+    letter-spacing: 0.04em;
+    font-feature-settings: "palt" 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--kobai); }
+  :focus-visible { outline: 2px solid var(--kincha); outline-offset: 3px; }
+
+  /* ===== 全体を貫く「赤い糸」 ===== */
+  main { position: relative; }
+  main::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: var(--thread-x);
+    width: 1.5px;
+    background: var(--ito);
+    opacity: .55;
+  }
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 22px 0 calc(var(--thread-x) + 30px);
+  }
+  section { position: relative; padding: 72px 0; }
+  /* 各章の見出しに、糸の「結び目」 */
+  .knot::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--thread-x) - 5px);
+    margin-top: .7em;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--sakura);
+    border: 2px solid var(--ito);
+  }
+  .chapter {
+    display: block;
+    color: var(--kincha);
+    font-size: .85rem;
+    letter-spacing: .3em;
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-size: 1.55rem;
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--kobai);
+    margin: 0 0 28px;
+  }
+  p { margin: 0 0 1.2em; }
+  .note { font-size: .9rem; color: var(--usuzumi); }
+
+  /* ===== 画像の差し込み枠 ===== */
+  .img-slot {
+    position: relative;
+    border: 1px dashed var(--kincha);
+    background: var(--washi);
+    color: var(--kincha);
+    font-size: .8rem;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .img-slot img { width: 100%; height: 100%; object-fit: cover; }
+  .img-slot:has(img) { border: none; }
+  /* 画像がまだ入っていない枠は表示しない（画像を入れたら自動で出る） */
+  .img-slot:not(:has(img)) { display: none; }
+  .author:not(:has(img)) { grid-template-columns: 1fr; }
+
+  /* ===== ヒーロー ===== */
+  .hero { padding: 56px 0 64px; }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .hero-title {
+    writing-mode: vertical-rl;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: .25em;
+    line-height: 1;
+    color: var(--kobai);
+    margin: 0;
+  }
+  .hero-kind { color: var(--kincha); font-size: .85rem; letter-spacing: .3em; margin: 0 0 14px; }
+  .tagline { font-size: 1.25rem; font-weight: 600; line-height: 1.8; color: var(--sumi); margin: 0 0 20px; }
+  .hero-hook { font-size: 1.05rem; font-weight: 600; color: var(--kobai); line-height: 1.9; margin: 0 0 12px; }
+  .hero-lead { margin: 0 0 28px; }
+  .hero-img { aspect-ratio: 4 / 3; margin: 40px 0 0; }
+
+  .btn {
+    display: inline-block;
+    background: var(--ito);
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    padding: 17px 36px;
+    border-radius: 2px;
+    transition: background-color .2s ease;
+  }
+  .btn:hover { background: var(--kobai); }
+  .btn-note { display: block; margin-top: 10px; font-size: .85rem; color: var(--usuzumi); }
+
+  /* ===== 恋のクセ ===== */
+  .kuse-list { list-style: none; padding: 0; margin: 0 0 32px; }
+  .kuse-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .kuse-list li:first-child { border-top: 1px solid var(--line); }
+  .turn { font-size: 1.15rem; font-weight: 600; color: var(--kobai); line-height: 1.8; }
+
+  /* ===== しくみ ===== */
+  .pair { display: grid; gap: 18px; margin-bottom: 24px; }
+  .pair div {
+    background: var(--washi);
+    padding: 22px 24px;
+    border-top: 2px solid var(--kincha);
+  }
+  .pair h3 { font-size: 1.05rem; color: var(--kobai); margin: 0 0 6px; font-weight: 600; }
+  .pair p { margin: 0; font-size: .95rem; }
+
+  /* ===== 重なる要素（糸の束） ===== */
+  .layers { list-style: none; padding: 0; margin: 0 0 28px; }
+  .layers li {
+    position: relative;
+    padding: 8px 0 8px 26px;
+  }
+  .layers li::before {
+    content: "";
+    position: absolute; left: 0; top: 50%;
+    width: 16px; height: 1.5px;
+    background: var(--kincha);
+  }
+  .layers li:last-child::before { background: var(--ito); }
+  .types-img { aspect-ratio: 16 / 9; margin-top: 28px; }
+
+  /* ===== 鑑定書の中身 ===== */
+  .book { background: var(--washi); padding: 28px 26px; margin-bottom: 18px; }
+  .book.paid { border: 1.5px solid var(--kincha); }
+  .bridge { margin: 36px 0 18px; }
+  .bridge-h { font-size: 1.15rem; font-weight: 600; color: var(--kobai); line-height: 1.8; margin-bottom: 10px; }
+  .book-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 14px; }
+  .book-head h3 { margin: 0; font-size: 1.15rem; color: var(--kobai); font-weight: 600; }
+  .price { font-size: 1.35rem; font-weight: 700; color: var(--kobai); }
+  .price small { font-size: .8rem; font-weight: 400; color: var(--usuzumi); }
+  .book ul { margin: 0; padding-left: 1.2em; }
+  .book li { margin-bottom: 4px; }
+  .pages-fig { margin: 32px 0 0; }
+  .pages-fig figcaption { text-align: center; font-size: .85rem; color: var(--usuzumi); margin-top: 6px; }
+  /* 本編の見本：鑑定書の紙をそのまま切り取ったように */
+  .excerpt { margin-top: 40px; }
+  .ex-label { font-size: .9rem; color: var(--kincha); letter-spacing: .1em; margin-bottom: 14px; }
+  .ex-sheet {
+    background: #FFFDFD;
+    border: 1px solid var(--line);
+    padding: 26px 26px 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(124, 45, 74, .06);
+  }
+  .ex-no { font-size: .8rem; color: var(--kincha); letter-spacing: .3em; margin: 0 0 2px; }
+  .ex-h { font-size: 1.05rem; font-weight: 600; color: var(--kobai); margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .ex-body { font-size: .93rem; line-height: 2; margin: 0; }
+  .ex-blur {
+    margin-top: .2em;
+    filter: blur(4px);
+    -webkit-user-select: none; user-select: none;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
+    mask-image: linear-gradient(to bottom, #000 30%, transparent);
+  }
+  .ex-lock {
+    text-align: center; margin: 4px 0 0;
+    font-size: .85rem; color: var(--kobai); letter-spacing: .15em;
+  }
+  .ex-step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; }
+  .ex-num {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--kobai); color: #fff; font-weight: 600; font-size: .9rem;
+  }
+  .ex-step-t { font-weight: 600; color: var(--kobai); margin: 0 0 4px; }
+
+  /* ===== つくった人 ===== */
+  .author { display: grid; grid-template-columns: 112px 1fr; gap: 22px; align-items: start; }
+  .author-img { aspect-ratio: 1; border-radius: 50%; }
+  .author-name { font-size: 1.15rem; font-weight: 600; color: var(--kobai); margin: 0; }
+  .author-role { font-size: .85rem; color: var(--usuzumi); margin: 0 0 12px; }
+  .message { margin-top: 24px; padding-left: 18px; border-left: 2px solid var(--kincha); }
+
+  /* ===== 流れ ===== */
+  .steps { list-style: none; counter-reset: step; padding: 0; margin: 0; }
+  .steps li { counter-increment: step; display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding-bottom: 22px; }
+  .steps li::before {
+    content: counter(step);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--kobai);
+    color: var(--kobai);
+    font-weight: 600;
+  }
+  .steps strong { display: block; color: var(--kobai); font-weight: 600; }
+  .steps span { font-size: .93rem; }
+
+  /* ===== よくある質問 ===== */
+  details { border-bottom: 1px solid var(--line); }
+  details:first-of-type { border-top: 1px solid var(--line); }
+  summary {
+    cursor: pointer; list-style: none;
+    padding: 16px 28px 16px 0; position: relative;
+    font-weight: 600; color: var(--kobai);
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "＋"; position: absolute; right: 0; top: 16px; color: var(--kincha); }
+  details[open] summary::after { content: "－"; }
+  details p { margin: 0 0 18px; font-size: .95rem; }
+
+  /* ===== 最後の誘導 ===== */
+  .final { text-align: left; padding-bottom: 96px; }
+  .final .turn { margin-bottom: 24px; }
+
+  footer {
+    background: var(--kobai);
+    color: #F3ECEF;
+    font-size: .85rem;
+    padding: 36px 22px calc(36px + env(safe-area-inset-bottom, 0px));
+    text-align: center;
+  }
+  footer a { color: #F3ECEF; }
+  footer p { margin: 0 0 6px; }
+
+  /* ===== スマホの下部固定ボタン ===== */
+  .sticky-cta {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(243, 236, 239, .96);
+    border-top: 1px solid var(--line);
+    text-align: center;
+    transform: translateY(110%);
+    transition: transform .3s ease;
+    z-index: 10;
+  }
+  .sticky-cta.show { transform: translateY(0); }
+  .sticky-cta .btn { display: block; padding: 14px; }
+
+  /* ===== ひとつだけの動き：ヒーローで糸が下りてくる ===== */
+  @media (prefers-reduced-motion: no-preference) {
+    main::before { transform-origin: top; animation: thread 1.6s ease-out both; }
+    @keyframes thread { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .sticky-cta { transition: none; }
+  }
+
+  @media (min-width: 720px) {
+    :root { --thread-x: 48px; }
+    .hero { padding: 88px 0 72px; }
+    .hero-title { font-size: 4rem; }
+    .tagline { font-size: 1.45rem; }
+    h2 { font-size: 1.8rem; }
+    .pair { grid-template-columns: 1fr 1fr; }
+    .sticky-cta { display: none; }
+  }
+  @media (max-width: 380px) {
+    .hero-title { font-size: 2.5rem; }
+    .author { grid-template-columns: 1fr; }
+    .author-img { width: 112px; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- ===== ヒーロー ===== -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <div class="hero-inner">
+        <h1 class="hero-title">恋の攻略図</h1>
+        <div>
+          <p class="hero-kind">恋愛パターン鑑定</p>
+          <p class="tagline">ホントの自分で、<br>なぜか？愛される。</p>
+          <p class="hero-hook">「今度こそ」と思った恋で、<br>また同じことで悩んでいませんか。</p>
+          <p class="hero-lead">生年月日と25の質問から、自分の恋のクセと、自分に合う恋の進め方を読み解き、一冊の鑑定書にまとめます。</p>
+          <a class="btn" href="https://moritto.net/koi-koryakuzu.html">無料で恋のクセを見てみる</a>
+          <span class="btn-note">約7〜10分／第一の書は無料<br>本編は500円（税込）。無料の結果を読んでから選べます</span>
+        </div>
+      </div>
+
+      <!-- 【画像①】ヒーロー画像（4:3） 例：images/koi-hero.jpg -->
+      <div class="img-slot hero-img">
+        <img src="images/koi-hero.jpg" alt="桜と金色の光の中を、結び目のある赤い糸がのびていく" width="1200" height="900">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 恋のクセ ===== -->
+  <section>
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">一</span>いつも、同じところでつまずく</h2>
+      <ul class="kuse-list">
+        <li>追いかけると燃えるのに、追われると冷めてしまう</li>
+        <li>長く続くのに、心から好きになれる人に出会えない</li>
+        <li>大事にしてくれる人がいるのに、選ぶのはいつも似たような人</li>
+        <li>好きになるほど不安になって、自分らしくいられなくなる</li>
+      </ul>
+      <p class="turn">それは性格の欠点ではなく、恋の「クセ」です。<br>クセは、知ってしまえば攻略できます。</p>
+    </div>
+  </section>
+
+  <!-- ===== しくみ ===== -->
+  <section>
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">二</span>二つの視点を重ねて読み解きます</h2>
+      <div class="pair">
+        <div>
+          <h3>生まれ持った資質</h3>
+          <p>生年月日から数秘術と星座を読み解き、もともとの恋の傾向と、今年の恋の流れを出します。</p>
+        </div>
+        <div>
+          <h3>今の心のクセ</h3>
+          <p>25の質問から、恋愛で無意識にとっている行動や、相手との距離の取り方を読み取ります。</p>
+        </div>
+      </div>
+      <p>この二つを重ね合わせて、自分の恋愛タイプと、自分に合った恋の進め方を読み解きます。</p>
+    </div>
+  </section>
+
+  <!-- ===== 一人ずつ違う鑑定書 ===== -->
+  <section>
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">三</span>同じタイプでも、鑑定書は一人ずつ違う</h2>
+      <p>恋愛タイプは、鑑定書の入り口です。そこに、いくつもの糸を重ねて読み解きます。</p>
+      <ul class="layers">
+        <li>生年月日から読む、数秘と星座</li>
+        <li>25の質問から見える、心のクセ</li>
+        <li>人との距離の取り方を映す、愛着スタイル</li>
+        <li>恋のバランスを映す、レーダーチャート</li>
+        <li>今年の恋の流れ</li>
+      </ul>
+      <p class="turn">だから、同じタイプの人でも、<br>記される内容は一人ずつ変わります。</p>
+      <p class="note">「月待ちの人」「篝火の人」「北極星の人」……自分がどんな恋をする人なのかは、鑑定の結果で。</p>
+
+      <!-- 【画像②】糸が重なって一本の道になるイメージ（16:9） 例：images/koi-threads.jpg -->
+      <div class="img-slot types-img">
+        <img src="images/koi-threads.jpg" alt="何本もの金色の糸が重なり合い、一本の赤い糸になっていく様子" width="1600" height="900">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 鑑定書の中身 ===== -->
+  <section id="contents">
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">四</span>鑑定書に記すこと</h2>
+
+      <div class="book">
+        <div class="book-head">
+          <h3>第一の書</h3>
+          <span class="price">無料</span>
+        </div>
+        <ul>
+          <li>自分の恋愛タイプ</li>
+          <li>恋のバランスを映すレーダーチャート</li>
+          <li>自分の愛着スタイル</li>
+        </ul>
+      </div>
+
+      <div class="bridge">
+        <p class="bridge-h">自分の恋のクセがわかったら、<br>次は「どう進めるか」へ。</p>
+        <p>「たしかに、こういう恋をしやすい」。そう感じたあとに知りたくなるのは、「じゃあ、これからどうしたらいい？」ということ。本編では、繰り返しやすい恋のパターンと落とし穴を読み解き、自分に合った恋の進め方を五箇条に。さらに、これから取り組めることを90日の実践プランにまとめます。</p>
+      </div>
+
+      <div class="book paid">
+        <div class="book-head">
+          <h3>本編　第二〜第九の書</h3>
+          <span class="price">500円<small>（税込）</small></span>
+        </div>
+        <ul>
+          <li>同じ恋を繰り返してしまう本当の理由</li>
+          <li>気をつけたい恋の落とし穴</li>
+          <li>自分専用の恋愛攻略パターン 五箇条</li>
+          <li>相性の良い相手</li>
+          <li>今年の恋の流れ</li>
+          <li>「なりたい未来」へ進む90日の実践プラン</li>
+        </ul>
+      </div>
+
+      <p class="note">A4・4枚の鑑定書として、保存・印刷できます。<br>第一の書を読んでから、続きを読むかどうか決められます。</p>
+
+      <!-- 鑑定書（A4・4枚）のイメージ：アプリの実際の画面から作成 -->
+      <figure class="pages-fig">
+        <img src="images/koi-sample-pages.jpg" alt="A4・4枚の鑑定書のイメージ" width="1600" height="940" loading="lazy">
+        <figcaption>鑑定書のイメージ（A4・4枚）</figcaption>
+      </figure>
+
+      <!-- 本編の見本（アプリの実際の鑑定文から抜粋） -->
+      <div class="excerpt" aria-label="本編の見本">
+        <p class="ex-label">本編より、ほんの一部をご紹介します（月待ちの人の場合）</p>
+
+        <div class="ex-sheet">
+          <p class="ex-no">第三の書</p>
+          <p class="ex-h">恋のクセの正体 — なぜ、繰り返すのか</p>
+          <p class="ex-body">月待ちの人がつまずくのは、「好きになってくれた人」と「自分が本当に望む人」のズレです。アプローチされると悪い気はせず、断るのも申し訳なくて、なんとなく始まる恋。けれど心のどこかで「この人でいいのかな」という小さな声が消えない。</p>
+          <div class="ex-blur" aria-hidden="true">
+            <p class="ex-body">あるいは逆に、強引に引っ張ってくれる人の熱量を「愛」と読み違えて、気づけば相手のペースに飲み込まれている。どちらの場合も、恋の中心に「自分の意志」が置かれていないことが、長続きしない・満たされない本当の原因です。</p>
+          </div>
+          <p class="ex-lock">この続きは本編で</p>
+        </div>
+
+        <div class="ex-sheet">
+          <p class="ex-no">第六の書</p>
+          <p class="ex-h">あなた専用・恋愛攻略パターン 五箇条</p>
+          <div class="ex-step">
+            <span class="ex-num">四</span>
+            <div>
+              <p class="ex-step-t">違和感は48時間以内に言葉にする</p>
+              <p class="ex-body">我慢グセのあるあなたは、不満を溜めてから冷める傾向があります。</p>
+              <div class="ex-blur" aria-hidden="true">
+                <p class="ex-body">小さな違和感は48時間以内に『責めない言い方』で伝える。「〜してくれると嬉しいな」の形なら、関係は壊れず深まります。</p>
+              </div>
+            </div>
+          </div>
+          <p class="ex-lock">この続きは本編で</p>
+        </div>
+
+        <p class="note" style="margin:16px 0 0">続きと、ほかの四箇条は本編で。自分のタイプと回答に合わせた内容が記されます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== つくった人 ===== -->
+  <section>
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">五</span>この鑑定をつくった人</h2>
+      <div class="author">
+        <!-- 【画像④】プロフィール写真（正方形） 例：images/moritto.jpg -->
+        <div class="img-slot author-img">
+          <!-- <img src="images/moritto.jpg" alt="モリット" width="400" height="400"> -->
+        </div>
+        <div>
+          <p class="author-name">moritto【モリット】</p>
+          <p class="author-role">恋愛カウンセラー・作家</p>
+          <p style="font-size:.93rem">何千人もの方の恋愛相談にのり、多くの人が恋愛成就していく姿も見てきました。<br>著書に『未来設定で幸せな恋愛を引き寄せる』『恋愛の底から抜け出して今より1000倍幸せになる方法』。</p>
+        </div>
+      </div>
+      <div class="message">
+        <p>長年、恋愛相談を受ける中で、強く感じてきたことがあります。<br>それは、同じような恋の悩みでも、必要なアドバイスは一人ひとり違うということです。</p>
+        <p>不安になる場面も、心地よい距離も、好きな人への気持ちの伝え方も、人それぞれ違います。<br>けれど、自分がどんなパターンで恋につまずきやすいのか、どこに気をつけたらいいのかは、案外、自分では気づきにくいものです。</p>
+        <p>「頭ではわかっているのに、また同じことをしてしまった」<br>そんなとき、自分を責める前に、まずは自分の恋のクセを知ってみてほしい。</p>
+        <p>どんなときに不安になりやすいのか。<br>どんな相手に惹かれやすいのか。<br>どんな関わり方なら、自分らしくいられるのか。</p>
+        <p>自分特有の恋愛パターンや心のクセがわかると、気をつけたいことや、自分に合った対策も見えてきます。</p>
+        <p>「恋の攻略図」では、生年月日と25の質問を重ね合わせて、あなたの恋の傾向と、あなたに合った進め方を読み解きます。</p>
+        <p>自分の傾向を知った、その先の<br>「じゃあ、うちはどうしたらいいんやろ？」<br>そこまで応えられるように、これからの恋で気をつけたいことや、実践できることまで、具体的にアドバイスしています。</p>
+        <p>自分の気持ちを大事にしながら、好きな人との関係を育てていってほしい。<br>そして、恋をする毎日を、もっと楽しんでほしい。<br>そんな思いから、この「恋の攻略図」をつくりました。</p>
+        <p>あなたに合った恋の進め方を見つけるために、ぜひ、この鑑定書を役立ててください。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 流れ ===== -->
+  <section>
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">六</span>鑑定の流れ</h2>
+      <ol class="steps">
+        <li><div><strong>生年月日を入力し、25の質問に答える</strong><span>所要時間は約7〜10分です。</span></div></li>
+        <li><div><strong>第一の書を無料で読む</strong><span>恋愛タイプ・レーダーチャート・愛着スタイルがすぐにわかります。</span></div></li>
+        <li><div><strong>続きを読みたい方は、本編を申し込む</strong><span>鑑定書の中の「本編を購入する」ボタンからお申し込みいただけます。</span></div></li>
+        <li><div><strong>届いたメールのリンクから、本編を読む</strong><span>お支払い後、解除コードのメールが自動で届きます。</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== よくある質問 ===== -->
+  <section>
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">七</span>よくある質問</h2>
+      <details>
+        <summary>占いですか？</summary>
+        <p>数秘術と星座を取り入れていますが、未来を言い当てたり断定したりするものではありません。自分の傾向を知って、恋の進め方を考えるための鑑定です。</p>
+      </details>
+      <details>
+        <summary>本当に無料で読めますか？</summary>
+        <p>はい。第一の書は無料で、最後まで読めます。本編に進むかどうかは、読んだあとで決められます。</p>
+      </details>
+      <details>
+        <summary>支払い方法は何がありますか？</summary>
+        <p>PayPalでお支払いいただけます。PayPalのアカウントがなくても、クレジットカードで支払えます。銀行振込をご希望の方は、お申し込み後のご案内メールに沿ってお手続きください。入金を確認したあと、解除コードをお送りします。</p>
+      </details>
+      <details>
+        <summary>解除コードのメールが届きません</summary>
+        <p>迷惑メールフォルダに入っていないかご確認ください。それでも見つからない場合は、<a href="https://moritto.net/tokusho.html">特定商取引法に基づく表記</a>の連絡先までご連絡ください。</p>
+      </details>
+      <details>
+        <summary>スマートフォンでも使えますか？</summary>
+        <p>はい。スマートフォンでもパソコンでもお使いいただけます。鑑定書はA4サイズで印刷もできます。</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===== 最後の誘導 ===== -->
+  <section class="final">
+    <div class="wrap">
+      <h2 class="knot"><span class="chapter">結</span>自分の恋の地図を、ひらく</h2>
+      <p class="turn">まずは無料の第一の書で、<br>自分の恋愛タイプを確かめてみてください。</p>
+      <a class="btn" href="https://moritto.net/koi-koryakuzu.html">無料で恋のクセを見てみる</a>
+      <span class="btn-note">約7〜10分／第一の書は無料<br>本編は500円（税込）。無料の結果を読んでから選べます</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>株式会社moritto</p>
+  <p><a href="https://moritto.net/tokusho.html">特定商取引法に基づく表記</a></p>
+  <p>&copy; 2026 moritto</p>
+</footer>
+
+<!-- スマホだけ：ヒーローのボタンが見えなくなったら、下に固定ボタンを出す -->
+<div class="sticky-cta" id="stickyCta" aria-hidden="true">
+  <a class="btn" href="https://moritto.net/koi-koryakuzu.html" tabindex="-1">無料で恋のクセを見てみる</a>
+</div>
+
+<script>
+  (function () {
+    var hero = document.getElementById('top');
+    var bar = document.getElementById('stickyCta');
+    var finalSec = document.querySelector('.final');
+    if (!('IntersectionObserver' in window) || !hero || !bar) return;
+    var heroVisible = true, finalVisible = false;
+    function update() {
+      var show = !heroVisible && !finalVisible;
+      bar.classList.toggle('show', show);
+      bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+      bar.querySelector('a').tabIndex = show ? 0 : -1;
+    }
+    new IntersectionObserver(function (e) { heroVisible = e[0].isIntersecting; update(); }).observe(hero);
+    if (finalSec) new IntersectionObserver(function (e) { finalVisible = e[0].isIntersecting; update(); }).observe(finalSec);
+  })();
+</script>
+
+</body>
+</html>
